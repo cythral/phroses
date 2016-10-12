@@ -36,7 +36,7 @@ abstract class Phroses {
 		self::SetupMode();
 		self::LoadModels();
 		self::LoadSiteInfo();
-		self::RenderPage();
+		self::Render();
 	}
 	
 	static public function SetupMode() {
@@ -68,10 +68,7 @@ abstract class Phroses {
 		// Determine Response Type
 		$response = "PAGE-200";
 		if(count($info) == 0) $response = "SYSTEM-404"; 
-		if(!isset(($info = $info[0])->pageID)) { // Page not found
-			$response = "PAGE-404";
-			if(REQ["TYPE"] == "asset" && file_exists(INCLUDES["THEMES"]."/{$info->theme}".REQ["PATH"])) $response = "ASSET-200";
-		}
+		if(!isset(($info = $info[0])->pageID)) $response = "PAGE-404";
 			
 		// Setup the site constant
 		define("Phroses\SITE", [
@@ -85,10 +82,19 @@ abstract class Phroses {
 		]);
 	}
 	
-	static public function RenderPage() {
-		$out = new Theme(SITE["THEME"]);
-		$out->content = SITE["PAGE"]["CONTENT"];
-		die($out);
+	static public function Render() {
+		$theme = new Theme(SITE["THEME"]);
+		
+		if(SITE["RESPONSE"] == "PAGE-200") {
+			$theme->title = SITE["PAGE"]["TITLE"];
+			$theme->content = SITE["PAGE"]["CONTENT"];
+			die($theme);
+		}
+		
+		if($theme->AssetExists(REQ["PATH"])) {
+			$theme->AssetRead(REQ["PATH"]);
+			die;
+		}
 	}
 }
 

@@ -6,7 +6,7 @@ final class Theme extends Template {
 	private $root;
 	
 	public function __construct(string $name) {
-		$this->root = INCLUDES["THEMES"]."/".strtolower($name);
+		$this->root = INCLUDES["THEMES"]."/".strtolower($name);		
 		if(!file_exists($this->root)) throw new \Exception("Theme doesn't exist");
 		if(!file_exists("{$this->root}/page.tpl")) throw new \Exception("Theme template doesn't exist");
 		
@@ -16,5 +16,13 @@ final class Theme extends Template {
 		};
 		
 		parent::__construct("{$this->root}/page.tpl");
+	}
+	
+	public function AssetExists(string $asset) : bool {
+		return (file_exists("{$this->root}/assets{$asset}"));
+	}
+	
+	public function AssetRead(string $asset) {
+		if($this->AssetExists($asset)) readfile("{$this->root}/assets{$asset}");
 	}
 }

@@ -11,6 +11,28 @@ $extension = ($extension == "") ? null : $extension;
 $domainParts = explode(".", $_SERVER["HTTP_HOST"]);
 parse_str(strtok("?"), $_GET);
 
+const MIME_TYPES = [
+	"" => "text/html; charset=utf8",
+	"php" => "text/html; charset=utf8",
+	"html" => "text/html; charset=utf8",
+	"xml" => "application/xml; charset=utf8",
+	"json" => "application/json; charset=utf8",
+	"js" => "text/javascript; charset=utf8",
+	"css" => "text/css; charset=utf8",
+	"woff" => "application/font-woff",
+	"woff2" => "font/woff2",
+	"ttf" => "font/ttf",
+	"png" => "image/png",
+	"jpg" => "image/jpeg",
+	"jpeg" => "image/jpeg",
+	"gif" => "image/gif",
+	"pdf" => "application/pdf",
+	"webp" => "image/webp",
+	"otf" => "application/font-otf",
+	"ico" => "image/x-icon",
+	"tpl" => "text/html; charset=utf8"
+];
+
 define("Phroses\REQ", [
 	"PROTOCOL" => $_SERVER["SERVER_PROTOCOL"],
 	"H2PUSH" => (bool)($_SERVER["H2PUSH"] ?? false),
@@ -32,3 +54,6 @@ define("Phroses\REQ", [
 	"SUBDOMAIN" => (count($domainParts) == 2) ? "main" : implode(".", array_slice($domainParts, 2)),
 	"TYPE" => (isset($extension)) ? "asset" : "page"
 ]);
+
+if(array_key_exists(strtolower(REQ["EXTENSION"]), MIME_TYPES)) header("content-type: ".MIME_TYPES[strtolower(REQ["EXTENSION"])]);
+else header("content-type: ".MIME_TYPES[""]);
