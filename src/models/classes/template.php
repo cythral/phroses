@@ -8,7 +8,7 @@ class Template {
 	protected $vars = [];
 	static public $defaultFilters = [];
     
-    public function __construct(string $tpl, array $vars) {
+    public function __construct(string $tpl, array $vars = []) {
 		if(is_file($tpl) && !file_exists($tpl)) throw new \Exception("Bad Parameter \$tpl");
         $this->tpl = (is_file($tpl)) ? file_get_contents($tpl) : $tpl;
 		$this->vars = $vars;
@@ -33,8 +33,11 @@ class Template {
     }
 	
 	public function __set($key, $val) {
-		$key = strtolower($key);
 		$this->tpl = str_replace("<{var:{$key}}>", $val, $this->tpl);
+	}
+	
+	public function __toString() {
+		return $this->tpl;
 	}
 }
 
@@ -44,8 +47,8 @@ Template::$defaultFilters = [
 		if(file_exists("{$file}.php")) include "{$file}.php"; 
 	},
 	
-	"var" => function($arg) {
-		if(array_key_exists($arg, $this->args)) echo $this->args[$arg];
-		else echo "<{var:{$arg}}>";
+	"var" => function($var) {
+		if(array_key_exists($var, $this->vars)) echo $this->vars[$var];
+		else echo "<{var:{$var}}>";
 	}
 ];
