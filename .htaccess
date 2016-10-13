@@ -3,6 +3,8 @@ php_value display_errors 1
 php_value expose_php 0
 php_value error_reporting 6143
 
+header unset x-powered-by
+
 RewriteEngine on
 RewriteBase /
-RewriteRule ^(.*)$ src/phroses.php
+RewriteRule ^(.*)$ src/phroses.php [L]

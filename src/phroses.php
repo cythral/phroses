@@ -9,6 +9,7 @@ define("Phroses\CONF", parse_ini_file(ROOT."/phroses.conf", true));
 define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",
 	"MODELS" => SRC."/models/classes",
+	"VIEWS" => SRC."/views",
 	"META" => [ // ORDER OF THESE IS IMPORTANT
 		"TRAITS" => SRC."/models/traits",
 		"INTERFACES" => SRC."/models/interfaces"
@@ -29,7 +30,7 @@ abstract class Phroses {
 	];
 	
 	static public function Start() {
-		if(self::$ran) return true; // only run once
+		if(self::$ran) return; // only run once
 		include SRC."/functions.php"; // include functions
 		include SRC."/request.php";
 		
@@ -68,7 +69,10 @@ abstract class Phroses {
 		// Determine Response Type
 		$response = "PAGE-200";
 		if(count($info) == 0) $response = "SYSTEM-404"; 
-		if(!isset(($info = $info[0])->pageID)) $response = "PAGE-404";
+		if(!isset(($info = $info[0])->pageID)) $response = "UNDETERMINED";
+		if(file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
+		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
+		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) $response = "SYSTEM-200";
 			
 		// Setup the site constant
 		define("Phroses\SITE", [
@@ -83,18 +87,40 @@ abstract class Phroses {
 	}
 	
 	static public function Render() {
+		ob_start("ob_gzhandler");
 		$theme = new Theme(SITE["THEME"]);
 		
 		if(SITE["RESPONSE"] == "PAGE-200") {
 			$theme->title = SITE["PAGE"]["TITLE"];
 			$theme->content = SITE["PAGE"]["CONTENT"];
-			die($theme);
+			echo $theme;
 		}
 		
-		if($theme->AssetExists(REQ["PATH"])) {
-			$theme->AssetRead(REQ["PATH"]);
-			die;
+		if(SITE["RESPONSE"] == "SYSTEM-200") {
+			if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]) && strtolower(REQ["EXTENSION"]) != "php") readfile(INCLUDES["VIEWS"].REQ["PATH"]);
+			else {
+				ob_start();
+				if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
+				else include INCLUDES["VIEWS"].REQ["PATH"].".php";
+				
+				$theme->title = $title;
+				$theme->content = trim(ob_get_clean());
+				echo $theme;
+			}
 		}
+		
+		if(SITE["RESPONSE"] == "UNDETERMINED") {
+			if($theme->AssetExists(REQ["PATH"])) $theme->AssetRead(REQ["PATH"]); // Assets
+			else if($theme->ErrorExists("404")) $theme->ErrorRead("404"); // Site-Level 404
+			else { // Generic Site 404
+				$theme->title = "404 Not Found";
+				$theme->content = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
+				echo $theme;
+			}
+		}
+		
+		ob_end_flush();
+		flush();
 	}
 }
 

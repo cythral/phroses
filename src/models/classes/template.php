@@ -12,7 +12,7 @@ class Template {
 		if(is_file($tpl) && !file_exists($tpl)) throw new \Exception("Bad Parameter \$tpl");
         $this->tpl = (is_file($tpl)) ? file_get_contents($tpl) : $tpl;
 		$this->vars = $vars;
-        $this->Process();
+		$this->Process();
     }
 	
 	protected function Filter(string $name, callable $filter) {

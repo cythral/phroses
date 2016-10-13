@@ -10,11 +10,6 @@ final class Theme extends Template {
 		if(!file_exists($this->root)) throw new \Exception("Theme doesn't exist");
 		if(!file_exists("{$this->root}/page.tpl")) throw new \Exception("Theme template doesn't exist");
 		
-		// Theme Includes Shortcut Filter
-		$this->filters["theme"] = function($file) {
-			if(file_exists("{$this->root}/{$file}.php")) include "{$this->root}/{$file}.php";
-		};
-		
 		parent::__construct("{$this->root}/page.tpl");
 	}
 	
@@ -25,4 +20,24 @@ final class Theme extends Template {
 	public function AssetRead(string $asset) {
 		if($this->AssetExists($asset)) readfile("{$this->root}/assets{$asset}");
 	}
+	
+	public function ErrorExists(string $error) : bool {
+		return (file_exists("{$this->root}/errors/{$error}.php"));
+	}
+	
+	public function ErrorRead(string $error) {
+		if($this->ErrorExists($error)) {
+			ob_start();
+			include "{$this->root}/errors/{$error}.php";
+			$this->title = $title ?? "404 Not Found";
+			$this->content = trim(ob_get_clean());
+			echo $this;
+			ob_end_flush();
+		}
+	}
 }
+
+
+Theme::$defaultFilters["theme.file"] = function($file) {
+	if(file_exists("{$this->root}/{$file}.php")) include "{$this->root}/{$file}.php";
+};
