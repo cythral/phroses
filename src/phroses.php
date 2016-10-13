@@ -70,9 +70,9 @@ abstract class Phroses {
 		$response = "PAGE-200";
 		if(count($info) == 0) $response = "SYSTEM-404"; 
 		if(!isset(($info = $info[0])->pageID)) $response = "UNDETERMINED";
-		if(file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
+		if(REQ["PATH"] != "/" && (file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
-		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) $response = "SYSTEM-200";
+		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php"))) $response = "SYSTEM-200";
 			
 		// Setup the site constant
 		define("Phroses\SITE", [

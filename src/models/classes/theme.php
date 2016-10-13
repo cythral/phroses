@@ -10,6 +10,8 @@ final class Theme extends Template {
 		if(!file_exists($this->root)) throw new \Exception("Theme doesn't exist");
 		if(!file_exists("{$this->root}/page.tpl")) throw new \Exception("Theme template doesn't exist");
 		
+		foreach(FileList("{$this->root}/assets/css") as $style) $this->Push("stylesheets", [ "src" => "/css/".pathinfo($style, PATHINFO_BASENAME)]);
+		
 		parent::__construct("{$this->root}/page.tpl");
 	}
 	
@@ -38,6 +40,6 @@ final class Theme extends Template {
 }
 
 
-Theme::$defaultFilters["theme.file"] = function($file) {
+Theme::$filters["include"] = function($file) {
 	if(file_exists("{$this->root}/{$file}.php")) include "{$this->root}/{$file}.php";
 };

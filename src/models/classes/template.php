@@ -4,20 +4,19 @@ namespace Phroses;
 
 class Template {
 	protected $tpl;
-    protected $filters = [];
 	protected $vars = [];
-	static public $defaultFilters = [];
+	protected $arrays = [];
+	static public $filters = [];
     
     public function __construct(string $tpl, array $vars = []) {
 		if(is_file($tpl) && !file_exists($tpl)) throw new \Exception("Bad Parameter \$tpl");
         $this->tpl = (is_file($tpl)) ? file_get_contents($tpl) : $tpl;
 		$this->vars = $vars;
-		$this->Process();
     }
 	
 	protected function Filter(string $name, callable $filter) {
         $return = "";
-        $this->tpl = preg_replace_callback("/<\{{$name}((:[a-zA-Z0-9_\-=]+)+)?\}>/", function($matches) use (&$return, $filter) {
+        $this->tpl = preg_replace_callback("/<\{{$name}((:[a-zA-Z0-9_\-=<>\'\"@\/ ]+)+)?\}>/", function($matches) use (&$return, $filter) {
             array_shift($matches);
             ob_start();
             $return = $filter->call($this, ...((isset($matches[0])) ? (explode(":", substr($matches[0], 1))) : []));
@@ -28,27 +27,42 @@ class Template {
     } 
     
     protected function Process() {
-		foreach(self::$defaultFilters as $key => $filter) $this->Filter($key, $filter);
-        foreach($this->filters as $key => $filter) $this->Filter($key, $filter);
+		foreach(self::$filters as $key => $filter) $this->Filter($key, $filter);
     }
 	
+	public function Push($array, $value) {
+		if(!array_key_exists($array, $this->arrays)) $this->arrays[$array] = [];
+		$this->arrays[$array][] = $value;
+	}
+	
 	public function __set($key, $val) {
-		$this->tpl = str_replace("<{var:{$key}}>", $val, $this->tpl);
+		$this->vars[$key] = $val;
 	}
 	
 	public function __toString() {
+		$this->Process();
 		return $this->tpl;
 	}
 }
 
 
-Template::$defaultFilters = [
+Template::$filters = [
 	"include" => function($file) { 
 		if(file_exists("{$file}.php")) include "{$file}.php"; 
 	},
 	
 	"var" => function($var) {
 		if(array_key_exists($var, $this->vars)) echo $this->vars[$var];
-		else echo "<{var:{$var}}>";
+	},
+	
+	"array" => function($key, $tpl) {
+		if(array_key_exists($key, $this->arrays) && is_array($this->arrays[$key])) {
+			foreach($this->arrays[$key] as $i) {
+				foreach($i as $k => $v) {
+					$tpl = str_replace("@{$k}", $v, $tpl);
+					echo $tpl;
+				}
+			}
+		}
 	}
 ];

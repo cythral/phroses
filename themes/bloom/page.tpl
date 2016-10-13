@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<{theme.tags:meta}>
+	<{array:meta:<meta name="@name" content="@content">}>
 	
 	<title><{var:title}></title>
-	<{theme.tags:style}>
-	<{theme.tags:script}>
+	
+	<{array:stylesheets:<link rel="stylesheet" href="@src" />}>
+	<{array:scripts:<script src="@src" @attrs></script>}>
 </head>
 <body>
-	<{theme.file:header}>
+	<{include:header}>
 	<{var:content}>
 </body>
 <html>
