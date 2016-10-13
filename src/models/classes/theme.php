@@ -11,6 +11,7 @@ final class Theme extends Template {
 		if(!file_exists("{$this->root}/page.tpl")) throw new \Exception("Theme template doesn't exist");
 		
 		foreach(FileList("{$this->root}/assets/css") as $style) $this->Push("stylesheets", [ "src" => "/css/".pathinfo($style, PATHINFO_BASENAME)]);
+		foreach(FileList("{$this->root}/assets/js") as $style) $this->Push("scripts", [ "src" => "/js/".pathinfo($style, PATHINFO_BASENAME)]);
 		
 		parent::__construct("{$this->root}/page.tpl");
 	}

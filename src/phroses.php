@@ -61,7 +61,7 @@ abstract class Phroses {
 	
 	static public function LoadSiteInfo() {
 		if(self::$ran) return;
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `pages`.`title`, `pages`.`content`, `pages`.`id` AS `pageID` FROM `sites` LEFT JOIN `pages` ON `pages`.`siteID`=`sites`.`id` AND `pages`.`uri`=? WHERE `sites`.`url`=?", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `pages`.`title`, `pages`.`content`, `pages`.`id` AS `pageID` FROM `sites` LEFT JOIN `pages` ON `pages`.`siteID`=`sites`.`id` AND `pages`.`uri`=? WHERE `sites`.`url`=?", [
 			REQ["PATH"],
 			REQ["BASEURL"]
 		]);
@@ -78,6 +78,7 @@ abstract class Phroses {
 		define("Phroses\SITE", [
 			"ID" => $info->id,
 			"RESPONSE" => $response,
+			"NAME" => $info->name,
 			"THEME" => $info->theme,
 			"PAGE" => [
 				"TITLE" => $info->title,

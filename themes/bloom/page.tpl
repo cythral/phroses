@@ -11,6 +11,9 @@
 </head>
 <body>
 	<{include:header}>
-	<{var:content}>
+	<main>
+		<{var:content}>
+	</main>
+	<{include:footer}>
 </body>
 <html>
