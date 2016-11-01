@@ -5,7 +5,7 @@ namespace Phroses;
 class Template {
 	protected $tpl;
 	protected $vars = [];
-	protected $arrays = [];
+	public $arrays = [];
 	static public $filters = [];
     
     public function __construct(string $tpl, array $vars = []) {
@@ -58,9 +58,10 @@ Template::$filters = [
 	"array" => function($key, $tpl) {
 		if(array_key_exists($key, $this->arrays) && is_array($this->arrays[$key])) {
 			foreach($this->arrays[$key] as $i) {
-				foreach($i as $k => $v) {
-					$tpl = str_replace("@{$k}", $v, $tpl);
-					echo $tpl;
+				if(is_array($i)) {
+					$tplc = $tpl;
+					foreach($i as $k => $v) $tplc = str_replace("@{$k}", $v, $tplc);
+					echo $tplc;
 				}
 			}
 		}

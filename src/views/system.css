@@ -1,0 +1,45 @@
+/* Placeholder for system styles */
+* {
+	box-sizing: border-box;
+}
+.editor { 
+	position: relative;
+	height: 500px;
+}
+
+.form_field {
+	width: 100%;
+	border: none;
+}
+
+.form_input {
+	height: 50px;
+	padding: 10px;
+	border: 1px solid #CCC;
+}
+
+.form_submit {
+	padding: 10px;
+	background: #260E3F;
+	color: white;
+}
+
+#saved {
+	margin-bottom: 25px;
+	margin-top: 25px;
+	height: 50px;
+	padding: 10px;
+	background: green;
+	color: white;
+	text-align: center;
+	font-weight: bold;
+	line-height: 30px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	opacity: 0;
+	transition: opacity .5s;
+}
+
+#saved.active {
+	opacity: 1;
+}

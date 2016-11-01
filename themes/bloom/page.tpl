@@ -12,7 +12,7 @@
 <body>
 	<{include:header}>
 	<main>
-		<{var:content}>
+		<{content:main:editor}>
 	</main>
 	<{include:footer}>
 </body>

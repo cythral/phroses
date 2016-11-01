@@ -55,7 +55,7 @@ abstract class Phroses {
 		spl_autoload_register(function($class) {
 			$class = strtolower(str_replace("Phroses\\", "", $class));
 			if(file_exists(INCLUDES["MODELS"]."/{$class}.php"))
-				include INCLUDES["MODELS"]."/{$class}.php";
+				include_once INCLUDES["MODELS"]."/{$class}.php";
 		});
 	}
 	
@@ -74,6 +74,7 @@ abstract class Phroses {
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php"))) $response = "SYSTEM-200";
 			
+		
 		// Setup the site constant
 		define("Phroses\SITE", [
 			"ID" => $info->id,
@@ -82,7 +83,7 @@ abstract class Phroses {
 			"THEME" => $info->theme,
 			"PAGE" => [
 				"TITLE" => $info->title,
-				"CONTENT" => $info->content
+				"CONTENT" => json_decode($info->content, true)
 			]
 		]);
 	}
@@ -93,19 +94,23 @@ abstract class Phroses {
 		
 		if(SITE["RESPONSE"] == "PAGE-200") {
 			$theme->title = SITE["PAGE"]["TITLE"];
-			$theme->content = SITE["PAGE"]["CONTENT"];
 			echo $theme;
 		}
 		
 		if(SITE["RESPONSE"] == "SYSTEM-200") {
-			if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]) && strtolower(REQ["EXTENSION"]) != "php") readfile(INCLUDES["VIEWS"].REQ["PATH"]);
+			if(!is_dir(INCLUDES["VIEWS"].REQ["PATH"]) && 
+				file_exists(INCLUDES["VIEWS"].REQ["PATH"]) && 
+				strtolower(REQ["EXTENSION"]) != "php") readfile(INCLUDES["VIEWS"].REQ["PATH"]);
 			else {
 				ob_start();
 				if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
 				else include INCLUDES["VIEWS"].REQ["PATH"].".php";
 				
-				$theme->title = $title;
-				$theme->content = trim(ob_get_clean());
+				$theme->title = $title ?? "Phroses System Page";
+				$theme->main = trim(ob_get_clean());
+				$theme->Push("stylesheets", [ "src" => "/system.css" ]);
+				$theme->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "async"]);
+				$theme->Push("scripts", [ "src" => "/system.js", "attrs" => "async defer"]);
 				echo $theme;
 			}
 		}
@@ -115,7 +120,7 @@ abstract class Phroses {
 			else if($theme->ErrorExists("404")) $theme->ErrorRead("404"); // Site-Level 404
 			else { // Generic Site 404
 				$theme->title = "404 Not Found";
-				$theme->content = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
+				$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
 				echo $theme;
 			}
 		}

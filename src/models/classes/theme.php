@@ -38,9 +38,25 @@ final class Theme extends Template {
 			ob_end_flush();
 		}
 	}
+	
+	public function GetContentFields(string $tpl) {
+		if(!file_exists("{$this->root}/{$tpl}.tpl")) return [];
+		preg_match_all("/<\{content((:[a-zA-Z0-9_\-=<>\'\"@\/ ]+)+)?\}>/", file_get_contents("{$this->root}/{$tpl}.tpl"), $matches, PREG_SET_ORDER);
+		$return = [];
+		foreach($matches as $match) {
+			$fields = explode(":", substr($match[1], 1));
+			$return[$fields[0]] = $fields[1];
+		} 
+		return $return;
+	}
 }
 
 
 Theme::$filters["include"] = function($file) {
 	if(file_exists("{$this->root}/{$file}.php")) include "{$this->root}/{$file}.php";
+};
+
+Theme::$filters["content"] = function($key, $fieldtype) {
+	if(array_key_exists($key, SITE["PAGE"]["CONTENT"] ?? []))	echo SITE["PAGE"]["CONTENT"][$key];
+	else if(array_key_exists($key, $this->vars)) echo $this->vars[$key];
 };

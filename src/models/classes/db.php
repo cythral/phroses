@@ -17,6 +17,10 @@ abstract class DB {
 		$q->execute();
 		return $q->fetchAll($fetchStyle);
 	}
+	
+	static public function Error() {
+		return self::$db->errorInfo();
+	}
 }
 
 DB::Setup();
