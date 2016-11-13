@@ -61,7 +61,7 @@ abstract class Phroses {
 	
 	static public function LoadSiteInfo() {
 		if(self::$ran) return;
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `pages`.`title`, `pages`.`content`, `pages`.`id` AS `pageID` FROM `sites` LEFT JOIN `pages` ON `pages`.`siteID`=`sites`.`id` AND `pages`.`uri`=? WHERE `sites`.`url`=?", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `pages`.`title`, `pages`.`content`, `pages`.`id` AS `pageID`, `pages`.`type` FROM `sites` LEFT JOIN `pages` ON `pages`.`siteID`=`sites`.`id` AND `pages`.`uri`=? WHERE `sites`.`url`=?", [
 			REQ["PATH"],
 			REQ["BASEURL"]
 		]);
@@ -82,6 +82,7 @@ abstract class Phroses {
 			"NAME" => $info->name,
 			"THEME" => $info->theme,
 			"PAGE" => [
+				"TYPE" => $info->type ?? "page",
 				"TITLE" => $info->title,
 				"CONTENT" => json_decode($info->content, true)
 			]
@@ -90,7 +91,7 @@ abstract class Phroses {
 	
 	static public function Render() {
 		ob_start("ob_gzhandler");
-		$theme = new Theme(SITE["THEME"]);
+		$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
 		
 		if(SITE["RESPONSE"] == "PAGE-200") {
 			$theme->title = SITE["PAGE"]["TITLE"];

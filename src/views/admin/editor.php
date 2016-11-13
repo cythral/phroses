@@ -32,12 +32,12 @@ $theme->Push("scripts", [
 	<br>
 	<?php
 	
-	foreach($theme->GetContentFields($page->type ?? "page") as $key => $type) {
+	foreach($theme->GetContentFields($page->type) as $key => $type) {
 		if($type == "editor")  { ?><div class="form_field editor content" id="<?= $key; ?>"><?= htmlspecialchars(((string)$page->content[$key] ?? "")); ?></div><? }
 		else if($type == "text") { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" class="form_field content" value="<?= $page->content[$key] ?? ""; ?>"><? }
 	}
 	
 	?>
-	<input class="form_submit form_field" type="submit">
+	<input class="form_submit form_field" type="submit" value="Save">
 </form>
 

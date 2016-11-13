@@ -5,15 +5,15 @@ namespace Phroses;
 final class Theme extends Template {
 	private $root;
 	
-	public function __construct(string $name) {
+	public function __construct(string $name, string $type) {
 		$this->root = INCLUDES["THEMES"]."/".strtolower($name);		
 		if(!file_exists($this->root)) throw new \Exception("Theme doesn't exist");
-		if(!file_exists("{$this->root}/page.tpl")) throw new \Exception("Theme template doesn't exist");
+		if(!file_exists("{$this->root}/{$type}.tpl")) throw new \Exception("Theme template doesn't exist");
 		
 		foreach(FileList("{$this->root}/assets/css") as $style) $this->Push("stylesheets", [ "src" => "/css/".pathinfo($style, PATHINFO_BASENAME)]);
 		foreach(FileList("{$this->root}/assets/js") as $style) $this->Push("scripts", [ "src" => "/js/".pathinfo($style, PATHINFO_BASENAME)]);
 		
-		parent::__construct("{$this->root}/page.tpl");
+		parent::__construct("{$this->root}/{$type}.tpl");
 	}
 	
 	public function AssetExists(string $asset) : bool {
@@ -57,6 +57,6 @@ Theme::$filters["include"] = function($file) {
 };
 
 Theme::$filters["content"] = function($key, $fieldtype) {
-	if(array_key_exists($key, SITE["PAGE"]["CONTENT"] ?? []))	echo SITE["PAGE"]["CONTENT"][$key];
+	if(array_key_exists($key, SITE["PAGE"]["CONTENT"] ?? [])) echo SITE["PAGE"]["CONTENT"][$key];
 	else if(array_key_exists($key, $this->vars)) echo $this->vars[$key];
 };
