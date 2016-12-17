@@ -4,6 +4,7 @@ namespace Phroses;
 
 final class Theme extends Template {
 	private $root;
+	private $types = [];
 	
 	public function __construct(string $name, string $type) {
 		$this->root = INCLUDES["THEMES"]."/".strtolower($name);		
@@ -12,6 +13,7 @@ final class Theme extends Template {
 		
 		foreach(FileList("{$this->root}/assets/css") as $style) $this->Push("stylesheets", [ "src" => "/css/".pathinfo($style, PATHINFO_BASENAME)]);
 		foreach(FileList("{$this->root}/assets/js") as $style) $this->Push("scripts", [ "src" => "/js/".pathinfo($style, PATHINFO_BASENAME)]);
+		foreach(glob("{$this->root}/*.tpl") as $ctype) $this->types[] = pathinfo($ctype, PATHINFO_FILENAME);
 		
 		parent::__construct("{$this->root}/{$type}.tpl");
 	}
@@ -49,6 +51,8 @@ final class Theme extends Template {
 		} 
 		return $return;
 	}
+	
+	public function GetTypes() : array { return $this->types; }
 }
 
 

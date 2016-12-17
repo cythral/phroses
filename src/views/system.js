@@ -1,6 +1,14 @@
 var editors = {};
 
-$(function() {	
+$(function() {
+	$(window).keydown(function(e) {
+		if(!(e.which == 83 && e.ctrlKey) && !(e.which == 17)) return true;
+		e.preventDefault();
+		e.stopPropagation();
+		$("#phroses_editor").submit();
+		 
+	});
+	
 	$(".editor").each(function() {
 		var id = $(this).attr("id");
 		editors[id] = ace.edit(id);
