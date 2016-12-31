@@ -73,7 +73,7 @@ abstract class Phroses {
 		if(REQ["PATH"] != "/" && (file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php"))) $response = "SYSTEM-200";
-			
+		if(REQ["PATH"] == "/api" && REQ["METHOD"] != "GET") $response = "THEME-API";	
 		
 		// Setup the site constant
 		define("Phroses\SITE", [
@@ -113,6 +113,16 @@ abstract class Phroses {
 				$theme->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "async"]);
 				$theme->Push("scripts", [ "src" => "/system.js", "attrs" => "async defer"]);
 				echo $theme;
+			}
+		}
+		
+		if(SITE["RESPONSE"] == "THEME-API") {
+			if(!$theme->HasAPI()) {
+				$theme->title = "404 Not Found";
+				$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
+				echo $theme;
+			} else {
+				$theme->RunAPI();
 			}
 		}
 		

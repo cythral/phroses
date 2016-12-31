@@ -41,6 +41,14 @@ final class Theme extends Template {
 		}
 	}
 	
+	public function HasAPI() : bool {
+		return (file_exists("{$this->root}/api.php"));
+	}
+	
+	public function RunAPI() {
+		if($this->HasAPI()) include "{$this->root}/api.php";
+	}
+	
 	public function GetContentFields(string $tpl) {
 		if(!file_exists("{$this->root}/{$tpl}.tpl")) return [];
 		preg_match_all("/<\{content((:[a-zA-Z0-9_\-=<>\'\"@\/ ]+)+)?\}>/", file_get_contents("{$this->root}/{$tpl}.tpl"), $matches, PREG_SET_ORDER);

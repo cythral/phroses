@@ -1,18 +1,18 @@
 var editors = {};
 
 $(function() {
-	$(window).keydown(function(e) {
-		if(!(e.which == 83 && e.ctrlKey) && !(e.which == 17)) return true;
-		e.preventDefault();
-		e.stopPropagation();
-		$("#phroses_editor").submit();
-		 
+	$(window).bind("keydown", function(e) {
+		if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			$("#phroses_editor").submit();
+		}
 	});
 	
 	$(".editor").each(function() {
 		var id = $(this).attr("id");
 		editors[id] = ace.edit(id);
-		editors[id].setTheme("ace/theme/chrome");
+		editors[id].setTheme("ace/theme/monokai");
 		editors[id].getSession().setMode("ace/mode/html");
 
 		editors[id].commands.addCommand({

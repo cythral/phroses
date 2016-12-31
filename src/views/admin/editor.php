@@ -14,8 +14,8 @@ $page = DB::Query("SELECT * FROM `pages` WHERE `siteID`=? AND `uri`=?", [ Phrose
 $page->content = json_decode($page->content, true);
 
 $theme->Push("scripts", [ 
-	"src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js",
-	"attrs" => "async"
+	"src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js",
+	"attrs" => ""
 ]);
 
 ?>
@@ -49,7 +49,7 @@ $theme->Push("scripts", [
 	<?php
 	
 	foreach($theme->GetContentFields($page->type) as $key => $type) {
-		if($type == "editor")  { ?><div class="form_field editor content" id="<?= $key; ?>"><?= htmlspecialchars(((string)$page->content[$key] ?? "")); ?></div><? }
+		if($type == "editor")  { ?><div class="form_field content editor" id="<?= $key; ?>"><?= trim(htmlspecialchars(((String)$page->content[$key] ?? ""))); ?></div><? }
 		else if($type == "text") { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" class="form_field content" value="<?= $page->content[$key] ?? ""; ?>"><? }
 	}
 	
