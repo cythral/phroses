@@ -19,41 +19,42 @@ $theme->Push("scripts", [
 ]);
 
 ?>
-<hgroup>
-	<h1>Phroses Editor</h1>
-	<br>
-	<h2>You're editing <a href="<?= $_GET["uri"]; ?>"><?= $page->title; ?></a>, a page on <a href="/"><?= Phroses\SITE["NAME"]; ?></a></h2>
-	<p>This page was created on <?= date("m/d/Y @ h:ia", strtotime($page->dateCreated)); ?> <?php if($page->dateCreated != $page->dateModified) { ?>and last modified on <?= date("m/d/Y @ h:ia", strtotime($page->dateModified)); ?><? } ?></p>
-</hgroup>
+<div class="container">
+	<hgroup>
+		<h1>Phroses Editor</h1>
+		<br>
+		<h2>You're editing <a href="<?= $_GET["uri"]; ?>"><?= $page->title; ?></a>, a page on <a href="/"><?= Phroses\SITE["NAME"]; ?></a></h2>
+		<p>This page was created on <?= date("m/d/Y @ h:ia", strtotime($page->dateCreated)); ?> <?php if($page->dateCreated != $page->dateModified) { ?>and last modified on <?= date("m/d/Y @ h:ia", strtotime($page->dateModified)); ?><? } ?></p>
+	</hgroup>
 
-<form id="phroses_editor" class="form">
-	<div id="saved">Page Saved!</div>
-	<input name="id" type="hidden" value="<?= $page->id; ?>">
-	<div class="form_icfix">
-		<div>Title:</div>
-		<input name="title" class="form_input form_field" placeholder="Page Title" value="<?= $page->title; ?>" autocomplete="off">	
-	</div>
-	<div class="form_icfix">
-		<div>URI:</div>
-		<input name="uri" class="form_input form_field" placeholder="Page URI" value="<?= $page->uri; ?>" autocomplete="off">	
-	</div>
-	
-	<div class="form_icfix">
-		<div>Type:</div>
-		<select name="type" class="form_select form_field">
-			<?php foreach($theme->GetTypes() as $type) { ?>
-			<option value="<?= $type; ?>" <? if($type == $page->type) { ?>selected<? } ?>><?= ucfirst($type); ?></option>
-			<? } ?>
-		</select>	
-	</div>
-	<?php
-	
-	foreach($theme->GetContentFields($page->type) as $key => $type) {
-		if($type == "editor")  { ?><div class="form_field content editor" id="<?= $key; ?>"><?= trim(htmlspecialchars(((String)$page->content[$key] ?? ""))); ?></div><? }
-		else if($type == "text") { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" class="form_field content" value="<?= $page->content[$key] ?? ""; ?>"><? }
-	}
-	
-	?>
-	<input class="form_submit form_field" type="submit" value="Save">
-</form>
-
+	<form id="phroses_editor" class="form">
+		<div id="saved">Page Saved!</div>
+		<input name="id" type="hidden" value="<?= $page->id; ?>">
+		<div class="form_icfix">
+			<div>Title:</div>
+			<input name="title" class="form_input form_field" placeholder="Page Title" value="<?= $page->title; ?>" autocomplete="off">	
+		</div>
+		<div class="form_icfix">
+			<div>URI:</div>
+			<input name="uri" class="form_input form_field" placeholder="Page URI" value="<?= $page->uri; ?>" autocomplete="off">	
+		</div>
+		
+		<div class="form_icfix">
+			<div>Type:</div>
+			<select name="type" class="form_select form_field">
+				<?php foreach($theme->GetTypes() as $type) { ?>
+				<option value="<?= $type; ?>" <? if($type == $page->type) { ?>selected<? } ?>><?= ucfirst($type); ?></option>
+				<? } ?>
+			</select>	
+		</div>
+		<?php
+		
+		foreach($theme->GetContentFields($page->type) as $key => $type) {
+			if($type == "editor")  { ?><div class="form_field content editor" id="<?= $key; ?>"><?= trim(htmlspecialchars(((String)$page->content[$key] ?? ""))); ?></div><? }
+			else if($type == "text") { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" class="form_field content" value="<?= $page->content[$key] ?? ""; ?>"><? }
+		}
+		
+		?>
+		<input class="form_submit form_field" type="submit" value="Save">
+	</form>
+</div>

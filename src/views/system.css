@@ -9,7 +9,10 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
+	font-family: monospace !important;
 }
+
+.editor * { font-family: inherit !important; }
 
 .form_field {
 	width: 100%;
