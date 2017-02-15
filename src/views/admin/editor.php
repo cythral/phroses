@@ -1,7 +1,6 @@
 <?php
 use Phroses\DB;
 
-
 // Handle POST method -- saves page updates over AJAX
 Phroses\HandleMethod("POST", function() {
 	$q = Phroses\DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=? WHERE `id`=?", [

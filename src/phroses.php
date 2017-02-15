@@ -37,6 +37,10 @@ abstract class Phroses {
 		self::SetupMode();
 		self::LoadModels();
 		self::LoadSiteInfo();
+		Session::start();
+		register_shutdown_function(function() {
+			session_write_close();
+		});
 		self::Render();
 	}
 	
@@ -61,7 +65,7 @@ abstract class Phroses {
 	
 	static public function LoadSiteInfo() {
 		if(self::$ran) return;
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `pages`.`title`, `pages`.`content`, `pages`.`id` AS `pageID`, `pages`.`type` FROM `sites` LEFT JOIN `pages` ON `pages`.`siteID`=`sites`.`id` AND `pages`.`uri`=? WHERE `sites`.`url`=?", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `pages`.`title`, `pages`.`content`, `pages`.`id` AS `pageID`, `pages`.`type` FROM `sites` LEFT JOIN `pages` ON `pages`.`siteID`=`sites`.`id` AND `pages`.`uri`=? WHERE `sites`.`url`=?", [
 			REQ["PATH"],
 			REQ["BASEURL"]
 		]);
@@ -81,6 +85,8 @@ abstract class Phroses {
 			"RESPONSE" => $response,
 			"NAME" => $info->name,
 			"THEME" => $info->theme,
+			"USERNAME" => $info->adminUsername,
+			"PASSWORD" => $info->adminPassword,
 			"PAGE" => [
 				"TYPE" => $info->type ?? "page",
 				"TITLE" => $info->title,
@@ -104,9 +110,29 @@ abstract class Phroses {
 				strtolower(REQ["EXTENSION"]) != "php") readfile(INCLUDES["VIEWS"].REQ["PATH"]);
 			else {
 				ob_start();
-				if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
-				else include INCLUDES["VIEWS"].REQ["PATH"].".php";
-				
+				if(!$_SESSION && REQ["PATH"] != "/admin/login") { 
+					http_response_code(401);
+?>				<form id="phroses-login">
+						<h2>Login to Phroses Site Panel</h2>
+						<div><input name="username" type="text" placeholder="Username"></div>
+						<div><input name="password" type="password" placeholder="Password"></div>
+						<div><input type="submit" value="Login"></div>
+					</form>
+				<? } else { ?>
+		
+					<div class="dashbar">
+						<div class="dashbar_brand">
+							<a href="/admin">Phroses Panel</a>
+						</div>
+						<div class="dashbar_actions">
+							<?= REQ["HOST"]; ?> | <a href="/admin/logout">Logout</a>
+						</div>
+						<div class="clear"></div>
+					</div>
+			
+		<?  if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
+					else include INCLUDES["VIEWS"].REQ["PATH"].".php";
+				}
 				$theme->title = $title ?? "Phroses System Page";
 				$theme->main = trim(ob_get_clean());
 				$theme->Push("stylesheets", [ "src" => "/system.css" ]);
@@ -136,6 +162,7 @@ abstract class Phroses {
 			}
 		}
 		
+		session_write_close();
 		ob_end_flush();
 		flush();
 	}

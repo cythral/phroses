@@ -15,6 +15,7 @@ abstract class DB {
 		$q = self::$db->prepare($query);
 		foreach($values as $key => $val) $q->bindValue($key + 1, $val);
 		$q->execute();
+		
 		return $q->fetchAll($fetchStyle);
 	}
 	

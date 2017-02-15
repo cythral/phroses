@@ -76,3 +76,53 @@
 	height: 30px;
 	padding: 10px;
 }
+
+#phroses-login {
+	padding-top: 30vh;
+	width: 100%;
+	text-align: center;
+}
+
+#phroses-login input {
+	display: inline-block;
+	height: 50px;
+	width: 50%;
+	padding: 10px;
+	text-align: center;
+	margin: 10px;
+}
+
+#phroses-login input[type="submit"] {
+	background: #260E3F;
+	border: none;
+	color: white;
+}
+
+.dashbar {
+  background: #260E3F;
+  height: 50px;
+  padding: 10px;
+  box-sizing: border-box;
+  line-height: 30px;
+  font-family: sans-serif;
+}
+  
+.dashbar, .dashbar a {
+	color: white;
+	text-decoration: none;
+}
+.dashbar div {
+	display: inline-block;
+	float: left;
+}
+
+.dashbar_brand {
+	width: 20%;
+	overflow: hidden;
+	font-weight: bold;
+}
+
+.dashbar_actions {
+	width: 80%;
+	text-align: right;
+}
