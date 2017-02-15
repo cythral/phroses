@@ -8,7 +8,7 @@ $directory = implode("/", array_slice($parts, 0, -1));
 $filename = array_reverse($parts)[0];
 $extension = (ltrim(strstr($uri, "."), "."));
 $extension = ($extension == "") ? null : $extension;
-$domainParts = explode(".", $_SERVER["HTTP_HOST"]);
+$domainParts = array_reverse(explode(".", $_SERVER["HTTP_HOST"]));
 parse_str(strtok("?"), $_GET);
 
 const MIME_TYPES = [
@@ -37,7 +37,7 @@ define("Phroses\REQ", [
 	"PROTOCOL" => $_SERVER["SERVER_PROTOCOL"],
 	"H2PUSH" => (bool)($_SERVER["H2PUSH"] ?? false),
 	"SSL" => (bool)($_SERVER["HTTPS"] ?? false),
-	"HOST" => "{$domainParts[1]}.{$domainParts[0]}",
+	"HOST" => strstr($_SERVER["HTTP_HOST"], ":", true),
 	"METHOD" => $_SERVER['REQUEST_METHOD'],
 	"BASEURL" => $_SERVER["SERVER_NAME"],
 	"FULLURL" => (((bool)($_SERVER["HTTPS"] ?? false)) ? "https://" : "http://").$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"],
