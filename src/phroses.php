@@ -77,7 +77,8 @@ abstract class Phroses {
 		if(REQ["PATH"] != "/" && (file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php"))) $response = "SYSTEM-200";
-		if(REQ["PATH"] == "/api" && REQ["METHOD"] != "GET") $response = "THEME-API";	
+		if(REQ["PATH"] == "/api" && REQ["METHOD"] != "GET") $response = "THEME-API";
+		if($info->type == "redirect") $response = "PAGE-301";
 		
 		// Setup the site constant
 		define("Phroses\SITE", [
@@ -96,9 +97,14 @@ abstract class Phroses {
 	}
 	
 	static public function Render() {
+		if(SITE["RESPONSE"] == "PAGE-301") {
+			http_response_code(301);
+			header("location: ".SITE["PAGE"]["CONTENT"]["destination"]);
+			die;
+		}
+		
 		ob_start("ob_gzhandler");
 		$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
-		
 		if(SITE["RESPONSE"] == "PAGE-200") {
 			$theme->title = SITE["PAGE"]["TITLE"];
 			echo $theme;

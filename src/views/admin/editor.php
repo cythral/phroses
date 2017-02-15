@@ -40,20 +40,31 @@ $theme->Push("scripts", [
 		
 		<div class="form_icfix">
 			<div>Type:</div>
-			<select name="type" class="form_select form_field">
-				<?php foreach($theme->GetTypes() as $type) { ?>
+			<select id="page_type" name="type" class="form_select form_field">
+				<?php 
+				foreach($theme->GetTypes() as $type) { ?>
 				<option value="<?= $type; ?>" <? if($type == $page->type) { ?>selected<? } ?>><?= ucfirst($type); ?></option>
 				<? } ?>
 			</select>	
 		</div>
-		<?php
 		
-		foreach($theme->GetContentFields($page->type) as $key => $type) {
-			if($type == "editor")  { ?><div class="form_field content editor" id="<?= $key; ?>"><?= trim(htmlspecialchars(((String)$page->content[$key] ?? ""))); ?></div><? }
-			else if($type == "text") { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" class="form_field content" value="<?= $page->content[$key] ?? ""; ?>"><? }
-		}
+		<div id="form_fields"> Loading ...</div>
 		
-		?>
 		<input class="form_submit form_field" type="submit" value="Save">
 	</form>
 </div>
+
+<?php
+
+foreach($theme->GetTypes() as $type) { ?>
+	<div class="editor_tpl" id="type-<?= $type; ?>">
+		<?php
+		foreach($theme->GetContentFields($type) as $key => $field) { 
+			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars($page->content[$key] ?? "")); ?></div><? }
+			else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= $page->content[$key] ?? ""; ?>"><? }	
+		} ?>
+	</div>
+<?
+}
+
+?>

@@ -4,7 +4,7 @@ namespace Phroses;
 
 final class Theme extends Template {
 	private $root;
-	private $types = [];
+	private $types = ["redirect"];
 	
 	public function __construct(string $name, string $type) {
 		$this->root = INCLUDES["THEMES"]."/".strtolower($name);		
@@ -50,6 +50,7 @@ final class Theme extends Template {
 	}
 	
 	public function GetContentFields(string $tpl) {
+		if($tpl == "redirect") return ["destination" => "text"];
 		if(!file_exists("{$this->root}/{$tpl}.tpl")) return [];
 		preg_match_all("/<\{content((:[a-zA-Z0-9_\-=<>\'\"@\/ ]+)+)?\}>/", file_get_contents("{$this->root}/{$tpl}.tpl"), $matches, PREG_SET_ORDER);
 		$return = [];

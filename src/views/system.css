@@ -46,6 +46,7 @@
 	z-index: 0;
 }
 
+
 .form_icfix div {
 	position: absolute;
 	z-index: 1;
@@ -128,4 +129,8 @@
 .dashbar_actions {
 	width: 80%;
 	text-align: right;
+}
+
+.editor_tpl {
+	display: none;
 }
