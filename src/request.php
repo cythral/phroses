@@ -57,3 +57,4 @@ define("Phroses\REQ", [
 
 if(array_key_exists(strtolower(REQ["EXTENSION"]), MIME_TYPES)) header("content-type: ".MIME_TYPES[strtolower(REQ["EXTENSION"])]);
 else header("content-type: ".MIME_TYPES[""]);
+parse_str(file_get_contents('php://input'), $_REQUEST);

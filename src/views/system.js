@@ -28,27 +28,43 @@ $(function() {
 	});
 
 	$("#page_type").change(function() {
-		$("#form_fields").html($("#type-"+$(this).val()).html());	
-		$("#form_fields .editor").each(function() {
-			var id = $(this).attr("id");
-			editors[id] = ace.edit(id);
-			editors[id].setTheme("ace/theme/monokai");
-			editors[id].getSession().setMode("ace/mode/html");
-			if(editors[id].getValue() == "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX") {
-				editors[id].setValue("");
-			}
+		$("#form_fields").slideUp(400, function() {
+			$("#form_fields").html($("#type-"+$("#page_type").val()).html());	
+			$("#form_fields .editor").each(function() {
+				var id = $(this).attr("id");
+				editors[id] = ace.edit(id);
+				editors[id].setTheme("ace/theme/monokai");
+				editors[id].getSession().setMode("ace/mode/html");
+				if(editors[id].getValue() == "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX") {
+					editors[id].setValue("");
+				}
 
-			editors[id].commands.addCommand({
-				name: 'Save',
-				bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
-				exec: function(editor) {
-					$("#phroses_editor").submit();
-				},
-				readOnly: true // false if this command should not apply in readOnly mode
+				editors[id].commands.addCommand({
+					name: 'Save',
+					bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+					exec: function(editor) {
+						$("#phroses_editor").submit();
+					},
+					readOnly: true // false if this command should not apply in readOnly mode
+				});
 			});
+			$("#form_fields").slideDown();
 		});
 	});
 	
+	
+	$("#phroses_editor_delete").click(function(e) {
+		var data = [];
+		data.push({ name : "id", value : $("#pageID").val() });
+		
+		$.ajax({ url : "/admin/editor", method: "DELETE", data : data })
+		.done(function(data) {
+			document.location = "/admin";
+		})
+		.fail(function(data) {
+			console.log(data);
+		});
+	});
 	
 	
 	$("#phroses_editor").submit(function(e) {
@@ -60,7 +76,9 @@ $(function() {
 			if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
 			else content[$(this).attr("id")] = $(this).val();
 		});
+		
 		data.push({ name : "content", value : JSON.stringify(content) });
+		data.push({ name : "paction", value : "1" }); // edit action
 		
 		$.post("/admin/editor", data)
 		.done(function(data) {
@@ -80,7 +98,7 @@ $(function() {
 		e.stopPropagation();
 		
 		var data = $(this).serializeArray();
-		$.post("/admin/login", data, { async: false})
+		$.post("/admin/login", data, { async: false })
 		.done(function(data) {
 			console.log(data);
 			location.reload();

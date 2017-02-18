@@ -124,7 +124,8 @@ abstract class Phroses {
 						<div><input name="password" type="password" placeholder="Password"></div>
 						<div><input type="submit" value="Login"></div>
 					</form>
-				<? } else { ?>
+				<? } else { 
+					if(REQ["METHOD"] == "GET") { ?>
 		
 					<div class="dashbar">
 						<div class="dashbar_brand">
@@ -136,7 +137,8 @@ abstract class Phroses {
 						<div class="clear"></div>
 					</div>
 			
-		<?  if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
+		<? 			}
+					if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
 					else include INCLUDES["VIEWS"].REQ["PATH"].".php";
 				}
 				$theme->title = $title ?? "Phroses System Page";
