@@ -34,10 +34,9 @@ final class Theme extends Template {
 		if($this->ErrorExists($error)) {
 			ob_start();
 			include "{$this->root}/errors/{$error}.php";
+			$this->main = trim(ob_get_clean());
 			$this->title = $title ?? "404 Not Found";
-			$this->content = trim(ob_get_clean());
 			echo $this;
-			ob_end_flush();
 		}
 	}
 	
