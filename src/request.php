@@ -1,6 +1,6 @@
 <?php
 namespace Phroses;
-if($_SERVER["REQUEST_URI"] == "/")
+
 $uri = strtok($_SERVER["REQUEST_URI"], "?");
 $path = (strpos($uri, ".")) ? strstr($uri, ".", true) : $uri;
 $parts = explode("/", $path);
