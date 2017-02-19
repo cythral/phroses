@@ -37,11 +37,8 @@ abstract class Phroses {
 		self::SetupMode();
 		self::LoadModels();
 		self::LoadSiteInfo();
-		Session::start();
-		register_shutdown_function(function() {
-			session_write_close();
-		});
-		self::Render();
+		self::SetupSession();
+		call_user_func("self::".REQ["METHOD"]);
 	}
 	
 	static public function SetupMode() {
@@ -96,7 +93,14 @@ abstract class Phroses {
 		]);
 	}
 	
-	static public function Render() {
+	static public function SetupSession() {
+		Session::start();
+		register_shutdown_function(function() {
+			session_write_close();
+		});
+	}
+	
+	static public function GET() {
 		if(SITE["RESPONSE"] == "PAGE-301") {
 			http_response_code(301);
 			header("location: ".SITE["PAGE"]["CONTENT"]["destination"]);
@@ -173,6 +177,53 @@ abstract class Phroses {
 		session_write_close();
 		ob_end_flush();
 		flush();
+	}
+	
+	static public function POST() {
+		// Validation
+		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
+		foreach(["title","type","content"] as $type)
+			if(!in_array($type, array_keys($_REQUEST))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
+		if(SITE["RESPONSE"] != "UNDETERMINED" && SITE["RESPONSE"] != "SYSTEM-404") JsonOutput([ "type" => "error", "error" => "resource_exists" ]);
+		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"]); }
+		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
+		
+		DB::Query("INSERT INTO `pages` (`uri`,`title`,`type`,`content`, `siteID`,`dateCreated`) VALUES (?, ?, ?, ?, ?, NOW())", [ 
+			REQ["PATH"],
+			$_REQUEST["title"],
+			$_REQUEST["type"],
+			$_REQUEST["content"] ?? $content,
+			SITE["ID"]
+		]);	
+		
+		JsonOutput(["type" => "success"],200);
+	}
+	
+	static public function PATCH() {
+		// Validation
+		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
+		foreach(["id", "title", "uri", "content", "type"] as $type)
+			if(!in_array($type, array_keys($_REQUEST))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
+		if(SITE["RESPONSE"] != "PAGE-200") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
+		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"]); }
+		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
+		
+		DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=? WHERE `id`=?", [
+			$_REQUEST["title"], 
+			urldecode($_REQUEST["uri"]), 
+			htmlspecialchars_decode($_REQUEST["content"]), 
+			urldecode($_REQUEST["type"]), 
+			(int)$_REQUEST["id"]
+		]);
+		
+		JsonOutput(["type" => "success"], 200);
+	}
+	
+	static public function DELETE() {
+		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
+		if(SITE["RESPONSE"] != "PAGE-200") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
+		
+		DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ REQ["PATH"], SITE["ID"] ]);
 	}
 }
 

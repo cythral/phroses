@@ -15,8 +15,8 @@ function FileList($dir) : array {
     return [];
 }
 
-function JsonOutput($array) {
-    http_response_code(400);
+function JsonOutput($array, $code = 400) {
+    http_response_code($code);
     header("content-type: application/json; charset=utf8");
     die(json_encode($array));
 }

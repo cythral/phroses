@@ -6,6 +6,11 @@
 .aln-r {
 	text-align: right;
 }
+
+.aln-c {
+	text-align: center;
+}
+
 .editor { 
 	position: absolute;
 	height: 500px;
@@ -147,4 +152,24 @@
 	display: inline-block;
 	color: white;
 	cursor: pointer;
+}
+
+#phroses_creator {
+    padding-top: 50px;
+}
+
+#phroses_creator button {
+    height: 150px;
+    width: 150px;
+    background-image: url(/admin/next.png);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform .5s;
+}
+
+#phroses_creator button:hover {
+    transform: scale(1.1,1.1);
 }

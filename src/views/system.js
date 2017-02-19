@@ -54,10 +54,7 @@ $(function() {
 	
 	
 	$("#phroses_editor_delete").click(function(e) {
-		var data = [];
-		data.push({ name : "id", value : $("#pageID").val() });
-		
-		$.ajax({ url : "/admin/editor", method: "DELETE", data : data })
+		$.ajax({ url : $("#pageuri").val(), method: "DELETE" })
 		.done(function(data) {
 			document.location = "/admin";
 		})
@@ -67,26 +64,32 @@ $(function() {
 	});
 	
 	
-	$("#phroses_editor").submit(function(e) {
+	$(".sys.form").submit(function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		
-		var data = $(this).serializeArray(), content = {};		
+		var data = $(this).serializeArray(), 
+            content = {}, 
+            method = $(this).data("method"),
+            uri = $("[name='uri']").val();	
+                    
 		$("#phroses_editor .content").each(function() {
 			if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
 			else content[$(this).attr("id")] = $(this).val();
 		});
 		
-		data.push({ name : "content", value : JSON.stringify(content) });
-		data.push({ name : "paction", value : "1" }); // edit action
+        data.push({ name : "content", value : JSON.stringify(content) });
 		
-		$.post("/admin/editor", data)
-		.done(function(data) {
-			console.log(data);
-			$("#saved").addClass("active");
-			setTimeout(function() {
-				$("#saved").removeClass("active");
-			}, 5000);
+		$.ajax({url : uri, data: data, method : method })
+		.done(function(postdata) {
+            if(method == "PATCH") {
+				$("#saved").addClass("active");
+				setTimeout(function() {
+					$("#saved").removeClass("active");
+				}, 5000);
+			} else if(method == "POST") {
+				document.location = "/admin/editor?uri="+uri;
+			}
 		})
 		.fail(function(data) {
 			console.log(data);

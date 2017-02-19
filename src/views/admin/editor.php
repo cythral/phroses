@@ -1,20 +1,8 @@
 <?php
 use Phroses\DB;
 
-// Handle POST method -- saves page updates over AJAX
-Phroses\HandleMethod("POST", function() {
-	$q = Phroses\DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=? WHERE `id`=?", [
-		$_POST["title"], urldecode($_POST["uri"]), htmlspecialchars_decode($_POST["content"]), urldecode($_POST["type"]), (int)$_POST["id"]
-	]);	
-}, [ "id", "title", "uri", "content", "type" ]);
-
-Phroses\HandleMethod("DELETE", function() {
-	$q = Phroses\DB::Query("DELETE FROM `pages` WHERE `id`=?", [ $_REQUEST["id"] ]);
-}, [ "id" ]);
-
 // Fetch Page Variables
-$page = DB::Query("SELECT * FROM `pages` WHERE `siteID`=? AND `uri`=?", [ Phroses\SITE["ID"], $_GET["uri"] ])[0];
-$page->content = json_decode($page->content, true);
+$page = DB::Query("SELECT * FROM `pages` WHERE `siteID`=? AND `uri`=?", [ Phroses\SITE["ID"], $_GET["uri"] ])[0] ?? new stdClass;
 
 $theme->Push("scripts", [ 
 	"src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js",
@@ -23,7 +11,15 @@ $theme->Push("scripts", [
 
 $theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
 
-?>
+if(!isset($page->id)) { ?>
+
+    <div class="container aln-c" id="nopage">
+        <h1>Oops.. that page doesn't exist yet.</h1>
+        <p>Would you like to <a href="/admin/create?uri=<?= $_GET["uri"]; ?>">create it now?</a></p>
+    </div>
+
+<?php } else { $page->content = json_decode($page->content, true); ?>
+
 <div class="container">
 	<div>
 		<h2>You're editing <a href="<?= $_GET["uri"]; ?>"><?= $page->title; ?></a>, a page on <a href="/"><?= Phroses\SITE["NAME"]; ?></a></h2>
@@ -31,7 +27,7 @@ $theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-aw
 	</div>
 	
 	
-	<form id="phroses_editor" class="form">
+	<form id="phroses_editor" class="sys form" data-method="PATCH">
 		<div id="saved">Page Saved!</div>
 		<div class="aln-r">
 			<div id="phroses_editor_delete"><i class="fa fa-trash"></i> Delete This Page</div>
@@ -43,7 +39,7 @@ $theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-aw
 		</div>
 		<div class="form_icfix">
 			<div>URI:</div>
-			<input name="uri" class="form_input form_field" placeholder="Page URI" value="<?= $page->uri; ?>" autocomplete="off">	
+			<input id="pageuri" name="uri" class="form_input form_field" placeholder="Page URI" value="<?= $page->uri; ?>" autocomplete="off">	
 		</div>
 		
 		<div class="form_icfix">
@@ -74,5 +70,5 @@ foreach($theme->GetTypes() as $type) { ?>
 	</div>
 <?
 }
-
+}
 ?>
