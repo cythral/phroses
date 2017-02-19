@@ -56,7 +56,7 @@ $(function() {
 	$("#phroses_editor_delete").click(function(e) {
 		$.ajax({ url : $("#pageuri").val(), method: "DELETE" })
 		.done(function(data) {
-			document.location = "/admin";
+			document.location = "/admin/pages";
 		})
 		.fail(function(data) {
 			console.log(data);
@@ -78,7 +78,7 @@ $(function() {
 			else content[$(this).attr("id")] = $(this).val();
 		});
 		
-        data.push({ name : "content", value : JSON.stringify(content) });
+    data.push({ name : "content", value : JSON.stringify(content) });
 		
 		$.ajax({url : uri, data: data, method : method })
 		.done(function(postdata) {
@@ -88,7 +88,7 @@ $(function() {
 					$("#saved").removeClass("active");
 				}, 5000);
 			} else if(method == "POST") {
-				document.location = "/admin/editor?uri="+uri;
+				document.location = "/admin/pages/"+postdata.id;
 			}
 		})
 		.fail(function(data) {

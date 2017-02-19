@@ -22,6 +22,10 @@ abstract class DB {
 	static public function Error() {
 		return self::$db->errorInfo();
 	}
+	
+	static public function LastID() {
+		return self::$db->lastInsertId();
+	}
 }
 
 DB::Setup();

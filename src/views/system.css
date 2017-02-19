@@ -215,3 +215,8 @@
 	background: #260E3F;
 	color: #DDD !important;
 }
+
+.backbtn {
+	font-size: 1.1em;
+	font-weight: bold;
+}

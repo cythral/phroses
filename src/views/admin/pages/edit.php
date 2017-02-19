@@ -1,4 +1,9 @@
-<div class="container"><?php
+<div class="container">
+	<div>
+		<a href="/admin/pages" class="backbtn"><i class="fa fa-chevron-left"></i> Pages</a>
+	</div>
+	
+<?php
 use Phroses\DB;
 
 if(!isset($_GET["id"])) { // no uri specified error
