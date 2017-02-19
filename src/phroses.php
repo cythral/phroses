@@ -37,8 +37,10 @@ abstract class Phroses {
 		self::SetupMode();
 		self::LoadModels();
 		self::LoadSiteInfo();
+		self::UrlFix();
 		self::SetupSession();
-		call_user_func("self::".REQ["METHOD"]);
+		if(SITE["RESPONSE"] != "SYSTEM-200") call_user_func("self::".REQ["METHOD"]);
+		else self::GET();
 	}
 	
 	static public function SetupMode() {
@@ -73,7 +75,8 @@ abstract class Phroses {
 		if(!isset(($info = $info[0])->pageID)) $response = "UNDETERMINED";
 		if(REQ["PATH"] != "/" && (file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
-		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php"))) $response = "SYSTEM-200";
+		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php") ||
+		   substr(REQ["PATH"], 0, 13) == "/admin/pages/")) $response = "SYSTEM-200";
 		if(REQ["PATH"] == "/api" && REQ["METHOD"] != "GET") $response = "THEME-API";
 		if($info->type == "redirect") $response = "PAGE-301";
 		
@@ -91,6 +94,13 @@ abstract class Phroses {
 				"CONTENT" => json_decode($info->content, true)
 			]
 		]);
+	}
+	
+	static public function UrlFix() {
+		if(substr(REQ["PATH"], -1) == "/" && $_SERVER["REQUEST_URI"] != "/") {
+			header("location: ".substr(REQ["PATH"], 0, -1));
+			die;
+		}
 	}
 	
 	static public function SetupSession() {
@@ -143,13 +153,19 @@ abstract class Phroses {
 			
 		<? 			}
 					if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
-					else include INCLUDES["VIEWS"].REQ["PATH"].".php";
+					else if(substr(REQ["PATH"], 0, 13) == "/admin/pages/") {
+						$_GET["id"] = substr(REQ["PATH"], 13);
+						include INCLUDES["VIEWS"]."/admin/pages/edit.php";
+					} else if(file_exists(INCLUDES["VIEWS"].REQ['PATH'].'.php')) include INCLUDES["VIEWS"].REQ["PATH"].".php";
+					else echo "resource not found";
 				}
 				$theme->title = $title ?? "Phroses System Page";
 				$theme->main = trim(ob_get_clean());
+				$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
 				$theme->Push("stylesheets", [ "src" => "/system.css" ]);
-				$theme->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "async"]);
+				$theme->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "async defer"]);
 				$theme->Push("scripts", [ "src" => "/system.js", "attrs" => "async defer"]);
+				
 				echo $theme;
 			}
 		}
@@ -204,7 +220,7 @@ abstract class Phroses {
 		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
 		foreach(["id", "title", "uri", "content", "type"] as $type)
 			if(!in_array($type, array_keys($_REQUEST))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
-		if(SITE["RESPONSE"] != "PAGE-200") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
+		if(SITE["RESPONSE"] != "PAGE-200" && SITE["RESPONSE"] != "PAGE-301") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
 		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"]); }
 		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
 		
@@ -221,7 +237,7 @@ abstract class Phroses {
 	
 	static public function DELETE() {
 		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
-		if(SITE["RESPONSE"] != "PAGE-200") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
+		if(SITE["RESPONSE"] != "PAGE-200" && SITE["RESPONSE"] != "PAGE-301") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
 		
 		DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ REQ["PATH"], SITE["ID"] ]);
 	}

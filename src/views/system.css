@@ -3,6 +3,10 @@
 	box-sizing: border-box;
 }
 
+.container a:not(.btn) {
+	color: #260E3F;
+}
+
 .aln-r {
 	text-align: right;
 }
@@ -11,6 +15,12 @@
 	text-align: center;
 }
 
+.clear {
+	clear: both;
+}
+.container {
+	padding: 15px;
+}
 .editor { 
 	position: absolute;
 	height: 500px;
@@ -69,8 +79,6 @@
 }
 
 #saved {
-	margin-bottom: 25px;
-	margin-top: 25px;
 	overflow: hidden;
 	padding: 0;
 	background: green;
@@ -83,6 +91,11 @@
 	height: 0;
 	box-sizing: content-box;
 	transition: height .5s, padding .5s;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	z-index: 999;
 }
 
 #saved.active {
@@ -144,14 +157,28 @@
 	display: none;
 }
 
-#phroses_editor_delete {
+.aln-r .btn { float: right; }
+
+.btn {
 	background: #260E3F;
 	height: 50px;
-	padding: 10px;
+	padding: 10px 20px 10px 20px;
 	line-height: 30px;
 	display: inline-block;
 	color: white;
 	cursor: pointer;
+	border: 1px solid #CCC;
+	transition: background .5s, color .5s;
+	margin: 0;
+}
+
+.btn i {
+	margin-right: 10px;
+}
+
+.btn:hover {
+	background: #DDD;
+	color: #260E3F;
 }
 
 #phroses_creator {
@@ -172,4 +199,19 @@
 
 #phroses_creator button:hover {
     transform: scale(1.1,1.1);
+}
+
+.page_item {
+	display: block;
+	background: #DDD;
+	border: 1px solid #BBB;
+	height: 50px;
+	line-height: 50px;
+	padding-left: 20px;
+	transition: color .5s, background .5s;
+}
+
+.page_item:hover {
+	background: #260E3F;
+	color: #DDD !important;
 }
