@@ -8,7 +8,6 @@ if(!file_exists(dirname(__DIR__)."/phroses.conf")) {
 	return;
 }
 
-
 // Define constants
 define("Phroses\SRC", __DIR__);
 define("Phroses\ROOT", dirname(SRC));
@@ -72,6 +71,7 @@ abstract class Phroses {
 	
 	static public function LoadSiteInfo() {
 		if(self::$ran) return;
+		
 		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `pages`.`title`, `pages`.`content`, `pages`.`id` AS `pageID`, `pages`.`type` FROM `sites` LEFT JOIN `pages` ON `pages`.`siteID`=`sites`.`id` AND `pages`.`uri`=? WHERE `sites`.`url`=?", [
 			REQ["PATH"],
 			REQ["BASEURL"]
@@ -189,7 +189,7 @@ abstract class Phroses {
 		}
 		
 		if(SITE["RESPONSE"] == "UNDETERMINED") {
-			if($theme->AssetExists(REQ["PATH"])) $theme->AssetRead(REQ["PATH"]); // Assets
+			if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") $theme->AssetRead(REQ["PATH"]); // Assets
 			else if($theme->ErrorExists("404")) $theme->ErrorRead("404"); // Site-Level 404
 			else { // Generic Site 404
 				$theme->title = "404 Not Found";

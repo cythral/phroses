@@ -5,6 +5,13 @@
 	</div>
 	<?php
 	$q = Phroses\DB::Query("SELECT * FROM `pages` WHERE `siteID`=?", [ Phroses\SITE["ID"] ]);
+	
+	if(count($q) == 0) {
+		?>
+	<em>No pages for <?= Phroses\REQ["BASEURL"]; ?>.  <a href="/admin/pages/create"><strong>Create your first one?</strong></a></em>
+		<?
+	}
+	
 	foreach($q as $page) {
 		?>
 	<a href="/admin/pages/<?= $page->id; ?>" class="page_item"><?= $page->uri; ?> ( <strong><?= $page->title; ?></strong> )</a>
