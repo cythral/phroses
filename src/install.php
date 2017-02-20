@@ -20,6 +20,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     touch(dirname(__DIR__)."/phroses.conf");
     file_put_contents(dirname(__DIR__)."/phroses.conf", $c);
     
+    http_response_code(301);
+    header("location: /admin/pages");
+    die;
   } catch(Exception $e) {
     $error = "Invalid database credentials.";
   }
