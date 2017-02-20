@@ -2,6 +2,13 @@
 
 namespace Phroses;
 
+// if no configuration file found, run installer
+if(!file_exists(dirname(__DIR__)."/phroses.conf")) {
+	include "install.php";
+	return;
+}
+
+
 // Define constants
 define("Phroses\SRC", __DIR__);
 define("Phroses\ROOT", dirname(SRC));
@@ -15,6 +22,7 @@ define("Phroses\INCLUDES", [
 		"INTERFACES" => SRC."/models/interfaces"
 	]
 ]);
+
 
 abstract class Phroses {
 	static private $ran = false;

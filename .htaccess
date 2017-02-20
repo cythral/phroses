@@ -7,4 +7,4 @@ header unset x-powered-by
 
 RewriteEngine on
 RewriteBase /
-RewriteRule ^(.*)$ src/phroses.php [L]
+RewriteRule ^(.*)$ src/phroses.php [B]
