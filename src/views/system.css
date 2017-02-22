@@ -1,6 +1,7 @@
 /* Placeholder for system styles */
 * {
 	box-sizing: border-box;
+	outline: none !important;
 }
 
 .container a:not(.btn) {
@@ -59,6 +60,8 @@
 	position: relative;
 }
 
+#phroses_site_password .form_icfix { margin: 20px 0 20px 0; }
+
 .form_icfix .form_input, .form_icfix .form_select {
 	position: absolute;
 	padding-left: 100px;
@@ -78,7 +81,7 @@
 	text-align: center;
 }
 
-#saved {
+#saved, #error {
 	overflow: hidden;
 	padding: 0;
 	background: green;
@@ -98,10 +101,12 @@
 	z-index: 999;
 }
 
-#saved.active {
+#saved.active, #error.active {
 	height: 30px;
 	padding: 10px;
 }
+
+#error { background: red; }
 
 #phroses-login {
 	padding-top: 30vh;
@@ -185,7 +190,7 @@
     padding-top: 50px;
 }
 
-#phroses_creator button {
+.sys.form button {
     height: 150px;
     width: 150px;
     background-image: url(/admin/next.png);
@@ -197,7 +202,7 @@
     transition: transform .5s;
 }
 
-#phroses_creator button:hover {
+.sys.form button:hover {
     transform: scale(1.1,1.1);
 }
 
@@ -219,4 +224,8 @@
 .backbtn {
 	font-size: 1.1em;
 	font-weight: bold;
+}
+
+#phroses_site_creds section {
+	margin: 30px 0 30px 0;
 }

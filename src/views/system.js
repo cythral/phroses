@@ -71,7 +71,8 @@ $(function() {
 		var data = $(this).serializeArray(), 
             content = {}, 
             method = $(this).data("method"),
-            uri = $("[name='uri']").val();	
+            uri = $("[name='uri']").val() || $(this).data("uri"),
+						id = $(this).attr("id");	
                     
 		$("#phroses_editor .content").each(function() {
 			if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
@@ -82,17 +83,29 @@ $(function() {
 		
 		$.ajax({url : uri, data: data, method : method })
 		.done(function(postdata) {
-            if(method == "PATCH") {
+      if(id == "phroses_editor" || id == "phroses_site_creds") {
 				$("#saved").addClass("active");
 				setTimeout(function() {
 					$("#saved").removeClass("active");
 				}, 5000);
-			} else if(method == "POST") {
+			} else if(id == "phroses_creator") {
 				document.location = "/admin/pages/"+postdata.id;
 			}
 		})
 		.fail(function(data) {
-			console.log(data);
+			data = data.responseJSON;
+			
+			if(id =="phroses_site_creds") {
+				$("#error").html({ 
+					"username" : "Please enter a value for the username field.",
+					"old" : "The value for the old password was incorrect.",
+					"repeat" : "The two new passwords do not match."
+				}[data.field]);
+				$("#error").addClass("active");
+				setTimeout(function() {
+					$("#error").removeClass("active");
+				}, 5000);
+			}
 		});
 	});
 	
