@@ -22,10 +22,16 @@ Phroses\HandleMethod("POST", function() {
   
   Phroses\JsonOutput(["type" => "success"], 200);
 }, ["username", "old", "new", "repeat"]);
-
+ 
 ?>
 
 <div class="container">
+  <div>
+		<a href="/admin/site" class="backbtn"><i class="fa fa-chevron-left"></i> Site Manager</a>
+	</div>
+  
+  <br>
+  
   <form id="phroses_site_creds" class="sys form" data-method="POST" data-uri="/admin/site/credentials">
     <h1>
       Change Site Credentials

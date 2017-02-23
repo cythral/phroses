@@ -2,12 +2,6 @@
 
 namespace Phroses;
 
-// if no configuration file found, run installer
-if(!file_exists(dirname(__DIR__)."/phroses.conf")) {
-	include "install.php";
-	return;
-}
-
 // Define constants
 define("Phroses\SRC", __DIR__);
 define("Phroses\ROOT", dirname(SRC));
@@ -77,9 +71,11 @@ abstract class Phroses {
 			REQ["BASEURL"]
 		]);
 		
+		// if site doesn't exist, create a new one (script ends here)
+		if(count($info) == 0) include "system/newsite.php";
+		
 		// Determine Response Type
 		$response = "PAGE-200";
-		if(count($info) == 0) $response = "SYSTEM-404"; 
 		if(!isset(($info = $info[0])->pageID)) $response = "UNDETERMINED";
 		if(REQ["PATH"] != "/" && (file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
@@ -170,9 +166,9 @@ abstract class Phroses {
 				$theme->title = $title ?? "Phroses System Page";
 				$theme->main = trim(ob_get_clean());
 				$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
-				$theme->Push("stylesheets", [ "src" => "/system.css" ]);
+				$theme->Push("stylesheets", [ "src" => "/phroses.css" ]);
 				$theme->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "async defer"]);
-				$theme->Push("scripts", [ "src" => "/system.js", "attrs" => "async defer"]);
+				$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "async defer"]);
 				
 				echo $theme;
 			}
