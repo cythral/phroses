@@ -52,6 +52,14 @@ $(function() {
 		});
 	});
 	
+	$("#theme_selector").change(function() {
+		$.post("/admin/site", { theme : $(this).val() }, function() {
+			$("#saved").addClass("active");
+				setTimeout(function() {
+					$("#saved").removeClass("active");
+				}, 5000);
+		});
+	});
 	
 	$("#phroses_editor_delete").click(function(e) {
 		$.ajax({ url : $("#pageuri").val(), method: "DELETE" })

@@ -61,6 +61,14 @@ final class Theme extends Template {
 	}
 	
 	public function GetTypes() : array { return $this->types; }
+	
+	static public function List() : array {
+		$list = [];
+		foreach(glob(INCLUDES["THEMES"] . '/*' , GLOB_ONLYDIR) as $dir) {
+			if($dir != "") $list[] = str_replace(INCLUDES["THEMES"]."/", "", $dir);
+		}
+		return $list;
+	}
 }
 
 

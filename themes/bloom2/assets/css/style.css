@@ -1,0 +1,63 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: Open Sans;
+}
+
+a {
+	text-decoration: none;
+}
+
+.clear {
+	clear: both;
+}
+
+main {
+	padding: 30px;
+}
+
+/** Header **/
+header {
+	height: 50px;
+	background: #260E3F;
+	color: white;
+}
+
+.navlist {
+	list-style-type: none;
+}
+
+.navlist_item {
+	display: inline-block;
+}
+
+.header_sitename, .header_nav {
+	display: inline-block;
+	float: left;
+}
+
+.header_sitename {
+	width: 30%;
+	text-align: center;
+	line-height: 50px;
+}
+
+.header_sitename_link, .header.navlist_link {
+	color: white;
+}
+
+.header_nav {
+	width: 70%;
+}
+
+.header.navlist_item {
+	width: 20%;
+	float: left;
+}
+
+.header.navlist_link {
+	width: 100%;
+	line-height: 50px;
+	text-align: center;
+	display: block;
+}

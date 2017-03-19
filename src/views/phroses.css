@@ -229,3 +229,9 @@
 #phroses_site_creds section {
 	margin: 30px 0 30px 0;
 }
+
+#theme_selector {
+	height: 50px;
+	padding: 5px;
+	min-width: 200px;
+}
