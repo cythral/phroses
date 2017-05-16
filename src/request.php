@@ -41,6 +41,7 @@ define("Phroses\REQ", [
 	"METHOD" => $_SERVER['REQUEST_METHOD'],
 	"BASEURL" => $_SERVER["SERVER_NAME"],
 	"FULLURL" => (((bool)($_SERVER["HTTPS"] ?? false)) ? "https://" : "http://").$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"],
+	"URI" => strtok($_SERVER["REQUEST_URI"], "?"),
 	"PORT" => (int)$_SERVER['SERVER_PORT'],
 	"IP" => $_SERVER["REMOTE_ADDR"],
 	"USERAGENT" => $_SERVER["HTTP_USER_AGENT"],

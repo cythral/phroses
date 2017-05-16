@@ -21,6 +21,10 @@ function JsonOutput($array, $code = 400) {
     die(json_encode($array));
 }
 
+function JsonOutputSuccess($array = [ "type" => "success" ], $code = 200) {
+  JsonOutput($array, $code);
+}
+
 
 function HandleMethod(string $method, callable $handler, array $filters = []) {
     if(strtolower($_SERVER["REQUEST_METHOD"]) == strtolower($method)) {

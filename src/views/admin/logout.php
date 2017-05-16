@@ -1,7 +1,6 @@
 <?php
 
-session_destroy();
-session_write_close();
+Phroses\Session::end();
 
 http_response_code(301);
 header("location: /");

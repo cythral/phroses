@@ -10,6 +10,7 @@ define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",
 	"MODELS" => SRC."/models/classes",
 	"VIEWS" => SRC."/views",
+	"TPL" => SRC."/templates",
 	"META" => [ // ORDER OF THESE IS IMPORTANT
 		"TRAITS" => SRC."/models/traits",
 		"INTERFACES" => SRC."/models/interfaces"
@@ -93,6 +94,7 @@ abstract class Phroses {
 			"USERNAME" => $info->adminUsername,
 			"PASSWORD" => $info->adminPassword,
 			"PAGE" => [
+				"ID" => $info->pageID,
 				"TYPE" => $info->type ?? "page",
 				"TITLE" => $info->title,
 				"CONTENT" => json_decode($info->content, true)
@@ -167,7 +169,6 @@ abstract class Phroses {
 				$theme->main = trim(ob_get_clean());
 				$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
 				$theme->Push("stylesheets", [ "src" => "/phroses.css" ]);
-				$theme->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "async defer"]);
 				$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "async defer"]);
 				
 				echo $theme;
@@ -222,21 +223,22 @@ abstract class Phroses {
 	static public function PATCH() {
 		// Validation
 		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
-		foreach(["id", "title", "uri", "content", "type"] as $type)
+		foreach(["id"] as $type)
 			if(!in_array($type, array_keys($_REQUEST))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
+		
 		if(SITE["RESPONSE"] != "PAGE-200" && SITE["RESPONSE"] != "PAGE-301") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
-		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"]); }
+		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]); }
 		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
 		
 		DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=? WHERE `id`=?", [
-			$_REQUEST["title"], 
-			urldecode($_REQUEST["uri"]), 
-			htmlspecialchars_decode($_REQUEST["content"]), 
-			urldecode($_REQUEST["type"]), 
+			$_REQUEST["title"] ?? SITE["PAGE"]["TITLE"], 
+			urldecode($_REQUEST["uri"] ?? REQ["URI"]), 
+			htmlspecialchars_decode($_REQUEST["content"] ?? json_encode(SITE["PAGE"]["CONTENT"])), 
+			urldecode($_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]), 
 			(int)$_REQUEST["id"]
 		]);
 		
-		JsonOutput(["type" => "success"], 200);
+		JsonOutput(["type" => "success", "content" => $theme->GetMainContent() ], 200);
 	}
 	
 	static public function DELETE() {

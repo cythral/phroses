@@ -1,8 +1,15 @@
 <?php
-Phroses\HandleMethod("POST", function() {
-  Phroses\DB::Query("UPDATE `sites` SET `theme`=? WHERE `id`=?", [ $_POST["theme"], Phroses\SITE["ID"] ]);
-  Phroses\JsonOutput(["type" => "success"], 200);
+
+use Phroses\{Theme, DB};
+use function Phroses\{HandleMethod, JsonOutputSuccess};
+use const Phroses\SITE;
+
+HandleMethod("POST", function() {
+  DB::Query("UPDATE `sites` SET `theme`=? WHERE `id`=?", [ $_POST["theme"], SITE["ID"] ]);
+  JsonOutputSuccess();
 });
+
+
 ?>
 
 <div class="container">
@@ -15,8 +22,8 @@ Phroses\HandleMethod("POST", function() {
     <strong>Change Theme: </strong>
     <select id="theme_selector">
       <?php
-      foreach(Phroses\Theme::List() as $thm) {
-      ?><option value="<?= $thm; ?>" <? if($thm == Phroses\SITE["THEME"]) { ?>selected<? } ?>><?= ucfirst($thm); ?></option><?
+      foreach(Theme::List() as $thm) {
+      ?><option value="<?= $thm; ?>" <? if($thm == SITE["THEME"]) { ?>selected<? } ?>><?= ucfirst($thm); ?></option><?
       }
       ?>
     </select>

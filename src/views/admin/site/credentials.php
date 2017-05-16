@@ -1,26 +1,29 @@
 <?php
 
-use Phroses\JsonOutput;
+use Phroses\DB;
+use function Phroses\{HandleMethod, JsonOutput, JsonOutputSuccess};
+use const Phroses\SITE;
 
-Phroses\HandleMethod("POST", function() {
+HandleMethod("POST", function() {
   
-  if($_POST["username"] == "") Phroses\JsonOutput(["type" => "error", "error" => "bad_value", "field" => "username" ]);
+  if($_POST["username"] == "") JsonOutput(["type" => "error", "error" => "bad_value", "field" => "username" ]);
+	
   if($_POST["old"] != "" || $_POST["new"] != "" || $_POST["repeat"] != "") {
-    if(!password_verify($_POST["old"], Phroses\SITE["PASSWORD"])) Phroses\JsonOutput(["type" => "error", "error" => "bad_value", "field" => "old"]);
-    if($_POST["new"] != $_POST["repeat"]) Phroses\JsonOutput(["type" => "error", "error" => "bad_value", "field" => "repeat"]);
+    if(!password_verify($_POST["old"], SITE["PASSWORD"])) JsonOutput(["type" => "error", "error" => "bad_value", "field" => "old"]);
+    if($_POST["new"] != $_POST["repeat"]) JsonOutput(["type" => "error", "error" => "bad_value", "field" => "repeat"]);
     
-    Phroses\DB::Query("UPDATE `sites` SET `adminPassword`=? WHERE `id`=?", [
+    DB::Query("UPDATE `sites` SET `adminPassword`=? WHERE `id`=?", [
       password_hash($_POST["new"], PASSWORD_DEFAULT),
-      Phroses\SITE["ID"]
+      SITE["ID"]
     ]);
   }
   
-  Phroses\DB::Query("UPDATE `sites` SET `adminUsername`=? WHERE `id`=?", [
+  DB::Query("UPDATE `sites` SET `adminUsername`=? WHERE `id`=?", [
     $_POST["username"],
     Phroses\SITE["ID"]
   ]);
   
-  Phroses\JsonOutput(["type" => "success"], 200);
+  JsonOutputSuccess();
 }, ["username", "old", "new", "repeat"]);
  
 ?>
@@ -42,7 +45,7 @@ Phroses\HandleMethod("POST", function() {
     <section>
       <div class="form_icfix">
           <div>Username:</div>
-          <input name="username" required placeholder="Username" class="form_input form_field" autocomplete="off" value="<?= Phroses\SITE["USERNAME"]; ?>">
+          <input name="username" required placeholder="Username" class="form_input form_field" autocomplete="off" value="<?= SITE["USERNAME"]; ?>">
       </div>
     </section>
     

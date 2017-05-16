@@ -20,6 +20,11 @@ class Session extends \SessionHandler {
     self::$run = true;
   }
   
+  static public function end() {
+    session_destroy();
+    session_write_close();
+  }
+  
   static public function _open($a, $b) { return true; }
   static public function _close() { return true; }
   
@@ -35,7 +40,7 @@ class Session extends \SessionHandler {
   
   static public function _gc($max) {
     $max = time() - $max;
-    //\Phroses\DB::Query("DELETE FROM `sessions` WHERE `date` > $max");
+    \Phroses\DB::Query("DELETE FROM `sessions` WHERE `date` > $max");
     return true;
   }
   

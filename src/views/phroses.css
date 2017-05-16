@@ -235,3 +235,109 @@
 	padding: 5px;
 	min-width: 200px;
 }
+
+
+
+/** session tools **/
+#pst {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 20px;
+}
+
+.pst_btn {
+  position: relative;
+  display: inline-block;
+  height: 70px;
+  width: 70px;
+  border-radius: 50px;
+  font-size: 0;
+  background-color: #260E3F;
+  background-size: 80% 80%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 10px #000;
+  margin: 0 10px 0 10px;
+  vertical-align: bottom;
+  /*transform: scale(0, 0);*/
+  animation: bounceIn .3s forwards;
+  transition: height .3s, width .3s;
+  cursor: pointer;
+}
+
+.pst_btn:hover {
+  height: 90px;
+  width: 90px;
+}
+
+.pst_btn:hover:before {
+  position: absolute;
+  top: -30px;
+  height: 20px;
+  width: 90px;
+  border-radius: 25px;
+  height: 20px;
+  background: #333;
+  color: white;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 15px !important;
+  line-height: 20px;
+}
+
+#pst-delete {
+  background-image: url(/phr-assets/img/delete.png);
+}
+
+#pst-delete:hover:before { content: "delete"; }
+
+
+#pst-edit {
+  background-image: url(/phr-assets/img/edit.png);
+  animation-delay: .2s !important;
+}
+
+#pst-edit:hover:before { content: "edit"; }
+
+#pst-es-save { background-image: url(/phr-assets/img/save.png); }
+#pst-es-done { background-image: url(/phr-assets/img/done.png); }
+
+#pst-es {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
+  background: rgba(255,255,255,.95);
+	display: none;
+}
+
+#pst-es h1 {
+	height: 100px;
+	line-height: 100px;
+}
+
+#pst-es-actions {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+#pst-es-actions .pst_btn {
+	vertical-align: top;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0, 0);
+  }
+  
+  80% {
+    transform: scale(1.2, 1.2);
+  }
+  
+  100% {
+    transform: scale(1,1);
+  }
+}
