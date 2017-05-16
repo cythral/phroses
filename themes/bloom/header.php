@@ -11,7 +11,7 @@
                 "About" => "#",
                 "Contact" => "#",
                 "Links" => "#",
-                "Games" => "#"
+                "Test" => "#"
             ];
             
             foreach($items as $k => $v) { ?>

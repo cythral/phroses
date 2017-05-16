@@ -48,4 +48,16 @@ $(function() {
 			$("main").html(pdata.content);
 		}).fail(function(pdata) {});
 	});
+	
+	$("#pst-ds").submit(function(e) {
+		e.preventDefault();
+		var data = $(this).serializeArray();
+		
+		$.ajax({ url : window.location.href, method : "DELETE", data : data })
+		.done(function(pdata) {
+			location.reload();
+		}).fail(function(pdata) {
+			console.error("delete page error");
+		});
+	});
 });

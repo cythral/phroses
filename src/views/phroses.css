@@ -262,13 +262,25 @@
   vertical-align: bottom;
   /*transform: scale(0, 0);*/
   animation: bounceIn .3s forwards;
-  transition: height .3s, width .3s;
+  transition: height .3s, width .3s, line-height .3s, font-size .3s;
   cursor: pointer;
+}
+
+.pst_btn.txt {
+	font-size: inherit;
+	text-align: center;
+	line-height: 70px;
+	color: white !important;
 }
 
 .pst_btn:hover {
   height: 90px;
   width: 90px;
+	line-height: 90px;
+}
+
+.pst_btn.txt:hover {
+	font-size: 1.2em;
 }
 
 .pst_btn:hover:before {
@@ -303,7 +315,7 @@
 #pst-es-save { background-image: url(/phr-assets/img/save.png); }
 #pst-es-done { background-image: url(/phr-assets/img/done.png); }
 
-#pst-es {
+.screen {
   position: absolute;
   top: 0;
   left: 0;
@@ -324,9 +336,16 @@
 	right: 20px;
 }
 
-#pst-es-actions .pst_btn {
+.screen .pst_btn {
 	vertical-align: top;
 }
+
+#pst-ds {
+	padding-top: 100px;
+	text-align: center;
+}
+
+#pst-ds p { margin-bottom: 30px; }
 
 @keyframes bounceIn {
   0% {
