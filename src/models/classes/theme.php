@@ -26,7 +26,7 @@ final class Theme extends Template {
 		if(!file_exists("{$this->root}/{$type}.tpl") && $type != "redirect") throw new \Exception("Theme template doesn't exist");
 		
 		// load stylesheets, scripts and page types
-		$this->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "async defer"]);
+		$this->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "defer"]);
 		foreach(FileList("{$this->root}/assets/css") as $style) $this->Push("stylesheets", [ "src" => "/css/".pathinfo($style, PATHINFO_BASENAME)]);
 		foreach(FileList("{$this->root}/assets/js") as $style) $this->Push("scripts", [ "src" => "/js/".pathinfo($style, PATHINFO_BASENAME)]);
 		foreach(glob("{$this->root}/*.tpl") as $ctype) $this->types[] = pathinfo($ctype, PATHINFO_FILENAME);
@@ -43,13 +43,15 @@ final class Theme extends Template {
 	* @param string $type the current page type
 	*/
 	private function SetupSessionTools(string $type) {
-		if($_SESSION && SITE["RESPONSE"] == "PAGE-200") {
+		if($_SESSION && SITE["RESPONSE"] == "PAGE-200" && REQ["METHOD"] == "GET") {
 			$this->Push("stylesheets", [ "src" => "/phroses.css" ]);
-			$this->Push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "async defer" ]);
-			$this->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "async defer" ]);
+			$this->Push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
+			$this->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
 			
 			$pst = new Template(INCLUDES["TPL"]."/pst.tpl");
 			$pst->id = SITE["PAGE"]["ID"];
+			$pst->title = SITE["PAGE"]["TITLE"];
+			$pst->uri = REQ["URI"];
 			
 			ob_start();
 			foreach($this->GetContentFields($type) as $key => $field) { 
@@ -57,8 +59,10 @@ final class Theme extends Template {
 				else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= SITE["PAGE"]["CONTENT"][$key] ?? ""; ?>"><? }	
 			}
 			$pst->fields = trim(ob_get_clean());
+			foreach($this->GetTypes() as $type2) $pst->Push("types", ["type" => $type2, "checked" => ($type == $type2) ? "selected" : "" ]);
 			
-			$this->tpl = str_replace("</body>", $pst."</body>", $this->tpl);
+			$this->tpl = str_replace("<body>", '<body><div id="phr-container">', $this->tpl);
+			$this->tpl = str_replace("</body>", "</div>".$pst."</body>", $this->tpl);
 		}
 	}
 	
@@ -119,10 +123,10 @@ final class Theme extends Template {
 		return $this-> types; 
 	}
 	
-	public function GetMainContent() {
+	public function GetBody() {
 		$this->useconst = false;
 		$matches = [];
-		preg_match("/<main>(.*)?<\/main>/is", (String)$this, $matches);
+		preg_match("/<body>(.*)?<\/body>/is", (String)$this, $matches);
 		return $matches[1] ?? "";
 	}
 	
@@ -146,7 +150,7 @@ Theme::$filters["include"] = function($file) {
 
 Theme::$filters["content"] = function($key, $fieldtype) {
 	$content = SITE["PAGE"]["CONTENT"];
-	if(!$this->useconst) $content = json_decode($_REQUEST["content"], true);
+	if(!$this->useconst) $content = json_decode($_REQUEST["content"] ?? "{}", true);
 	
 	if(array_key_exists($key, $content ?? [])) echo $content[$key];
 	else if(array_key_exists($key, $this->vars)) echo $this->vars[$key];

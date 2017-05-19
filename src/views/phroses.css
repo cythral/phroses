@@ -16,6 +16,10 @@
 	text-align: center;
 }
 
+.aln-l {
+	text-align: left;
+}
+
 .clear {
 	clear: both;
 }
@@ -83,27 +87,28 @@
 
 #saved, #error {
 	overflow: hidden;
-	padding: 0;
-	background: green;
+	padding: 10px;
+	background: #673AB7;
 	color: white;
 	text-align: center;
 	font-weight: bold;
 	line-height: 30px;
 	text-transform: uppercase;
 	letter-spacing: 1px;
-	height: 0;
+	height: 30px;
 	box-sizing: content-box;
-	transition: height .5s, padding .5s;
+	transition: transform .3s;
 	position: fixed;
 	bottom: 0;
 	left: 0;
 	width: 100%;
 	z-index: 999;
+	transform: scaleY(0);
+	transform-origin: bottom;
 }
 
 #saved.active, #error.active {
-	height: 30px;
-	padding: 10px;
+	transform: scaleY(1);
 }
 
 #error { background: red; }
@@ -244,16 +249,21 @@
   bottom: 0;
   right: 0;
   padding: 20px;
+	opacity: .8;
+	transition: opacity .3s;
+	z-index: 99;
 }
+
+#pst:hover { opacity: 1; }
 
 .pst_btn {
   position: relative;
   display: inline-block;
-  height: 70px;
-  width: 70px;
+  height: 0;
+  width: 0;
   border-radius: 50px;
   font-size: 0;
-  background-color: #260E3F;
+  background-color: #673AB7;
   background-size: 80% 80%;
   background-position: center center;
   background-repeat: no-repeat;
@@ -262,7 +272,7 @@
   vertical-align: bottom;
   /*transform: scale(0, 0);*/
   animation: bounceIn .3s forwards;
-  transition: height .3s, width .3s, line-height .3s, font-size .3s;
+  transition: transform .3s;
   cursor: pointer;
 }
 
@@ -274,44 +284,49 @@
 }
 
 .pst_btn:hover {
-  height: 90px;
-  width: 90px;
-	line-height: 90px;
-}
-
-.pst_btn.txt:hover {
-	font-size: 1.2em;
+  transform: scale(1.2,1.2);
 }
 
 .pst_btn:hover:before {
   position: absolute;
   top: -30px;
   height: 20px;
-  width: 90px;
+  width: 70px;
   border-radius: 25px;
   height: 20px;
   background: #333;
   color: white;
   text-transform: uppercase;
   text-align: center;
-  font-size: 15px !important;
+  font-size: 10px !important;
   line-height: 20px;
+}
+
+.pst_btn:active {
+	box-shadow: inset 0 0 10px #000;
 }
 
 #pst-delete {
   background-image: url(/phr-assets/img/delete.png);
+	animation-delay: 1s;
 }
 
-#pst-delete:hover:before { content: "delete"; }
 
+
+#pst-move {
+	background-image: url(/phr-assets/img/move.png);
+	animation-delay: 1.2s;
+}
 
 #pst-edit {
   background-image: url(/phr-assets/img/edit.png);
-  animation-delay: .2s !important;
+  animation-delay: 1.4s;
 }
-
+#pst-delete:hover:before { content: "delete"; }
+#pst-move:hover:before { content: "move"; }
 #pst-edit:hover:before { content: "edit"; }
 
+#pst-es .pst_btn { animation: none; height: 70px; width: 70px; }
 #pst-es-save { background-image: url(/phr-assets/img/save.png); }
 #pst-es-done { background-image: url(/phr-assets/img/done.png); }
 
@@ -319,15 +334,37 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100%;
   background: rgba(255,255,255,.95);
 	display: none;
+	z-index: 100;
 }
 
-#pst-es h1 {
-	height: 100px;
-	line-height: 100px;
+#pst-es-top {
+	height: 100px;	
+}
+
+#pst-es-title {
+	height: 70px;
+	line-height: 70px;
+	margin-top: 5px;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background: none;
+	border: none;
+	font-size: 2em;
+	font-weight: bold;
+	color: #673AB7;
+	padding-left: 20px;
+	transition: border .3s;
+	border: 5px dashed transparent;
+	border-radius: 25px;
+}
+
+#pst-es-title:hover, #pst-es-title:focus {
+	border: 5px dashed #673AB7;
 }
 
 #pst-es-actions {
@@ -340,23 +377,57 @@
 	vertical-align: top;
 }
 
-#pst-ds {
+#pst-ds, #pst-ms {
 	padding-top: 100px;
 	text-align: center;
 }
 
 #pst-ds p { margin-bottom: 30px; }
 
+#pst-es-type {
+	background: transparent;
+	height: 50px;
+	width: 200px;
+	padding: 0 10px 0 10px;
+	border-radius: 25px;
+	border: 5px solid #673AB7;
+	color: #673AB7;
+	font-weight: bold;
+	font-size: 1.05em;
+	position:relative;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	text-align: center;
+	margin-top: 10px;
+	cursor: pointer;
+	text-align-last: center;
+	text-transform: uppercase;
+}
+
+#pst-ms .form_icfix div, #puri {
+	color: #673AB7;
+}
+#puri {
+	border: 5px solid #673AB7;
+	border-radius: 25px;
+	font-size: 110%;
+	font-weight: bold;
+}
+
 @keyframes bounceIn {
   0% {
-    transform: scale(0, 0);
+    height: 0;
+		width: 0;
   }
   
   80% {
-    transform: scale(1.2, 1.2);
+    height: 80px;
+		width: 80px;
   }
   
   100% {
-    transform: scale(1,1);
+    height: 70px;
+		width: 70px;
   }
 }

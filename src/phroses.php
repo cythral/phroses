@@ -67,7 +67,7 @@ abstract class Phroses {
 	static public function LoadSiteInfo() {
 		if(self::$ran) return;
 		
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `pages`.`title`, `pages`.`content`, `pages`.`id` AS `pageID`, `pages`.`type` FROM `sites` LEFT JOIN `pages` ON `pages`.`siteID`=`sites`.`id` AND `pages`.`uri`=? WHERE `sites`.`url`=?", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, `page`.`id` AS `pageID`, `page`.`type` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?", [
 			REQ["PATH"],
 			REQ["BASEURL"]
 		]);
@@ -128,6 +128,7 @@ abstract class Phroses {
 		if(SITE["RESPONSE"] == "PAGE-200") {
 			$theme->title = SITE["PAGE"]["TITLE"];
 			echo $theme;
+			
 		}
 		
 		if(SITE["RESPONSE"] == "SYSTEM-200") {
@@ -230,15 +231,37 @@ abstract class Phroses {
 		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]); }
 		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
 		
-		DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=? WHERE `id`=?", [
-			$_REQUEST["title"] ?? SITE["PAGE"]["TITLE"], 
-			urldecode($_REQUEST["uri"] ?? REQ["URI"]), 
-			htmlspecialchars_decode($_REQUEST["content"] ?? json_encode(SITE["PAGE"]["CONTENT"])), 
-			urldecode($_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]), 
-			(int)$_REQUEST["id"]
-		]);
+		// if no change was made, dont update the db
+		if(!isset($_REQUEST["type"]) && !isset($_REQUEST["uri"]) && !isset($_REQUEST["title"]) && !isset($_REQUEST["content"]))
+			JsonOutput(["type" => "error", "error" => "no_change" ]);
 		
-		JsonOutput(["type" => "success", "content" => $theme->GetMainContent() ], 200);
+		// do NOT update the database if the request is to change the page to a redirect and there is no content specifying the destination.
+		// if the page is a type redirect and there is no destination, an error will be displayed which we should be trying to avoid
+		if(!(isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect" && (!isset($_REQUEST["content"]) || (isset($_REQUEST["content"]) && !isset(json_decode($_REQUEST["content"])->destination))))) {
+			
+			DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=? WHERE `id`=?", [
+				$_REQUEST["title"] ?? SITE["PAGE"]["TITLE"], 
+				urldecode($_REQUEST["uri"] ?? REQ["URI"]), 
+				(isset($_REQUEST["type"]) && $_REQUEST["type"] != "redirect") ? "{}" : (htmlspecialchars_decode($_REQUEST["content"] ?? json_encode(SITE["PAGE"]["CONTENT"]))), 
+				urldecode($_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]), 
+				(int)$_REQUEST["id"]
+			]);
+		}
+		
+		$output = [ "type" => "success", "content" => $theme->GetBody() ];
+		if(isset($_REQUEST["type"])) {
+			
+			ob_start();
+			foreach($theme->GetContentFields($_REQUEST["type"]) as $key => $field) { 
+				if($field == "editor")  { ?><div class="form_field content editor" id="<?= $_REQUEST["type"] ?>-main" data-id="<?= $key; ?>"></div><? }
+				else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value=""><? }	
+			}
+			$output["typefields"] = trim(ob_get_clean());
+		}
+		
+		// if we are changing to type redirect or the page is a redirect, there is no content
+		if(SITE["PAGE"]["TYPE"] == "redirect" || (isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect")) unset($output["content"]);
+		JsonOutput($output, 200);
 	}
 	
 	static public function DELETE() {
