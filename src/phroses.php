@@ -169,7 +169,7 @@ abstract class Phroses {
 				$theme->title = $title ?? "Phroses System Page";
 				$theme->main = trim(ob_get_clean());
 				$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
-				$theme->Push("stylesheets", [ "src" => "/phroses.css" ]);
+				$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 				$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "async defer"]);
 				
 				echo $theme;
@@ -218,7 +218,7 @@ abstract class Phroses {
 			SITE["ID"]
 		]);	
 		
-		JsonOutput(["type" => "success", "id" => DB::LastID() ], 200);
+		JsonOutputSuccess(["type" => "success", "id" => DB::LastID() ]);
 	}
 	
 	static public function PATCH() {
@@ -261,7 +261,7 @@ abstract class Phroses {
 		
 		// if we are changing to type redirect or the page is a redirect, there is no content
 		if(SITE["PAGE"]["TYPE"] == "redirect" || (isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect")) unset($output["content"]);
-		JsonOutput($output, 200);
+		JsonOutputSuccess($output);
 	}
 	
 	static public function DELETE() {
@@ -269,7 +269,7 @@ abstract class Phroses {
 		if(SITE["RESPONSE"] != "PAGE-200" && SITE["RESPONSE"] != "PAGE-301") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
 		
 		DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ REQ["PATH"], SITE["ID"] ]);
-		JsonOutput(["type" => "success"], 200);
+		JsonOutputSuccess();
 	}
 }
 

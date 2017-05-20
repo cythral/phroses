@@ -1,0 +1,403 @@
+
+
+* {
+	box-sizing: border-box;
+	outline: none !important;
+}
+
+.container a:not(.btn) {
+	color: #260E3F;
+}
+
+.aln-r { text-align: right; }
+.aln-c { text-align: center; }
+.aln-l { text-align: left; }
+
+.clear { clear: both; }
+
+.container { padding: 15px; }
+
+.editor { 
+	position: absolute;
+	height: 500px;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	font-family: monospace !important;
+}
+
+.editor * { font-family: inherit !important; }
+
+.form_field {
+	width: 100%;
+	border: none;
+}
+
+.form_input, .form_select {
+	height: 50px;
+	padding: 10px;
+	border: 1px solid #CCC;
+}
+
+.form_select {
+	background: white;
+}
+
+.form_submit {
+	padding: 10px;
+	background: #260E3F;
+	color: white;
+}
+
+.form_icfix {
+	height: 50px;
+	position: relative;
+	
+	div {
+		position: absolute;
+		z-index: 1;
+		line-height: 50px;
+		width: 100px;
+		font-weight: bold;
+		overflow: hidden;
+		white-space: nowrap;
+		padding-left: 5px;
+		text-align: center;
+	}
+	
+	.form_input, .form_select {
+		position: absolute;
+		padding-left: 100px;
+		z-index: 0;
+	}
+}
+
+#phroses_site_password .form_icfix { margin: 20px 0 20px 0; }
+
+#saved, #error {
+	overflow: hidden;
+	padding: 10px;
+	background: #673AB7;
+	color: white;
+	text-align: center;
+	font-weight: bold;
+	line-height: 30px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	height: 30px;
+	box-sizing: content-box;
+	transition: transform .3s;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	z-index: 999;
+	transform: scaleY(0);
+	transform-origin: bottom;
+	
+	&.active { transform: scaleY(1); }
+}
+
+#error { background: red; }
+
+#phroses-login {
+	padding-top: 30vh;
+	width: 100%;
+	text-align: center;
+	
+	input {
+		display: inline-block;
+		height: 50px;
+		width: 50%;
+		padding: 10px;
+		text-align: center;
+		margin: 10px;
+		
+		&[type="submit"] {
+			background: #260E3F;
+			border: none;
+			color: white;
+		}
+	}
+}
+
+.dashbar {
+  background: #260E3F;
+  height: 50px;
+  padding: 10px;
+  box-sizing: border-box;
+  line-height: 30px;
+  font-family: sans-serif;
+	
+	div {
+		display: inline-block;
+		float: left;
+	}
+}
+  
+.dashbar, .dashbar a {
+	color: white;
+	text-decoration: none;
+}
+
+.dashbar_brand {
+	width: 20%;
+	overflow: hidden;
+	font-weight: bold;
+}
+
+.dashbar_actions {
+	width: 80%;
+	text-align: right;
+}
+
+.editor_tpl {
+	display: none;
+}
+
+.aln-r .btn { float: right; }
+
+.btn {
+	background: #260E3F;
+	height: 50px;
+	padding: 10px 20px 10px 20px;
+	line-height: 30px;
+	display: inline-block;
+	color: white;
+	cursor: pointer;
+	border: 1px solid #CCC;
+	transition: background .5s, color .5s;
+	margin: 0;
+	
+	i { margin-right: 10px; }
+	&:hover {
+		background: #DDD;
+		color: #260E3F;
+	}
+}
+
+#phroses_creator {
+    padding-top: 50px;
+}
+
+.sys.form button {
+	height: 150px;
+	width: 150px;
+	background-image: url(/admin/next.png);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	transition: transform .5s;
+	&:hover { transform: scale(1.1,1.1); }
+}
+
+.page_item {
+	display: block;
+	background: #DDD;
+	border: 1px solid #BBB;
+	height: 50px;
+	line-height: 50px;
+	padding-left: 20px;
+	transition: color .5s, background .5s;
+	
+	&:hover {
+		background: #260E3F;
+		color: #DDD !important;
+	}
+}
+
+.backbtn {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+#phroses_site_creds section {
+	margin: 30px 0 30px 0;
+}
+
+#theme_selector {
+	height: 50px;
+	padding: 5px;
+	min-width: 200px;
+}
+
+
+
+/** session tools **/
+#pst {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 20px;
+	opacity: .8;
+	transition: opacity .3s;
+	z-index: 99;
+	
+	&:hover { opacity: 1; }
+}
+
+.pst_btn {
+  position: relative;
+  display: inline-block;
+  height: 0;
+  width: 0;
+  border-radius: 50px;
+  font-size: 0;
+  background-color: #673AB7;
+  background-size: 80% 80%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 10px #000;
+  margin: 0 10px 0 10px;
+  vertical-align: bottom;
+  /*transform: scale(0, 0);*/
+  animation: bounceIn .3s forwards;
+  transition: transform .3s;
+  cursor: pointer;
+	
+	&.txt {
+		font-size: inherit;
+		text-align: center;
+		line-height: 70px;
+		color: white !important;
+	}
+	
+	&:hover { transform: scale(1.2,1.2); }
+	&:hover:before {
+		position: absolute;
+		top: -30px;
+		height: 20px;
+		width: 70px;
+		border-radius: 25px;
+		height: 20px;
+		background: #333;
+		color: white;
+		text-transform: uppercase;
+		text-align: center;
+		font-size: 10px !important;
+		line-height: 20px;
+	}
+	&:active { box-shadow: inset 0 0 10px #000; }
+}
+
+#pst-delete {
+  background-image: url(/phr-assets/img/delete.png);
+	animation-delay: 1s;
+	&:hover:before { content: "delete"; }
+}
+
+#pst-move {
+	background-image: url(/phr-assets/img/move.png);
+	animation-delay: 1.2s;
+	&:hover:before { content: "move"; }
+}
+
+#pst-edit {
+  background-image: url(/phr-assets/img/edit.png);
+  animation-delay: 1.4s;
+	&:hover:before { content: "edit"; }
+}
+
+#pst-es .pst_btn { animation: none; height: 70px; width: 70px; }
+#pst-es-save { background-image: url(/phr-assets/img/save.png); }
+#pst-es-done { background-image: url(/phr-assets/img/done.png); }
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,.95);
+	display: none;
+	z-index: 100;
+	
+	.pst_btn { vertical-align: top; }
+}
+
+#pst-es-top {
+	height: 100px;	
+}
+
+#pst-es-title {
+	height: 70px;
+	line-height: 70px;
+	margin-top: 5px;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background: none;
+	border: none;
+	font-size: 2em;
+	font-weight: bold;
+	color: #673AB7;
+	padding-left: 20px;
+	transition: border .3s;
+	border: 5px solid transparent;
+	border-radius: 25px;
+	&:hover, &:focus { border: 5px solid #673AB7; }
+}
+
+#pst-es-actions {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+#pst-ds, #pst-ms {
+	padding-top: 100px;
+	text-align: center;
+}
+
+#pst-ds p { margin-bottom: 30px; }
+
+#pst-es-type {
+	background: transparent;
+	height: 50px;
+	width: 200px;
+	padding: 0 10px 0 10px;
+	border-radius: 25px;
+	border: 5px solid #673AB7;
+	color: #673AB7;
+	font-weight: bold;
+	font-size: 1.05em;
+	position:relative;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	text-align: center;
+	margin-top: 10px;
+	cursor: pointer;
+	text-align-last: center;
+	text-transform: uppercase;
+}
+
+#pst-ms .form_icfix div, #puri {
+	color: #673AB7;
+}
+#puri {
+	border: 5px solid #673AB7;
+	border-radius: 25px;
+	font-size: 110%;
+	font-weight: bold;
+}
+
+@keyframes bounceIn {
+  0% {
+    height: 0;
+		width: 0;
+  }
+  
+  80% {
+    height: 80px;
+		width: 80px;
+  }
+  
+  100% {
+    height: 70px;
+		width: 70px;
+  }
+}

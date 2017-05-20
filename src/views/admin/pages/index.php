@@ -14,7 +14,7 @@
 	
 	foreach($q as $page) {
 		?>
-	<a href="/admin/pages/<?= $page->id; ?>" class="page_item"><?= $page->uri; ?> ( <strong><?= $page->title; ?></strong> )</a>
+	<a href="<?= $page->uri; ?>" class="page_item"><?= $page->uri; ?> ( <strong><?= $page->title; ?></strong> )</a>
 		<?
 	}
 	?>

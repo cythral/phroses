@@ -13,6 +13,7 @@
 <body>
 	<{include:header}>
 	<main>
+	blahblah
 		<{content:main:editor}>
 	</main>
 	<{include:footer}>

@@ -94,7 +94,7 @@ $(function() {
 	});
 	
 	$("#pst-es-type").change(function() {
-		var data = { type : $(this).val(), id : $("#pst-es input[name=id]").val() };
+		var data = { type : $(this).val(), id : $("#pid").val() };
 		$("#pst-es-fields").slideUp();
 		$.ajax({ url : window.location.href, method : "PATCH", data: data })
 		.done(function(pdata) {
