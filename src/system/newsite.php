@@ -2,14 +2,13 @@
 
 Phroses\HandleMethod("POST", function() {
   Phroses\DB::Query("INSERT INTO `sites` (`url`, `theme`, `name`,`adminUsername`, `adminPassword`) VALUES (?, 'bloom', ?, ?, ?)", [
-    $_SERVER["SERVER_NAME"],
+    strtok($_SERVER["HTTP_HOST"], ":"),
     $_POST["name"],
     $_POST["username"],
     password_hash($_POST["password"], PASSWORD_DEFAULT)
   ]);
   
-  http_response_code(302);
-  header("location: /admin");
+  JsonOutputSuccess();
 }, ["name", "username", "password"]);
 
 http_response_code(404);

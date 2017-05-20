@@ -1,8 +1,82 @@
+@import "animations";
+@primary: #673AB7; 
+.c { color: @primary; }
 
+/* INSTALL FLOW */
+#install-welcome {
+	display: block;
+	padding-top: 35vh;
+	color: @primary;
+	text-align: center;
+	animation: fadeOut 1s forwards;
+	animation-delay: 4s;
+	pointer-events: none;
+	
+	h1 { 
+		font-size: 3em;
+		opacity: 0;
+		animation: fadeIn 2s forwards;
+		animation-delay: 1s;
+		margin-bottom: 5px;
+		width: 100%;
+	}
+	
+	div {
+		width: 30%;
+		height: 5px;
+		background: @primary;
+		transform: scaleX(0);
+		animation: growX 1s forwards;
+		animation-delay: 1.5s;
+		display: inline-block;
+	}
+}
+
+#install-flow {
+	white-space: nowrap;
+	overflow-x: hidden;
+	h1 {
+		background: @primary;
+		color: white;
+		height: 100px;
+		line-height: 100px;
+		margin: 0 0 50px 0;
+	}
+	
+	form {
+		text-align: center;
+		position: relative;
+		white-space: initial;
+		display:inline-block;
+		width: 100%;
+		vertical-align: top;
+		padding-bottom: 100px;
+		h2, p {
+			margin: 10px;
+		}
+		
+		.form_icfix {
+			width: 60%;
+			display: inline-block !important;
+			margin: 10px 0 10px 0;
+		}
+	}
+}
+
+
+#flow-db-error, #flow-success {
+	padding-top: 35vh;
+	
+	h2 {
+		font-size: 3em;
+	}
+}
 
 * {
 	box-sizing: border-box;
 	outline: none !important;
+	padding: 0;
+	margin: 0;
 }
 
 .container a:not(.btn) {
@@ -58,7 +132,7 @@
 		position: absolute;
 		z-index: 1;
 		line-height: 50px;
-		width: 100px;
+		width: 15%;
 		font-weight: bold;
 		overflow: hidden;
 		white-space: nowrap;
@@ -68,7 +142,7 @@
 	
 	.form_input, .form_select {
 		position: absolute;
-		padding-left: 100px;
+		padding-left: 15%;
 		z-index: 0;
 	}
 }
@@ -244,6 +318,7 @@
   display: inline-block;
   height: 0;
   width: 0;
+	border: none;
   border-radius: 50px;
   font-size: 0;
   background-color: #673AB7;
@@ -251,6 +326,7 @@
   background-position: center center;
   background-repeat: no-repeat;
   box-shadow: 0 0 10px #000;
+	text-decoration: none !important;
   margin: 0 10px 0 10px;
   vertical-align: bottom;
   /*transform: scale(0, 0);*/
@@ -375,29 +451,15 @@
 	text-transform: uppercase;
 }
 
-#pst-ms .form_icfix div, #puri {
+.form_icfix.c div, input {
 	color: #673AB7;
 }
-#puri {
-	border: 5px solid #673AB7;
-	border-radius: 25px;
+.form_icfix.c input {
+	border-bottom: 2px solid #673AB7;
+	border-top: none;
+	border-left: none;
+	border-right: none;
 	font-size: 110%;
 	font-weight: bold;
 }
 
-@keyframes bounceIn {
-  0% {
-    height: 0;
-		width: 0;
-  }
-  
-  80% {
-    height: 80px;
-		width: 80px;
-  }
-  
-  100% {
-    height: 70px;
-		width: 70px;
-  }
-}

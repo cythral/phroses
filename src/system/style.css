@@ -15,31 +15,6 @@
 .aln-r { text-align: right; }
 .aln-c { text-align: center; }
 
-.field {
-  margin: 15px;
-  width: 80%;
-  padding-left: 10%;
-  position: relative;
-}
-.field label {
-  display: inline-block;
-  float: left;
-  text-align: right;
-  padding: 10px;
-  height: 30px;
-  line-height: 10px;
-  width: 20%;
-}
-.field input {
-  height: 30px;
-  padding: 10px;
-  float: left;
-  width: 80%;
-  background: #CCC;
-  color: #260E3F;
-  border: 1px solid #260E3F;
-}
-
 button {
   height: 150px;
   width: 150px;

@@ -1,15 +1,11 @@
 <?php 
-if($_SERVER["REQUEST_METHOD"] == "POST") {
+http_response_code(401);
+
+Phroses\HandleMethod("POST", function() {
   try {
     $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
+    if(version_compare($db->query("select version()")->fetchColumn(), Phroses\DEPS["MYSQL"], "<")) throw new Exception("version");
     $db->query(file_get_contents(dirname(dirname(__DIR__))."/schema.sql"));
-    
-    $q = $db->prepare("INSERT INTO `sites` (`url`, `theme`, `name`,`adminUsername`, `adminPassword`) VALUES (?, 'bloom', ?, ?, ?)");
-    $q->bindValue(1, $_SERVER["SERVER_NAME"]);
-    $q->bindValue(2, $_POST["name"]);
-    $q->bindValue(3, $_POST["susername"]);
-    $q->bindValue(4, password_hash($_POST["spassword"], PASSWORD_DEFAULT));
-    $q->execute();
     
     $c = file_get_contents("phroses.conf");
     $c = str_replace("<mode>", "production", $c);
@@ -20,108 +16,104 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     touch(dirname(dirname(__DIR__))."/phroses.conf");
     file_put_contents(dirname(dirname(__DIR__))."/phroses.conf", $c);
     
-    http_response_code(301);
-    header("location: /admin/pages");
-    die;
+    Phroses\JsonOutputSuccess();
   } catch(Exception $e) {
-    $error = "Invalid database credentials.";
+    $output = [ "type" => "error", "error" => "credentials" ];
+    if($e->getMessage() == "version") {
+      $output["error"] = "version";
+      $output["minver"] = Phroses\DEPS["MYSQL"];
+    }
+    
+    Phroses\JsonOutput($output);
   }
-}
+}, ["host", "database", "username", "password"]);
+  
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
    <title>Install Phroses</title>
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: sans-serif;
-      }
-      .clear {
-        clear: both;
-      }
-      .container, form {
-        padding: 15px;
-      }
-      
-      .field {
-        margin: 15px;
-      }
-      .field label {
-        width: 10%;
-        display: inline-block;
-        float: left;
-        text-align: right;
-        padding: 10px;
-        height: 30px;
-        line-height: 10px;
-      }
-      .field input {
-        width: 90%;
-        height: 30px;
-        padding: 10px;
-        float: left;
-      }
-    </style>
+    <style><?= file_get_contents(Phroses\SRC."/views/phr-assets/css/main.css"); ?></style>
   </head>
-  <body>
-    <div class="container">
-      <h1>
-        Install Phroses
-      </h1>
-      <form action="" method="post">
-        <?= $error ?? ""; ?>
-        <h2>Database Credentials</h2>
-        <div class="field">
-          <label for="host">Host:</label>
-          <input placeholder="Host" name="host" value="localhost" id="host" required>  
+  <body class="aln-c">
+    <div class="screen" id="install-welcome">
+      <h1>Welcome</h1>
+      <div></div>
+    </div>
+    <div id="install-flow">
+      <h1 class="c">Install Phroses</h1>
+      
+      <form class="flow" id="flow-db" action="" method="post">
+        <h2>1. Setup Database</h2>
+        <p>
+          I need your database credentials
+        </p>
+        
+        <div class="form_icfix c aln-l">
+          <div>Host:</div>
+          <input class="form_field form_input" placeholder="Host" name="host" value="localhost" id="host" required autocomplete="off">  
           <div class="clear"></div>
         </div>
-        
-        <div class="field">
-          <label for="database">Database:</label>
-          <input placeholder="Database" name="database" id="database" required>  
+
+        <div class="form_icfix c aln-l">
+          <div>Database:</div>
+          <input class="form_field form_input" placeholder="Database" name="database" id="database" required autocomplete="off">  
           <div class="clear"></div>
         </div>
-        
-        <div class="field">
-          <label for="password">Username:</label>
-          <input placeholder="Username" name="username" id="username" required>  
+
+        <div class="form_icfix c aln-l">
+          <div>Username:</div>
+          <input class="form_field form_input" placeholder="Username" name="username" id="username" required autocomplete="new-password">  
           <div class="clear"></div>
         </div>
-        
-         <div class="field">
-          <label for="password">Password:</label>
-          <input placeholder="Password" name="password" id="password" type="password">  
+
+         <div class="form_icfix c aln-l">
+          <div>Password:</div>
+          <input class="form_field form_input" placeholder="Password" name="password" id="password" type="password" autocomplete="new-password">  
           <div class="clear"></div>
         </div>
-        
+        <br>
+        <input type="submit" class="pst_btn txt" value="Next">
+      </form>
+     
+      <form action="" method="post" id="flow-site">
         <h2>Site Credentials</h2>
-        <div class="field">
-          <label for="name">Site Name:</label>
-          <input placeholder="name" name="name" id="name" required>
+        <div class="form_icfix c aln-l">
+          <div>Site Name:</div>
+          <input class="form_field form_input" placeholder="Phroses" name="name" id="name" required>
           <div class="clear"></div>
         </div>
         
-        <div class="field">
-          <label for="susername">Username:</label>
-          <input placeholder="Username" name="susername" id="susername" required>
+        <div class="form_icfix c aln-l">
+          <div>Username:</div>
+          <input class="form_field form_input" placeholder="Username" name="username" id="susername" required autocomplete="new-password">
           <div class="clear"></div>
         </div>
         
-        <div class="field">
-          <label for="spassword">Password:</label>
-          <input placeholder="Password" name="spassword" id="spassword" required type="password">
+        <div class="form_icfix c aln-l">
+          <div>Password:</div>
+          <input class="form_field form_input" placeholder="Password" name="password" id="spassword" required type="password" autocomplete="new-password">
           <div class="clear"></div>
         </div>
-        
-        <button>
+        <br>
+        <button class="pst_btn txt">
         Install
         </button>
-      </form>  
+      </form>
     </div>
+    
+    <div id="flow-db-error" class="screen">
+      <h2 class="c">Oops..</h2>
+      <br>
+      A minimum MySQL version of <span id="flow-db-error-ver"></span> is required to run Phroses.
+    </div>
+    
+    <div id="flow-success" class="screen">
+      <h2 class="c">Success</h2>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script><?= file_get_contents(Phroses\SRC."/views/phr-assets/js/install.js"); ?></script>
   </body>
 </html>

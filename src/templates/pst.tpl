@@ -34,7 +34,7 @@
 	<h1>Move Page</h1>
 	<p>You may change the URI of the page with this form.</p>
 		<div class="container">
-			<div class="form_icfix aln-l" style="width:60%; display: inline-block;">
+			<div class="form_icfix c aln-l" style="width:60%; display: inline-block;">
 				<div>URI:</div>
 				<input id="puri" name="uri" class="form_input form_field" placeholder="Page URI" value="<{var:uri}>" autocomplete="off">     
 			</div>

@@ -1,6 +1,114 @@
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    display: none;
+  }
+}
+@keyframes growX {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+@keyframes bounceIn {
+  0% {
+    height: 0;
+    width: 0;
+  }
+  80% {
+    height: 80px;
+    width: 80px;
+  }
+  100% {
+    height: 70px;
+    width: 70px;
+  }
+}
+.c {
+  color: #673AB7;
+}
+/* INSTALL FLOW */
+#install-welcome {
+  display: block;
+  padding-top: 35vh;
+  color: #673AB7;
+  text-align: center;
+  animation: fadeOut 1s forwards;
+  animation-delay: 4s;
+  pointer-events: none;
+}
+#install-welcome h1 {
+  font-size: 3em;
+  opacity: 0;
+  animation: fadeIn 2s forwards;
+  animation-delay: 1s;
+  margin-bottom: 5px;
+  width: 100%;
+}
+#install-welcome div {
+  width: 30%;
+  height: 5px;
+  background: #673AB7;
+  transform: scaleX(0);
+  animation: growX 1s forwards;
+  animation-delay: 1.5s;
+  display: inline-block;
+}
+#install-flow {
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+#install-flow h1 {
+  background: #673AB7;
+  color: white;
+  height: 100px;
+  line-height: 100px;
+  margin: 0 0 50px 0;
+}
+#install-flow form {
+  text-align: center;
+  position: relative;
+  white-space: initial;
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
+  padding-bottom: 100px;
+}
+#install-flow form h2,
+#install-flow form p {
+  margin: 10px;
+}
+#install-flow form .form_icfix {
+  width: 60%;
+  display: inline-block !important;
+  margin: 10px 0 10px 0;
+}
+#flow-db-error,
+#flow-success {
+  padding-top: 35vh;
+}
+#flow-db-error h2,
+#flow-success h2 {
+  font-size: 3em;
+}
 * {
   box-sizing: border-box;
   outline: none !important;
+  padding: 0;
+  margin: 0;
 }
 .container a:not(.btn) {
   color: #260E3F;
@@ -54,25 +162,25 @@
   height: 50px;
   position: relative;
 }
-#phroses_site_password .form_icfix {
-  margin: 20px 0 20px 0;
-}
-.form_icfix .form_input,
-.form_icfix .form_select {
-  position: absolute;
-  padding-left: 100px;
-  z-index: 0;
-}
 .form_icfix div {
   position: absolute;
   z-index: 1;
   line-height: 50px;
-  width: 100px;
+  width: 15%;
   font-weight: bold;
   overflow: hidden;
   white-space: nowrap;
   padding-left: 5px;
   text-align: center;
+}
+.form_icfix .form_input,
+.form_icfix .form_select {
+  position: absolute;
+  padding-left: 15%;
+  z-index: 0;
+}
+#phroses_site_password .form_icfix {
+  margin: 20px 0 20px 0;
 }
 #saved,
 #error {
@@ -129,14 +237,14 @@
   line-height: 30px;
   font-family: sans-serif;
 }
+.dashbar div {
+  display: inline-block;
+  float: left;
+}
 .dashbar,
 .dashbar a {
   color: white;
   text-decoration: none;
-}
-.dashbar div {
-  display: inline-block;
-  float: left;
 }
 .dashbar_brand {
   width: 20%;
@@ -232,6 +340,7 @@
   display: inline-block;
   height: 0;
   width: 0;
+  border: none;
   border-radius: 50px;
   font-size: 0;
   background-color: #673AB7;
@@ -239,6 +348,7 @@
   background-position: center center;
   background-repeat: no-repeat;
   box-shadow: 0 0 10px #000;
+  text-decoration: none !important;
   margin: 0 10px 0 10px;
   vertical-align: bottom;
   /*transform: scale(0, 0);*/
@@ -373,27 +483,15 @@
   text-align-last: center;
   text-transform: uppercase;
 }
-#pst-ms .form_icfix div,
-#puri {
+.form_icfix.c div,
+input {
   color: #673AB7;
 }
-#puri {
-  border: 5px solid #673AB7;
-  border-radius: 25px;
+.form_icfix.c input {
+  border-bottom: 2px solid #673AB7;
+  border-top: none;
+  border-left: none;
+  border-right: none;
   font-size: 110%;
   font-weight: bold;
-}
-@keyframes bounceIn {
-  0% {
-    height: 0;
-    width: 0;
-  }
-  80% {
-    height: 80px;
-    width: 80px;
-  }
-  100% {
-    height: 70px;
-    width: 70px;
-  }
 }
