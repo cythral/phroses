@@ -2,10 +2,9 @@
 
 namespace Phroses;
 
-// Define constants
 define("Phroses\SRC", __DIR__);
 define("Phroses\ROOT", dirname(SRC));
-define("Phroses\CONF", parse_ini_file(ROOT."/phroses.conf", true));
+define("Phroses\DEPS", $deps);
 define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",
 	"MODELS" => SRC."/models/classes",
@@ -16,7 +15,6 @@ define("Phroses\INCLUDES", [
 		"INTERFACES" => SRC."/models/interfaces"
 	]
 ]);
-
 
 abstract class Phroses {
 	static private $ran = false;
@@ -36,8 +34,9 @@ abstract class Phroses {
 		include SRC."/functions.php"; // include functions
 		include SRC."/request.php";
 		
-		self::SetupMode();
 		self::LoadModels();
+		self::CheckReqs();
+		self::SetupMode();
 		self::LoadSiteInfo();
 		self::UrlFix();
 		self::SetupSession();
@@ -62,6 +61,20 @@ abstract class Phroses {
 			if(file_exists(INCLUDES["MODELS"]."/{$class}.php"))
 				include_once INCLUDES["MODELS"]."/{$class}.php";
 		});
+	}
+	
+	static public function CheckReqs() {
+		if(!file_exists(INCLUDES["THEMES"]."/bloom")) {
+			http_response_code(500);
+			header("content-type: text/plain");
+			die("Default theme 'bloom' was not detected.  Please re-add the default bloom theme to its proper directory.");
+		}
+
+		// if no configuration file found, run installer
+		if(!Config::Load()) {
+			include SRC."/system/install.php";
+			die;
+		}
 	}
 	
 	static public function LoadSiteInfo() {
@@ -147,7 +160,7 @@ abstract class Phroses {
 					</form>
 				<? } else { 
 					if(REQ["METHOD"] == "GET") { ?>
-		
+					<?php echo $_SERVER['HTTP_HOST']; ?>
 					<div class="dashbar">
 						<div class="dashbar_brand">
 							<a href="/admin">Phroses Panel</a>
@@ -170,7 +183,7 @@ abstract class Phroses {
 				$theme->main = trim(ob_get_clean());
 				$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
 				$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-				$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "async defer"]);
+				$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "defer"]);
 				
 				echo $theme;
 			}

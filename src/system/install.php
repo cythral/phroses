@@ -2,7 +2,7 @@
 if($_SERVER["REQUEST_METHOD"] == "POST") {
   try {
     $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
-    $db->query(file_get_contents(dirname(__DIR__)."/schema.sql"));
+    $db->query(file_get_contents(dirname(dirname(__DIR__))."/schema.sql"));
     
     $q = $db->prepare("INSERT INTO `sites` (`url`, `theme`, `name`,`adminUsername`, `adminPassword`) VALUES (?, 'bloom', ?, ?, ?)");
     $q->bindValue(1, $_SERVER["SERVER_NAME"]);
@@ -17,8 +17,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $c = str_replace("<username>", $_POST["username"], $c);
     $c = str_replace("<password>", $_POST["password"], $c);
     $c = str_replace("<database>", $_POST["database"], $c);
-    touch(dirname(__DIR__)."/phroses.conf");
-    file_put_contents(dirname(__DIR__)."/phroses.conf", $c);
+    touch(dirname(dirname(__DIR__))."/phroses.conf");
+    file_put_contents(dirname(dirname(__DIR__))."/phroses.conf", $c);
     
     http_response_code(301);
     header("location: /admin/pages");

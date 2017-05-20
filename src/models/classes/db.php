@@ -5,10 +5,13 @@ use \PDO;
 abstract class DB {
 	static private $db;
 	static private $setup = false;
-
+	static public $version;
+	
 	static public function Setup() {
 		if(self::$setup) return; // only run once
 		self::$db = new PDO("mysql:host=".CONF["database"]["host"].";dbname=".CONF["database"]["name"], CONF["database"]["user"], CONF["database"]["password"]);
+		self::$version = self::$db->query("select version()")->fetchColumn();
+		self::$setup = true;
 	}
 	
 	static public function Query(string $query, array $values, int $fetchStyle = PDO::FETCH_OBJ) {

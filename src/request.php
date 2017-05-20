@@ -37,7 +37,7 @@ define("Phroses\REQ", [
 	"PROTOCOL" => $_SERVER["SERVER_PROTOCOL"],
 	"H2PUSH" => (bool)($_SERVER["H2PUSH"] ?? false),
 	"SSL" => (bool)($_SERVER["HTTPS"] ?? false),
-	"HOST" => strstr($_SERVER["HTTP_HOST"], ":", true),
+	"HOST" => strtok($_SERVER["HTTP_HOST"], ":"),
 	"METHOD" => $_SERVER['REQUEST_METHOD'],
 	"BASEURL" => $_SERVER["SERVER_NAME"],
 	"FULLURL" => (((bool)($_SERVER["HTTPS"] ?? false)) ? "https://" : "http://").$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"],
@@ -55,7 +55,6 @@ define("Phroses\REQ", [
 	"SUBDOMAIN" => (count($domainParts) == 2) ? "main" : implode(".", array_slice($domainParts, 2)),
 	"TYPE" => (isset($extension)) ? "asset" : "page"
 ]);
-
 if(array_key_exists(strtolower(REQ["EXTENSION"]), MIME_TYPES)) header("content-type: ".MIME_TYPES[strtolower(REQ["EXTENSION"])]);
 else header("content-type: ".MIME_TYPES[""]);
 parse_str(file_get_contents('php://input'), $_REQUEST);
