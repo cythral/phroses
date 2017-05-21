@@ -36,6 +36,7 @@ abstract class Phroses {
 		
 		self::LoadModels();
 		if(!self::CheckReqs()) return;
+		Config::Set("mode", "production");
 		self::SetupMode();
 		if(REQ["TYPE"] != "cli") {
 			self::LoadSiteInfo();

@@ -19,8 +19,9 @@ Phroses\HandleMethod("POST", function() {
     $c = str_replace("<username>", $_POST["username"], $c);
     $c = str_replace("<password>", $_POST["password"], $c);
     $c = str_replace("<database>", $_POST["database"], $c);
-    touch(Phroses\ROOT."/phroses.conf");
     file_put_contents(Phroses\ROOT."/phroses.conf", $c);
+    chown(Phroses\ROOT."/phroses.conf", posix_getpwuid(posix_geteuid())['name']);
+    chmod(Phroses\ROOT."/phroses.conf", 0775);
     
     Phroses\JsonOutputSuccess();
   } catch(Exception $e) {
