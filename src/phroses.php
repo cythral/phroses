@@ -46,8 +46,9 @@ abstract class Phroses {
 	
 	static public function SetupMode() {
 		if(self::$ran) return; // only run once
-		if(!array_key_exists(CONF["mode"], array_keys(self::$modes))) return false;
+		if(!array_key_exists(Config::Get("mode"), array_keys(self::$modes))) return false;
 		foreach(self::$modes as $key => $val) ini_set($key, $val);
+		die(Config::Get("mode"));
 	}
 	
 	static public function LoadModels() {

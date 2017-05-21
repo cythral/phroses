@@ -7,5 +7,5 @@ header unset x-powered-by
 
 RewriteEngine on
 RewriteBase /
-#RewriteRule ^(.*)$ src/startup.php [L]
-RewriteRule ^(.*)$ phroses.phar [L]
+RewriteRule ^(.*)$ src/startup.php [L]
+#RewriteRule ^(.*)$ phroses.phar [L]

@@ -15,6 +15,24 @@ function rcopy($src,$dst) {
     closedir($dir); 
 } 
 
+function rrmdir($src) {
+    $dir = opendir($src);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            $full = $src . '/' . $file;
+            if ( is_dir($full) ) {
+                rrmdir($full);
+            }
+            else {
+                unlink($full);
+            }
+        }
+    }
+    closedir($dir);
+    rmdir($src);
+}
+
+
 $p = new Phar(__DIR__.'/phroses.phar', 0, 'phroses');
 $p->startBuffering();
 $p->buildFromDirectory(__DIR__."/src/");
@@ -24,6 +42,7 @@ $p->stopBuffering();
 if(file_exists("phroses.tar")) unlink("phroses.tar");
 if(file_exists("phroses.tar.gz")) unlink("phroses.tar.gz");
 
+if(file_exists("themes.tmp")) rrmdir("themes.tmp");
 mkdir("themes.tmp");
 rcopy("themes", "themes.tmp/themes");
 
@@ -36,3 +55,5 @@ $r->addFile("deps.json");
 $r->addFile("LICENSE");
 $r->addFile("README.md");
 $r = $r->compress(Phar::GZ);
+rrmdir("themes.tmp");
+unlink("phroses.tar");
