@@ -5,9 +5,9 @@ php:
   - '7.1'
   
 script:
-  php build.php
-  php phroses.phar
-  php tests/bootstrap.php
+  - php build.php
+  - php phroses.phar
+  - php tests/bootstrap.php
   
 deploy:
   provider: releases
