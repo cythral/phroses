@@ -35,13 +35,15 @@ abstract class Phroses {
 		include SRC."/request.php";
 		
 		self::LoadModels();
-		self::CheckReqs();
+		if(!self::CheckReqs()) return;
 		self::SetupMode();
-		self::LoadSiteInfo();
-		self::UrlFix();
-		self::SetupSession();
-		if(SITE["RESPONSE"] != "SYSTEM-200") call_user_func("self::".REQ["METHOD"]);
-		else self::GET();
+		if(REQ["TYPE"] != "cli") {
+			self::LoadSiteInfo();
+			self::UrlFix();
+			self::SetupSession();
+			if(SITE["RESPONSE"] != "SYSTEM-200") call_user_func("self::".REQ["METHOD"]);
+			else self::GET();
+		}
 	}
 	
 	static public function SetupMode() {
@@ -75,12 +77,18 @@ abstract class Phroses {
 		// if no configuration file found, run installer
 		if(!Config::Load()) {
 			include SRC."/system/install.php";
-			die;
+			return false;
 		}
+		return true;
 	}
 	
 	static public function LoadSiteInfo() {
 		if(self::$ran) return;
+		
+		if(REQ["TYPE"] == "cli") { // functionality tbd
+			define("Phroses\SITE", ["RESPONSE" => "CLI"]);
+			return;
+		}
 		
 		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, `page`.`id` AS `pageID`, `page`.`type` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?", [
 			REQ["PATH"],
@@ -132,6 +140,7 @@ abstract class Phroses {
 	}
 	
 	static public function GET() {
+		
 		if(SITE["RESPONSE"] == "PAGE-301") {
 			http_response_code(301);
 			header("location: ".SITE["PAGE"]["CONTENT"]["destination"]);
@@ -211,8 +220,11 @@ abstract class Phroses {
 		}
 		
 		session_write_close();
-		ob_end_flush();
-		flush();
+		
+		if(Config::Get("mode") == "production") {
+			ob_end_flush();
+			flush();
+		}
 	}
 	
 	static public function POST() {

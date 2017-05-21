@@ -1,15 +1,17 @@
 <?php
 namespace Phroses;
 
-$uri = strtok($_SERVER["REQUEST_URI"], "?");
-$path = (strpos($uri, ".")) ? strstr($uri, ".", true) : $uri;
-$parts = explode("/", $path);
-$directory = implode("/", array_slice($parts, 0, -1));
-$filename = array_reverse($parts)[0];
-$extension = (ltrim(strstr($uri, "."), "."));
-$extension = ($extension == "") ? null : $extension;
-$domainParts = array_reverse(explode(".", $_SERVER["HTTP_HOST"]));
-parse_str(strtok("?"), $_GET);
+if(php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) {
+	$uri = strtok($_SERVER["REQUEST_URI"], "?");
+	$path = (strpos($uri, ".")) ? strstr($uri, ".", true) : $uri;
+	$parts = explode("/", $path);
+	$directory = implode("/", array_slice($parts, 0, -1));
+	$filename = array_reverse($parts)[0];
+	$extension = (ltrim(strstr($uri, "."), "."));
+	$extension = ($extension == "") ? null : $extension;
+	$domainParts = array_reverse(explode(".", $_SERVER["HTTP_HOST"]));
+	parse_str(strtok("?"), $_GET);
+}
 
 const MIME_TYPES = [
 	"" => "text/html; charset=utf8",
@@ -33,7 +35,7 @@ const MIME_TYPES = [
 	"tpl" => "text/html; charset=utf8"
 ];
 
-define("Phroses\REQ", [
+define("Phroses\REQ", (php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) ? [
 	"PROTOCOL" => $_SERVER["SERVER_PROTOCOL"],
 	"H2PUSH" => (bool)($_SERVER["H2PUSH"] ?? false),
 	"SSL" => (bool)($_SERVER["HTTPS"] ?? false),
@@ -54,7 +56,11 @@ define("Phroses\REQ", [
 	"PATH" => $directory."/".$filename.((isset($extension)) ? ".".$extension : ""),
 	"SUBDOMAIN" => (count($domainParts) == 2) ? "main" : implode(".", array_slice($domainParts, 2)),
 	"TYPE" => (isset($extension)) ? "asset" : "page"
-]);
-if(array_key_exists(strtolower(REQ["EXTENSION"]), MIME_TYPES)) header("content-type: ".MIME_TYPES[strtolower(REQ["EXTENSION"])]);
-else header("content-type: ".MIME_TYPES[""]);
+] : ["TYPE" => "cli"]);
+
+if(REQ["TYPE"] != "cli") {
+	if(array_key_exists(strtolower(REQ["EXTENSION"]), MIME_TYPES)) header("content-type: ".MIME_TYPES[strtolower(REQ["EXTENSION"])]);
+	else header("content-type: ".MIME_TYPES[""]);
+}
+
 parse_str(file_get_contents('php://input'), $_REQUEST);

@@ -30,8 +30,8 @@ class Config {
       if(is_array($val)) {
         $section = array_merge((array)$parent, (array)$key);
         $out .= '[' . join('.', $section) . ']' . PHP_EOL;
-        $out .= self::ArrayToConf($val, $section);
-      } else $out .= "$key=$val";
+        $out .= self::Array2IniStr($val, $section);
+      } else $out .= "$key=$val".PHP_EOL;
     }
     return $out;
   }
