@@ -67,7 +67,8 @@ abstract class Phroses {
 		if(!file_exists(INCLUDES["THEMES"]."/bloom")) {
 			http_response_code(500);
 			header("content-type: text/plain");
-			die("Default theme 'bloom' was not detected.  Please re-add the default bloom theme to its proper directory.");
+			echo "Default theme 'bloom' was not detected.  Please re-add the default bloom theme to its proper directory.";
+			exit(1);
 		}
 
 		// if no configuration file found, run installer
