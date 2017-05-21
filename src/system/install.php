@@ -5,16 +5,16 @@ Phroses\HandleMethod("POST", function() {
   try {
     $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
     if(version_compare($db->query("select version()")->fetchColumn(), Phroses\DEPS["MYSQL"], "<")) throw new Exception("version");
-    $db->query(file_get_contents(dirname(dirname(__DIR__))."/schema.sql"));
+    $db->query(file_get_contents(Phroses\ROOT."/schema.sql"));
     
-    $c = file_get_contents("phroses.conf");
+    $c = file_get_contents(Phroses\SRC."/phroses.conf");
     $c = str_replace("<mode>", "production", $c);
     $c = str_replace("<host>", $_POST["host"], $c);
     $c = str_replace("<username>", $_POST["username"], $c);
     $c = str_replace("<password>", $_POST["password"], $c);
     $c = str_replace("<database>", $_POST["database"], $c);
-    touch(dirname(dirname(__DIR__))."/phroses.conf");
-    file_put_contents(dirname(dirname(__DIR__))."/phroses.conf", $c);
+    touch(Phroses\ROOT."/phroses.conf");
+    file_put_contents(Phroses\ROOT."/phroses.conf", $c);
     
     Phroses\JsonOutputSuccess();
   } catch(Exception $e) {

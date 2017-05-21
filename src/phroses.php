@@ -160,7 +160,6 @@ abstract class Phroses {
 					</form>
 				<? } else { 
 					if(REQ["METHOD"] == "GET") { ?>
-					<?php echo $_SERVER['HTTP_HOST']; ?>
 					<div class="dashbar">
 						<div class="dashbar_brand">
 							<a href="/admin">Phroses Panel</a>
