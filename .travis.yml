@@ -1,7 +1,18 @@
 language: php
+
 php:
   - '7.0'
   - '7.1'
+  
 script:
   php build.php
   php tests/bootstrap.php
+  
+deploy:
+  provider: releases
+  api_key:
+    secure: "i0fpOdajaRH67ly1lCbYT/W+TMOpss2m694NZ8jg24UMLyTDLa81/XwdxCyRbkcLDujwZIZCPGANOqXHBuYYZXpYh2iZLXpX3vuwUg5Hcj0UMTShfuCC/6CJYrRPCz5SXq1fU/stSftSD5Qmw+33l+O/MWt3LK7GZ00YOzAUjoyEwXEA6Is04W0N/dmyBrbdNoqHNwMhBHSmNKfHOrE2kQnSPaXspoIS0OymEtUe8OfYmcjAfo5yiimInZlaGrlNQ+rQv7+8riu9S3nvno+8rDVlcuHJcwgtJmR4rnJix5Ikdrc1PZOQoHwsnktZxp0WhYvNTw/dfasxKmofH9gElKt1yeqwTYi3YY9etW5s7sABSQng8nDqYGmQbYWWODJosnzMqVMPbU1d8vTXuIUsqDGR/8BiGLrsgigUuHU58nK+YcsBXgSToZmwCyDZsI0kAoetxK22L6thzP6xGcFXvZT1q8bSej3v9ODLIKmPVEpf32r9iTy6DCWEDswtqmuDkv1BPd8m/jKA0j+jK5eQaEVrB1FBcZUICaRPoKlmU7uQKi4+w0Pqg00yWhb51SIA3ek04y+aX1IiAHAr0D16Rghruga1Us94Jrpn6EyLqNZWh8YdNpExkdqOcCdqkiJAvrprOSLNKOPU65a1o3RXMdoPb90LUK//IU54LienbtE="
+  file: "phroses.tar.gz"
+  skip_cleanup: true
+  on:
+    tags: true

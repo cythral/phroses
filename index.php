@@ -1,1 +1,0 @@
-<?php include "phar://".__DIR__."/builds/phroses-build-16.phar/startup.php";
