@@ -10,8 +10,7 @@ script:
   
 deploy:
   provider: releases
-  api_key: 
-    secure: "a6zLL8U1ipQpNV8iYRmlPq6v4UJq/IegZFJsSSNmlso1VmasYwA8DqJRMsfdnpA4xttNTus206WpCF84zjoEEjjJHxNwJz6UZAt5qq3y9Uka/Ah9hwZ8JzVnoPOrovYjVweR05xFQkBV1T1/MVjJ++lmC+dficFNjtz9vDLy35zFqBUQ3PpkGNIsfp6xdtjc8mbVy3RlZBKtAhhm7oWM8+NOFPHkpoJTN5TH8zk5o/SmCMSOXmZztE9Oh7TgfID4MCFD4xup/QzXHeZjs+47KsUb+6XAvimlzjLAxod4GSIyAqwYGcwudYJVgvX5WMMMj0xMg1L+G68zU3r1huhcPp9RVm85NzoBELzXylKAjgG+CXnjogQ7nBBXHRjkqWzU8i53QO62DpwSaAckoMIW2mvHfa81PmIAgxEbi7t+878BGnZHutJA3AKJLhJnwjrPeUE3LcLLHaLrrKKY1YpzKZcogFCSEntB2pkkChmz/QjqSnoWbp8831EOPdZmwY0wmx9drD1AKrCyZn5eT1lPG675ODOTN4pleNYhEsunRr5bjhGxWXhB/mlSrQVxqkesfSzxy2HZTzXMQC0zrLXgSvAPt5TO9jBQl1Cp0K54DcIS8CuQ4PVL+fOIEmTVrF1nCxEVwOVmZZm0KdazdRaQ8g8rkEeAMa8hbd2I5wMp2vU="
+  api_key: "80f359ca883dcc67accd924676196ffa071ffc05"
   file: "phroses.tar.gz"
   skip_cleanup: true
   on:
