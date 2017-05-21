@@ -49,7 +49,7 @@ rcopy("themes", "themes.tmp/themes");
 $r = new PharData("phroses.tar");
 $r->buildFromDirectory("themes.tmp");
 $r->addFile("phroses.phar");
-$r->addFile(".htaccess");
+$r->addFile(".htaccess.build", ".htaccess");
 $r->addFile("schema.sql");
 $r->addFile("deps.json");
 $r->addFile("LICENSE");

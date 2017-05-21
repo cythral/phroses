@@ -13,6 +13,7 @@ if(strpos(__DIR__, "phar://") !== false) {
   $inphar = true;
 }
 
+define("INPHAR", $inphar);
 $deps = array_change_key_case(json_decode(file_get_contents($depsfile), true), CASE_UPPER);
 
 if(version_compare(phpversion(), $deps["PHP"], "<")) {

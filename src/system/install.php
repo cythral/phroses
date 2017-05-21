@@ -1,6 +1,12 @@
 <?php 
 http_response_code(404);
 
+if(!is_writable(Phroses\ROOT)) {
+  header("content-type: text/plain");
+  echo "No write access to ".Phroses\ROOT.". Please fix directory permissions";
+  exit(1);
+}
+  
 Phroses\HandleMethod("POST", function() {
   try {
     $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
@@ -8,7 +14,7 @@ Phroses\HandleMethod("POST", function() {
     $db->query(file_get_contents(Phroses\ROOT."/schema.sql"));
     
     $c = file_get_contents(Phroses\SRC."/phroses.conf");
-    $c = str_replace("<mode>", "production", $c);
+    $c = str_replace("<mode>", (INPHAR) ? "production" : "development", $c);
     $c = str_replace("<host>", $_POST["host"], $c);
     $c = str_replace("<username>", $_POST["username"], $c);
     $c = str_replace("<password>", $_POST["password"], $c);
