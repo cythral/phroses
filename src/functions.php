@@ -27,6 +27,7 @@ function JsonOutputSuccess($array = [ "type" => "success" ], $code = 200) {
 
 
 function HandleMethod(string $method, callable $handler, array $filters = []) {
+  if(REQ["TYPE"] == "cli") return; 
     if(strtolower($_SERVER["REQUEST_METHOD"]) == strtolower($method)) {
         if(count($filters) > 0) {
             foreach($filters as $k => $f) {                
