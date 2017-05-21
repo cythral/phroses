@@ -6,6 +6,7 @@ php:
   
 script:
   php build.php
+  php phroses.phar
   php tests/bootstrap.php
   
 deploy:

@@ -1,3 +1,3 @@
 <?php
 
-echo "placeholder";
+include "app.php";
