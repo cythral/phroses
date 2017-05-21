@@ -19,39 +19,47 @@ http_response_code(404);
   <head>
     <meta charset="utf-8">
     <title>Create Phroses Site</title>
-    <style><?= file_get_contents(Phroses\SRC."/system/style.css"); ?></style>
+    <style><?= file_get_contents(Phroses\SRC."/views/phr-assets/css/main.css"); ?></style>
   </head>
-  <body>
-    <header>
-      <img src="data:image/png;base64,<?= base64_encode(file_get_contents(Phroses\INCLUDES["VIEWS"]."/phroses-logo.png")); ?>" alt="Phroses Logo">
-      <h1>
-        MultiCMS by Cythral&reg;
-      </h1>
-    </header>
-    <div class="container">
-      <form action="" method="POST">
-        <h1>No site found. Create one?</h1>
-        <div class="field">
-          <label for="name">Name:</label>
-          <input id="name" name="name" placeholder="Website title/name" required>
-          <div class="clear"></div>
-        </div>
-        <div class="field">
-          <label for="username">Username:</label>
-          <input id="username" name="username" placeholder="Admin Username" required>
-          <div class="clear"></div>
-        </div>
-        <div class="field">
-          <label for="password">Password:</label>
-          <input id="password" name="password" type="password" placeholder="Admin Password" required>
+  <body class="aln-c">
+    <div class="screen" id="install-welcome">
+      <h1>Welcome</h1>
+      <div></div>
+    </div>
+    <div id="install-flow">
+      <h1 class="c">Create a Site</h1>
+      <p>I couldn't find a site at <?= Phroses\REQ["HOST"]; ?>, so I'll help you create one.</p>
+      
+      <form action="" method="post" id="flow-site">
+        <div class="form_icfix c aln-l">
+          <div>Site Name:</div>
+          <input class="form_field form_input" placeholder="Phroses" name="name" id="name" required>
           <div class="clear"></div>
         </div>
         
-        <div class="aln-c">
-          <button style="background: url(data:image/png;base64,<?= base64_encode(file_get_contents(Phroses\INCLUDES["VIEWS"]."/admin/next.png")); ?>);"></button>
+        <div class="form_icfix c aln-l">
+          <div>Username:</div>
+          <input class="form_field form_input" placeholder="Username" name="username" id="susername" required autocomplete="new-password">
+          <div class="clear"></div>
         </div>
-      </form>  
+        
+        <div class="form_icfix c aln-l">
+          <div>Password:</div>
+          <input class="form_field form_input" placeholder="Password" name="password" id="spassword" required type="password" autocomplete="new-password">
+          <div class="clear"></div>
+        </div>
+        <br>
+        <button class="pst_btn txt">
+        Submit
+        </button>
+      </form>
     </div>
+    
+    <div id="flow-success" class="screen">
+      <h2 class="c">Success</h2>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script><?= file_get_contents(Phroses\SRC."/views/phr-assets/js/install.js"); ?></script>
   </body>
 </html>
 <?php die;

@@ -1,5 +1,5 @@
 <?php 
-http_response_code(401);
+http_response_code(404);
 
 Phroses\HandleMethod("POST", function() {
   try {
@@ -47,9 +47,7 @@ Phroses\HandleMethod("POST", function() {
       
       <form class="flow" id="flow-db" action="" method="post">
         <h2>1. Setup Database</h2>
-        <p>
-          I need your database credentials
-        </p>
+        <p>I need your database credentials</p>
         
         <div class="form_icfix c aln-l">
           <div>Host:</div>
@@ -79,7 +77,8 @@ Phroses\HandleMethod("POST", function() {
       </form>
      
       <form action="" method="post" id="flow-site">
-        <h2>Site Credentials</h2>
+        <h2>2. Site Specifics</h2>
+        <p>Lets set up your site together xoxo</p>
         <div class="form_icfix c aln-l">
           <div>Site Name:</div>
           <input class="form_field form_input" placeholder="Phroses" name="name" id="name" required>
