@@ -3,7 +3,7 @@
 namespace Phroses;
 
 define("Phroses\SRC", __DIR__);
-define("Phroses\ROOT", dirname(SRC));
+define("Phroses\ROOT", ($inphar) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
 define("Phroses\DEPS", $deps);
 define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",

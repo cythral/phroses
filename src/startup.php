@@ -4,7 +4,16 @@
 // lets check for versions
 // and make sure we take care of even the most dumb users here
 if(!function_exists("json_decode") || @__DIR__ == "__DIR__") die("ur php sux");
-$deps = array_change_key_case(json_decode(file_get_contents(dirname(__DIR__)."/deps.json"), true), CASE_UPPER);
+
+// if in a phar we need to fix paths
+$depsfile = dirname(__DIR__)."/deps.json";
+$inphar = false;
+if(strpos(__DIR__, "phar://") !== false) {
+  $depsfile = str_replace("phar://", "", dirname(__DIR__)."/deps.json");
+  $inphar = true;
+}
+
+$deps = array_change_key_case(json_decode(file_get_contents($depsfile), true), CASE_UPPER);
 
 if(version_compare(phpversion(), $deps["PHP"], "<")) {
   http_response_code(500);
