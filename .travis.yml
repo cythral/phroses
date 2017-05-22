@@ -4,8 +4,12 @@ php:
   - '7.0'
   - '7.1'
   
-before_script: phpenv config-add php.ini
+before_script: 
+  - phpenv config-add php.ini
+  - npm install -g less
 script:
+  - lessc --clean-css src/views/phr-assets/css/main.less src/views/phr-assets/css/main.css
+  - rm src/views/phr-assets/css/main.less && rm src/views/phr-assets/css/animations.less
   - php build.php
   - php phroses.phar
   - php tests/bootstrap.php

@@ -47,7 +47,7 @@ CREATE TABLE `pages` (
   `type` varchar(200) NOT NULL DEFAULT 'page',
   `title` varchar(2000) NOT NULL,
   `uri` varchar(2000) NOT NULL,
-  `content` JSON NOT NULL,
+  `content` LONGTEXT NOT NULL,
   PRIMARY KEY (`id`),
   KEY `siteID` (`siteID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
