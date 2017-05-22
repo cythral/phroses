@@ -7,6 +7,7 @@ php:
 before_script: 
   - phpenv config-add php.ini
   - npm install -g less
+  - npm install -g less-plugin-clean-css
 script:
   - lessc --clean-css src/views/phr-assets/css/main.less src/views/phr-assets/css/main.css
   - rm src/views/phr-assets/css/main.less && rm src/views/phr-assets/css/animations.less
