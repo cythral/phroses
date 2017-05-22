@@ -29,6 +29,20 @@ abstract class Phroses {
 		]
 	];
 	
+	const RESPONSES = [
+		"PAGE" => [ 
+			200 => 0, 
+			301 => 1,
+			404 => 2
+		],
+		
+		"SYS" => [
+			200 => 3
+		],
+		
+		"THEME" => 4
+	];
+	
 	static public function Start() {
 		if(self::$ran) return; // only run once
 		include SRC."/functions.php"; // include functions
@@ -36,13 +50,12 @@ abstract class Phroses {
 		
 		self::LoadModels();
 		if(!self::CheckReqs()) return;
-		Config::Set("mode", "production");
 		self::SetupMode();
 		if(REQ["TYPE"] != "cli") {
 			self::LoadSiteInfo();
 			self::UrlFix();
 			self::SetupSession();
-			if(SITE["RESPONSE"] != "SYSTEM-200") call_user_func("self::".REQ["METHOD"]);
+			if(SITE["RESPONSE"] != self::RESPONSES["SYS"][200]) call_user_func("self::".REQ["METHOD"]);
 			else self::GET();
 		}
 	}
@@ -100,14 +113,16 @@ abstract class Phroses {
 		if(count($info) == 0) include "system/newsite.php";
 		
 		// Determine Response Type
-		$response = "PAGE-200";
-		if(!isset(($info = $info[0])->pageID)) $response = "UNDETERMINED";
-		if(REQ["PATH"] != "/" && (file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
+		$response = self::RESPONSES["PAGE"][200];
+		if(!isset(($info = $info[0])->pageID)) $response = self::RESPONSES["PAGE"][404];
+		if(REQ["PATH"] != "/" && 
+			 (file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
 		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php") ||
-		   substr(REQ["PATH"], 0, 13) == "/admin/pages/")) $response = "SYSTEM-200";
-		if(REQ["PATH"] == "/api" && REQ["METHOD"] != "GET") $response = "THEME-API";
-		if($info->type == "redirect") $response = "PAGE-301";
+		   substr(REQ["PATH"], 0, 13) == "/admin/pages/")) $response = self::RESPONSES["SYS"][200];
+		
+		if(REQ["PATH"] == "/api" && REQ["METHOD"] != "GET") $response = self::RESPONSES["THEME"];
+		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
 		
 		// Setup the site constant
 		define("Phroses\SITE", [
@@ -141,86 +156,85 @@ abstract class Phroses {
 	}
 	
 	static public function GET() {
-		
-		if(SITE["RESPONSE"] == "PAGE-301") {
-			http_response_code(301);
-			header("location: ".SITE["PAGE"]["CONTENT"]["destination"]);
-			die;
-		}
-		
 		ob_start("ob_gzhandler");
 		$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
-		if(SITE["RESPONSE"] == "PAGE-200") {
-			$theme->title = SITE["PAGE"]["TITLE"];
-			echo $theme;
-			
-		}
 		
-		if(SITE["RESPONSE"] == "SYSTEM-200") {
-			if(!is_dir(INCLUDES["VIEWS"].REQ["PATH"]) && 
-				file_exists(INCLUDES["VIEWS"].REQ["PATH"]) && 
-				strtolower(REQ["EXTENSION"]) != "php") readfile(INCLUDES["VIEWS"].REQ["PATH"]);
-			else {
-				ob_start();
-				if(!$_SESSION && REQ["PATH"] != "/admin/login") { 
-					http_response_code(401);
-?>				<form id="phroses-login">
-						<h2>Login to Phroses Site Panel</h2>
-						<div><input name="username" type="text" placeholder="Username"></div>
-						<div><input name="password" type="password" placeholder="Password"></div>
-						<div><input type="submit" value="Login"></div>
-					</form>
-				<? } else { 
-					if(REQ["METHOD"] == "GET") { ?>
-					<div class="dashbar">
-						<div class="dashbar_brand">
-							<a href="/admin">Phroses Panel</a>
-						</div>
-						<div class="dashbar_actions">
-							<?= REQ["HOST"]; ?> | <a href="/admin/logout">Logout</a>
-						</div>
-						<div class="clear"></div>
-					</div>
+		[
+			self::RESPONSES["PAGE"][200] => function(&$theme) {
+				$theme->title = SITE["PAGE"]["TITLE"];
+			},
 			
-		<? 			}
-					if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
-					else if(substr(REQ["PATH"], 0, 13) == "/admin/pages/") {
-						$_GET["id"] = substr(REQ["PATH"], 13);
-						include INCLUDES["VIEWS"]."/admin/pages/edit.php";
-					} else if(file_exists(INCLUDES["VIEWS"].REQ['PATH'].'.php')) include INCLUDES["VIEWS"].REQ["PATH"].".php";
-					else echo "resource not found";
+			self::RESPONSES["PAGE"][301] => function($theme) {
+				http_response_code(301);
+				header("location: ".SITE["PAGE"]["CONTENT"]["destination"]);
+				die;
+			},
+		
+			self::RESPONSES["SYS"][200] => function(&$theme) {
+				if(!is_dir(INCLUDES["VIEWS"].REQ["PATH"]) && 
+					file_exists(INCLUDES["VIEWS"].REQ["PATH"]) && 
+					strtolower(REQ["EXTENSION"]) != "php") { 
+					readfile(INCLUDES["VIEWS"].REQ["PATH"]);
+					die;
+				} else {
+					ob_start();
+					if(!$_SESSION && REQ["PATH"] != "/admin/login") { 
+						http_response_code(401);
+	?>				<form id="phroses-login">
+							<h2>Login to Phroses Site Panel</h2>
+							<div><input name="username" type="text" placeholder="Username"></div>
+							<div><input name="password" type="password" placeholder="Password"></div>
+							<div><input type="submit" value="Login"></div>
+						</form>
+					<? } else { 
+						if(REQ["METHOD"] == "GET") { ?>
+						<div class="dashbar">
+							<div class="dashbar_brand">
+								<a href="/admin">Phroses Panel</a>
+							</div>
+							<div class="dashbar_actions">
+								<?= REQ["HOST"]; ?> | <a href="/admin/logout">Logout</a>
+							</div>
+							<div class="clear"></div>
+						</div>
+
+			<? 			}
+						if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
+						else if(substr(REQ["PATH"], 0, 13) == "/admin/pages/") {
+							$_GET["id"] = substr(REQ["PATH"], 13);
+							include INCLUDES["VIEWS"]."/admin/pages/edit.php";
+						} else if(file_exists(INCLUDES["VIEWS"].REQ['PATH'].'.php')) include INCLUDES["VIEWS"].REQ["PATH"].".php";
+						else echo "resource not found";
+					}
+					$theme->title = $title ?? "Phroses System Page";
+					$theme->main = trim(ob_get_clean());
+					$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
+					$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+					$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "defer"]);
 				}
-				$theme->title = $title ?? "Phroses System Page";
-				$theme->main = trim(ob_get_clean());
-				$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
-				$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-				$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "defer"]);
-				
-				echo $theme;
-			}
-		}
+			},
 		
-		if(SITE["RESPONSE"] == "THEME-API") {
-			if(!$theme->HasAPI()) {
-				$theme->title = "404 Not Found";
-				$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
-				echo $theme;
-			} else {
-				$theme->RunAPI();
-			}
-		}
+			self::RESPONSES["PAGE"][404] => function(&$theme) {
+				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") $theme->AssetRead(REQ["PATH"]); // Assets
+				else if($theme->ErrorExists("404")) $theme->ErrorRead("404"); // Site-Level 404
+				else { // Generic Site 404
+					$theme->title = "404 Not Found";
+					$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
+				}
+			},
 		
-		if(SITE["RESPONSE"] == "UNDETERMINED") {
-			if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") $theme->AssetRead(REQ["PATH"]); // Assets
-			else if($theme->ErrorExists("404")) $theme->ErrorRead("404"); // Site-Level 404
-			else { // Generic Site 404
-				$theme->title = "404 Not Found";
-				$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
-				echo $theme;
+			self::RESPONSES["THEME"] => function(&$theme) {
+				if(!$theme->HasAPI()) {
+					$theme->title = "404 Not Found";
+					$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
+				} else {
+					$theme->RunAPI();
+					die;
+				}
 			}
-		}
 		
-		session_write_close();
+		][SITE["RESPONSE"]]($theme);
+		echo $theme;
 		
 		if(Config::Get("mode") == "production") {
 			ob_end_flush();
@@ -233,7 +247,7 @@ abstract class Phroses {
 		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
 		foreach(["title","type","content"] as $type)
 			if(!in_array($type, array_keys($_REQUEST))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
-		if(SITE["RESPONSE"] != "UNDETERMINED" && SITE["RESPONSE"] != "SYSTEM-404") JsonOutput([ "type" => "error", "error" => "resource_exists" ]);
+		if(SITE["RESPONSE"] != self::RESPONSES["PAGE"][404]) JsonOutput([ "type" => "error", "error" => "resource_exists" ]);
 		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"]); }
 		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
 		

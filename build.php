@@ -57,3 +57,5 @@ $r->addFile("README.md");
 $r = $r->compress(Phar::GZ);
 rrmdir("themes.tmp");
 unlink("phroses.tar");
+
+opcache_compile_file("phroses.phar");

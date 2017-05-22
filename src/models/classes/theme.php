@@ -43,7 +43,7 @@ final class Theme extends Template {
 	* @param string $type the current page type
 	*/
 	private function SetupSessionTools(string $type) {
-		if($_SESSION && SITE["RESPONSE"] == "PAGE-200" && REQ["METHOD"] == "GET") {
+		if($_SESSION && SITE["RESPONSE"] == Phroses::RESPONSES["PAGE"][200] && REQ["METHOD"] == "GET") {
 			$this->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$this->Push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
 			$this->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
