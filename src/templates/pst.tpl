@@ -1,8 +1,9 @@
 
-<div id="pst">
+<div id="pst" class="<{var:pst_type}>">
   <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn">Delete</a>
   <a href="#" id="pst-move" class="pst_btn" data-target="pst-ms" data-action="fadeIn">Move</a>
   <a href="/admin/pages/<{var:id}>" id="pst-edit" class="pst_btn" data-target="pst-es" data-action="fadeIn">Edit</a>
+	<a href="#" id="pst-new" class="pst_btn txt" data-target="pst-ns" data-action="fadeIn">New</a>
 </div>
 <div id="saved">saved</div>
 <div id="error">error</div>
@@ -34,12 +35,31 @@
 	<h1>Move Page</h1>
 	<p>You may change the URI of the page with this form.</p>
 		<div class="container">
-			<div class="form_icfix c aln-l" style="width:60%; display: inline-block;">
+			<div class="form_icfix c aln-l">
 				<div>URI:</div>
 				<input id="puri" name="uri" class="form_input form_field" placeholder="Page URI" value="<{var:uri}>" autocomplete="off">     
 			</div>
 		</div>
     <a id="pst-ms-s" href="#" class="pst_btn txt" data-target="pst-ms" data-action="submit">Submit</a>
     <a id="pst-ms-c" href="#" class="pst_btn txt" data-target="pst-ms" data-action="fadeOut">Cancel</a>
+</form>
+
+<form id="pst-ns" class="container screen">
+	<h1>Create a New Page</h1>
+	<div class="container">
+		<div class="form_icfix c aln-l">
+			<div>Title:</div>
+			<input name="title" class="form_input form_field" placeholder="Page Title" autocomplete="off">
+		</div>
+		<div class="form_icfix c aln-l">
+			<div>Type:</div>
+			<select name="type" class="c form_select form_field">
+				<option value="" disabled selected>Select a Page Type</option>
+				<{array:types:<option value="@type">@type</option>}>
+			</select>
+		</div>
+	</div>
+	<a id="pst-ns-s" href="#" class="pst_btn txt" data-target="pst-ns" data-action="submit">Submit</a>
+  <a id="pst-ns-c" href="#" class="pst_btn txt" data-target="pst-ns" data-action="fadeOut">Cancel</a>
 </form>
 <script> </script><!-- LEAVE THIS HERE (see https://bugs.chromium.org/p/chromium/issues/detail?id=332189) -->

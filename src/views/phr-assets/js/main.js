@@ -93,6 +93,26 @@ $(function() {
 		});
 	});
 	
+	$("#pst-ns").submit(function(e) {
+		e.preventDefault();
+		
+		var data = $(this).serializeArray();
+		$.ajax({ url : window.location.href, method: "POST", data : data })
+		.done(function(pdata) {
+			$("#pid").val(pdata.id);
+			$("#pst").removeClass("new");
+			$("#pst").addClass("existing");
+			$("#phr-container").html(pdata.content);
+			$("#pst-es-fields").html(pdata.typefields);
+			$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
+			$("#pst-es-type").val($("#pst-ns select").val());
+			createEditors();
+			$("#pst-ns").fadeOut();
+		}).fail(function(pdata) {
+			console.log(pdata);
+		});
+	});
+	
 	$("#pst-es-type").change(function() {
 		var data = { type : $(this).val(), id : $("#pid").val() };
 		$("#pst-es-fields").slideUp();

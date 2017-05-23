@@ -43,7 +43,7 @@ final class Theme extends Template {
 	* @param string $type the current page type
 	*/
 	private function SetupSessionTools(string $type) {
-		if($_SESSION && SITE["RESPONSE"] == Phroses::RESPONSES["PAGE"][200] && REQ["METHOD"] == "GET") {
+		if($_SESSION && REQ["METHOD"] == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404]])) {
 			$this->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$this->Push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
 			$this->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
@@ -53,14 +53,23 @@ final class Theme extends Template {
 			$pst->title = SITE["PAGE"]["TITLE"];
 			$pst->uri = REQ["URI"];
 			
-			ob_start();
-			foreach($this->GetContentFields($type) as $key => $field) { 
-				if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></div><? }
-				else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= SITE["PAGE"]["CONTENT"][$key] ?? ""; ?>"><? }	
-			}
-			$pst->fields = trim(ob_get_clean());
-			foreach($this->GetTypes() as $type2) $pst->Push("types", ["type" => $type2, "checked" => ($type == $type2) ? "selected" : "" ]);
+			if(SITE["RESPONSE"] == Phroses::RESPONSES["PAGE"][200]) {
+				$pst->pst_type = "existing";
+
+				ob_start();
+				foreach($this->GetContentFields($type) as $key => $field) { 
+					if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></div><? }
+					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= SITE["PAGE"]["CONTENT"][$key] ?? ""; ?>"><? }	
+				}
+				$pst->fields = trim(ob_get_clean());
 			
+			// 404
+			} else {
+				$pst->pst_type = "new";
+				$pst->fields = "";
+			}
+			
+			foreach($this->GetTypes() as $type2) $pst->Push("types", ["type" => $type2, "checked" => ($type == $type2) ? "selected" : "" ]);
 			$this->tpl = str_replace("<body>", '<body><div id="phr-container">', $this->tpl);
 			$this->tpl = str_replace("</body>", "</div>".$pst."</body>", $this->tpl);
 		}

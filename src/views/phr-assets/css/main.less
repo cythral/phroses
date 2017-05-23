@@ -116,6 +116,7 @@
 
 .form_select {
 	background: white;
+	cursor: pointer;
 }
 
 .form_submit {
@@ -301,18 +302,6 @@
 
 
 /** session tools **/
-#pst {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  padding: 20px;
-	opacity: .8;
-	transition: opacity .3s;
-	z-index: 99;
-	
-	&:hover { opacity: 1; }
-}
-
 .pst_btn {
   position: relative;
   display: inline-block;
@@ -359,23 +348,44 @@
 	&:active { box-shadow: inset 0 0 10px #000; }
 }
 
-#pst-delete {
-  background-image: url(/phr-assets/img/delete.png);
-	animation-delay: 1s;
-	&:hover:before { content: "delete"; }
+#pst {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 20px;
+	opacity: .8;
+	transition: opacity .3s;
+	z-index: 99;
+	
+	#pst-delete {
+		background-image: url(/phr-assets/img/delete.png);
+		animation-delay: 1s;
+		&:hover:before { content: "delete"; }
+	}
+
+	#pst-move {
+		background-image: url(/phr-assets/img/move.png);
+		animation-delay: 1.2s;
+		&:hover:before { content: "move"; }
+	}
+
+	#pst-edit {
+		background-image: url(/phr-assets/img/edit.png);
+		animation-delay: 1.4s;
+		&:hover:before { content: "edit"; }
+	}
+	
+	&:hover { opacity: 1; }
+	&.new { 
+		#pst-edit, #pst-move, #pst-delete { display: none; }
+	}
+	
+	&.existing {
+		#pst-new { display: none; }
+	}
 }
 
-#pst-move {
-	background-image: url(/phr-assets/img/move.png);
-	animation-delay: 1.2s;
-	&:hover:before { content: "move"; }
-}
 
-#pst-edit {
-  background-image: url(/phr-assets/img/edit.png);
-  animation-delay: 1.4s;
-	&:hover:before { content: "edit"; }
-}
 
 #pst-es .pst_btn { animation: none; height: 70px; width: 70px; }
 #pst-es-save { background-image: url(/phr-assets/img/save.png); }
@@ -423,9 +433,15 @@
 	right: 20px;
 }
 
-#pst-ds, #pst-ms {
+#pst-ds, #pst-ms, #pst-ns {
 	padding-top: 100px;
 	text-align: center;
+	
+	.form_icfix {
+		width: 60%;
+		display: inline-block;
+		margin: 10px 0 10px 0;
+	}
 }
 
 #pst-ds p { margin-bottom: 30px; }
@@ -454,12 +470,19 @@
 .form_icfix.c div, input {
 	color: #673AB7;
 }
-.form_icfix.c input {
+.form_icfix.c input, select.c {
 	border-bottom: 2px solid #673AB7;
 	border-top: none;
 	border-left: none;
 	border-right: none;
 	font-size: 110%;
 	font-weight: bold;
+	background: none;
 }
+
+select.c {
+	height: 50px;
+	padding: 5px;
+}
+
 

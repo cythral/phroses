@@ -3,7 +3,7 @@
 namespace Phroses;
 
 define("Phroses\SRC", __DIR__);
-define("Phroses\ROOT", ($inphar) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
+define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
 define("Phroses\DEPS", $deps);
 define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",
@@ -216,7 +216,7 @@ abstract class Phroses {
 		
 			self::RESPONSES["PAGE"][404] => function(&$theme) {
 				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") $theme->AssetRead(REQ["PATH"]); // Assets
-				else if($theme->ErrorExists("404")) $theme->ErrorRead("404"); // Site-Level 404
+				else if($theme->ErrorExists("404")) { $theme->ErrorRead("404"); die; } // Site-Level 404
 				else { // Generic Site 404
 					$theme->title = "404 Not Found";
 					$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
@@ -245,7 +245,7 @@ abstract class Phroses {
 	static public function POST() {
 		// Validation
 		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
-		foreach(["title","type","content"] as $type)
+		foreach(["title","type"] as $type)
 			if(!in_array($type, array_keys($_REQUEST))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
 		if(SITE["RESPONSE"] != self::RESPONSES["PAGE"][404]) JsonOutput([ "type" => "error", "error" => "resource_exists" ]);
 		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"]); }
@@ -255,11 +255,20 @@ abstract class Phroses {
 			REQ["PATH"],
 			$_REQUEST["title"],
 			$_REQUEST["type"],
-			$_REQUEST["content"] ?? $content,
+			$_REQUEST["content"] ?? "{}",
 			SITE["ID"]
 		]);	
 		
-		JsonOutputSuccess(["type" => "success", "id" => DB::LastID() ]);
+		$output = [ "type" => "success", "id" => DB::LastID(), "content" => $theme->GetBody() ];
+		
+		ob_start();
+		foreach($theme->GetContentFields($_REQUEST["type"]) as $key => $field) { 
+			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $_REQUEST["type"] ?>-main" data-id="<?= $key; ?>"></div><? }
+			else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value=""><? }	
+		}
+		$output["typefields"] = trim(ob_get_clean());
+		
+		JsonOutputSuccess($output);
 	}
 	
 	static public function PATCH() {
