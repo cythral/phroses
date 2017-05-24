@@ -42,8 +42,9 @@ DROP TABLE IF EXISTS `pages`;
 CREATE TABLE `pages` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `siteID` bigint(20) unsigned NOT NULL,
-  `dateCreated` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `dateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dateModified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `views` bigint(20) unsigned NOT NULL DEFAULT 0,
   `type` varchar(200) NOT NULL DEFAULT 'page',
   `title` varchar(2000) NOT NULL,
   `uri` varchar(2000) NOT NULL,

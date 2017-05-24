@@ -106,6 +106,7 @@ $(function() {
 			$("#pst-es-fields").html(pdata.typefields);
 			$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
 			$("#pst-es-type").val($("#pst-ns select").val());
+			$("#pst-ns")[0].reset();
 			createEditors();
 			$("#pst-ns").fadeOut();
 		}).fail(function(pdata) {

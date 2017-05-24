@@ -103,7 +103,7 @@ abstract class Phroses {
 			return;
 		}
 		
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, `page`.`id` AS `pageID`, `page`.`type` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			REQ["PATH"],
 			REQ["BASEURL"]
 		]);
@@ -124,16 +124,19 @@ abstract class Phroses {
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
 		
 		// Setup the site constant
+		// maybe should have this as an object instead?
+		// todo: thinkabout that
 		define("Phroses\SITE", [
 			"ID" => $info->id,
 			"RESPONSE" => $response,
 			"NAME" => $info->name,
 			"THEME" => $info->theme,
-			"USERNAME" => $info->adminUsername,
+			"USERNAME" => $info->adminUsername, // todo: remove username and password from constant cause security
 			"PASSWORD" => $info->adminPassword,
 			"PAGE" => [
 				"ID" => $info->pageID,
 				"TYPE" => $info->type ?? "page",
+				"VIEWS" => $info->views,
 				"TITLE" => $info->title,
 				"CONTENT" => json_decode($info->content, true)
 			]
