@@ -1,5 +1,0 @@
-{
-  "php" : "7.0.0",
-  "mysql" : "5.7.0",
-  "exts" : ["json", "pdo_mysql", "session", "date"]
-}

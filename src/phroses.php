@@ -4,7 +4,6 @@ namespace Phroses;
 
 define("Phroses\SRC", __DIR__);
 define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
-define("Phroses\DEPS", $deps);
 define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",
 	"MODELS" => SRC."/models/classes",
