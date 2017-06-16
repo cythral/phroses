@@ -326,7 +326,7 @@ abstract class Phroses {
 		if($localver >= SCHEMAVER) return;
 		
 		while($localver < SCHEMAVER) {
-			DB::Query(file_get_contents(SRC."/schema/update-".++$localver.".sql"), []);
+			DB::UnpreparedQuery(file_get_contents(SRC."/schema/update-".++$localver.".sql"));
 		}
 	}
 }

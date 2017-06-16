@@ -23,6 +23,10 @@ abstract class DB {
 		return $q->fetchAll($fetchStyle);
 	}
 	
+	static public function UnpreparedQuery(string $query) {
+		self::$db->query($query);
+	}
+	
 	static public function Error() {
 		return self::$db->errorInfo();
 	}

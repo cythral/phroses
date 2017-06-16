@@ -1,5 +1,6 @@
 <?php
 namespace Phroses;
+
 define("Phroses", true);
 define("Phroses\SRC", __DIR__);
 define("Phroses\SCHEMAVER", 2);
