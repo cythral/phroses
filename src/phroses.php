@@ -46,7 +46,7 @@ abstract class Phroses {
 			else self::GET();
 			
 		} else {
-			if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "update") self::update();
+			if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "update") DB::Update();
 			exit(0);
 		}
 	}
@@ -319,15 +319,6 @@ abstract class Phroses {
 		
 		DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ REQ["PATH"], SITE["ID"] ]);
 		JsonOutputSuccess();
-	}
-	
-	static public function update() {
-		$localver = (int)DB::Query("SELECT `value` FROM `options` WHERE `key`='schemaver'", [])[0]->value;
-		if($localver >= SCHEMAVER) return;
-		
-		while($localver < SCHEMAVER) {
-			DB::UnpreparedQuery(file_get_contents(SRC."/schema/update-".++$localver.".sql"));
-		}
 	}
 }
 

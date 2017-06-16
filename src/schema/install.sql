@@ -3,7 +3,7 @@ OPTIONS TABLE
 *****************************************************/
 DROP TABLE IF EXISTS `options`;
 CREATE TABLE `options` (
-  `key` varchar(50) NOT NULL UNIQUE PRIMARY KEY,
+  `key` varchar(50) NOT NULL PRIMARY KEY,
   `value` text NOT NULL  
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
