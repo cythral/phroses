@@ -50,7 +50,6 @@ $r = new PharData("phroses.tar");
 $r->buildFromDirectory("themes.tmp");
 $r->addFile("phroses.phar");
 $r->addFile(".htaccess.build", ".htaccess");
-$r->addFile("schema.sql");
 $r->addFile("LICENSE");
 $r->addFile("README.md");
 $r = $r->compress(Phar::GZ);
