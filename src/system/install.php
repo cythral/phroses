@@ -11,7 +11,10 @@ Phroses\HandleMethod("POST", function() {
   try {
     $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
     if(version_compare($db->query("select version()")->fetchColumn(), Phroses\DEPS["MYSQL"], "<")) throw new Exception("version");
-    $db->query(file_get_contents(Phroses\ROOT."/schema.sql"));
+    
+    $schema = new Phroses\Template(Phroses\SRC."/schema/install.sql");
+    $schema->schemaver = Phroses\SCHEMAVER;
+    $db->query($schema);
     
     $c = file_get_contents(Phroses\SRC."/phroses.conf");
     $c = str_replace("<mode>", (INPHAR) ? "production" : "development", $c);

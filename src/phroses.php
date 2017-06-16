@@ -3,6 +3,8 @@
 namespace Phroses;
 
 define("Phroses\SRC", __DIR__);
+define("Phroses\SCHEMAVER", 1);
+define("Phroses\DEPS", DEPS);
 define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
 define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",
@@ -286,6 +288,11 @@ abstract class Phroses {
 		// if no change was made, dont update the db
 		if(!isset($_REQUEST["type"]) && !isset($_REQUEST["uri"]) && !isset($_REQUEST["title"]) && !isset($_REQUEST["content"]))
 			JsonOutput(["type" => "error", "error" => "no_change" ]);
+		
+		if(isset($_REQUEST["uri"])) {
+			$count = DB::Query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ SITE["ID"], $_REQUEST["uri"]])[0] ?? 0;
+			if($count->count > 0) JsonOutput(["type" => "error", "error" => "resource_exists"]);
+		}
 		
 		// do NOT update the database if the request is to change the page to a redirect and there is no content specifying the destination.
 		// if the page is a type redirect and there is no destination, an error will be displayed which we should be trying to avoid
