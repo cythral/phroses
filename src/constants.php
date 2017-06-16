@@ -1,5 +1,20 @@
 <?php
 namespace Phroses;
+define("Phroses", true);
+define("Phroses\SRC", __DIR__);
+define("Phroses\SCHEMAVER", 2);
+define("Phroses\DEPS", DEPS);
+define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
+define("Phroses\INCLUDES", [
+	"THEMES" => ROOT."/themes",
+	"MODELS" => SRC."/models/classes",
+	"VIEWS" => SRC."/views",
+	"TPL" => SRC."/templates",
+	"META" => [ // ORDER OF THESE IS IMPORTANT
+		"TRAITS" => SRC."/models/traits",
+		"INTERFACES" => SRC."/models/interfaces"
+	]
+]);
 
 if(php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) {
 	$uri = strtok($_SERVER["REQUEST_URI"], "?");

@@ -1,0 +1,1 @@
+UPDATE `options` SET `value`='2' WHERE `key`='schemaver';

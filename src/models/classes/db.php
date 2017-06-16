@@ -9,7 +9,8 @@ abstract class DB {
 	
 	static public function Setup() {
 		if(self::$setup) return; // only run once
-		self::$db = new PDO("mysql:host=".CONF["database"]["host"].";dbname=".CONF["database"]["name"], CONF["database"]["user"], CONF["database"]["password"]);
+		$conf = Config::Get("database");
+		self::$db = new PDO("mysql:host=".$conf["host"].";dbname=".$conf["name"], $conf["user"], $conf["password"]);
 		self::$version = self::$db->query("select version()")->fetchColumn();
 		self::$setup = true;
 	}

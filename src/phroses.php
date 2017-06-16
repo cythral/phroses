@@ -2,20 +2,8 @@
 
 namespace Phroses;
 
-define("Phroses\SRC", __DIR__);
-define("Phroses\SCHEMAVER", 1);
-define("Phroses\DEPS", DEPS);
-define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
-define("Phroses\INCLUDES", [
-	"THEMES" => ROOT."/themes",
-	"MODELS" => SRC."/models/classes",
-	"VIEWS" => SRC."/views",
-	"TPL" => SRC."/templates",
-	"META" => [ // ORDER OF THESE IS IMPORTANT
-		"TRAITS" => SRC."/models/traits",
-		"INTERFACES" => SRC."/models/interfaces"
-	]
-]);
+include __DIR__."/constants.php";
+include SRC."/functions.php";
 
 abstract class Phroses {
 	static private $ran = false;
@@ -46,8 +34,6 @@ abstract class Phroses {
 	
 	static public function Start() {
 		if(self::$ran) return; // only run once
-		include SRC."/functions.php"; // include functions
-		include SRC."/request.php";
 		
 		self::LoadModels();
 		if(!self::CheckReqs()) return;
@@ -58,6 +44,10 @@ abstract class Phroses {
 			self::SetupSession();
 			if(SITE["RESPONSE"] != self::RESPONSES["SYS"][200]) call_user_func("self::".REQ["METHOD"]);
 			else self::GET();
+			
+		} else {
+			if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "update") self::update();
+			exit(0);
 		}
 	}
 	
@@ -329,6 +319,15 @@ abstract class Phroses {
 		
 		DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ REQ["PATH"], SITE["ID"] ]);
 		JsonOutputSuccess();
+	}
+	
+	static public function update() {
+		$localver = (int)DB::Query("SELECT `value` FROM `options` WHERE `key`='schemaver'", [])[0]->value;
+		if($localver >= SCHEMAVER) return;
+		
+		while($localver < SCHEMAVER) {
+			DB::Query(file_get_contents(SRC."/schema/update-".++$localver.".sql"), []);
+		}
 	}
 }
 
