@@ -2,13 +2,8 @@ var editors = {};
 var errors = {
 	"write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
 	"api" : "There was a problem accessing the api.  Please try again later",
-	"dir" : "bad",
-	"write2" : "test",
-	"write3" : "asf",
-	"write4" : "sdfg",
-	"write5" : "write5",
-	"write6" : "write6"
 };
+
 function displaySaved() {
 	$("#saved").addClass("active");
 		setTimeout(function() {
