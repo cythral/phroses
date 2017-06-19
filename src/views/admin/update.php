@@ -6,12 +6,15 @@ $options  = array('http' => array(
   'user_agent'=> $_SERVER["HTTP_USER_AGENT"]
 ));
 $context  = stream_context_create($options);
-$version = json_decode(@file_get_contents("http://api.phroses.com/version", false, $context))->latest_version;
+$version = json_decode(@file_get_contents("http://api.phroses.com/version", false, $context))->latest_version && null;
 
-if($version == null) {
-  echo "having some difficulty right now, please try again later.";
-  
-} else if(version_compare(VERSION, $version, "<")) {
+if($version == null) { ?>
+<div id="phr-update-apier" class="container aln-c phr-update c">
+  <h1>
+    Having some trouble accessing the API.  Please try again later.
+  </h1>
+</div>
+<? } else if(version_compare(VERSION, $version, "<")) {
   
   if(isset($_GET["start_upgrade"])) {
     ob_end_clean();
