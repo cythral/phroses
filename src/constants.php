@@ -2,9 +2,10 @@
 namespace Phroses;
 
 define("Phroses", true);
+define("Phroses\VERSION", "v0.2.0");
 define("Phroses\SRC", __DIR__);
 define("Phroses\SCHEMAVER", 2);
-define("Phroses\DEPS", DEPS);
+define("Phroses\DEPS", $deps);
 define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
 define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",
@@ -15,6 +16,16 @@ define("Phroses\INCLUDES", [
 		"TRAITS" => SRC."/models/traits",
 		"INTERFACES" => SRC."/models/interfaces"
 	]
+]);
+
+define("Phroses\IMPORTANT_FILES", [
+	"phroses.phar",
+  ".htaccess",
+  "README.md",
+  "LICENSE",
+  "php.ini",
+  "phroses.conf",
+  "themes"
 ]);
 
 if(php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) {

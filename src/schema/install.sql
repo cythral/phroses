@@ -53,7 +53,7 @@ CREATE TABLE `sessions` (
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/** SET DATABASE VERSION **/
+/** SET DATABASE SCHEMA VERSION **/
 INSERT INTO `options` (`key`, `value`) VALUES (
   'schemaver',
   '<{var:schemaver}>'

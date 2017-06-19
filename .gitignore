@@ -4,3 +4,5 @@
 /phroses.tar.gz
 themes/frost/
 themes.tmp/
+/schema.sql
+/deps.json

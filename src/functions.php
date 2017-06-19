@@ -54,3 +54,28 @@ function HandleMethod(string $method, callable $handler, array $filters = []) {
         die;
     }
 }
+
+function rrmdir($src) {
+    $dir = opendir($src);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            $full = $src . '/' . $file;
+            if ( is_dir($full) ) {
+                rrmdir($full);
+            }
+            else {
+                if(!unlink($full)) return false;
+            }
+        }
+    }
+    closedir($dir);
+    if(!rmdir($src)) return false;
+  return true;
+}
+
+function sendEvent(string $event, array $data) {
+  $data = json_encode($data);
+  echo "event:$event\ndata:$data\n\n";
+  ob_end_flush();
+  flush();
+}

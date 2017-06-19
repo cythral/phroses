@@ -181,7 +181,10 @@ abstract class Phroses {
 							<div><input type="submit" value="Login"></div>
 						</form>
 					<? } else { 
-						if(REQ["METHOD"] == "GET") { ?>
+						if(REQ["METHOD"] == "GET") { 
+							$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+							$theme->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
+						?>
 						<div class="dashbar">
 							<div class="dashbar_brand">
 								<a href="/admin">Phroses Panel</a>
