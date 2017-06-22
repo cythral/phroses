@@ -187,7 +187,8 @@ $(function() {
     $(".pageman-select").click(function(e) { e.preventDefault(); });
     $(".pageman-select").change(function(e) {
         var $this = $(this);
-        var data = { type : $(this).val(), id : $(this).parent().data("id") };
-        $.ajax({ url : $this.parent().attr("href"), method : "PATCH", data : data });
+        var $parent = $this.parent().parent();
+        var data = { type : $(this).val(), id : $parent.data("id") };
+        $.ajax({ url : $parent.attr("href"), method : "PATCH", data : data });
     });
 });
