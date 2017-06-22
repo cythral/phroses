@@ -14,5 +14,5 @@ RewriteRule ^(.*)$ .maintenance [L]
 RewriteCond %{DOCUMENT_ROOT}/.developer -f
 RewriteCond %{DOCUMENT_ROOT}/src/startup.php -f
 RewriteRule ^(.*)$ src/startup.php [L] 
-# Production
+# Production --
 RewriteRule ^(.*)$ phroses.phar [L]

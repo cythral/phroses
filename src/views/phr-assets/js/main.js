@@ -42,7 +42,7 @@ $(function() {
 		}
 	});
 	
-	$(".pst_btn").click(function(e) {
+	$(".pst_btn, .phr-btn").click(function(e) {
 		e.preventDefault();
 		if($(this).data("target")) {
 			$("#"+$(this).data("target"))[$(this).data("action")]();
@@ -98,7 +98,9 @@ $(function() {
 			
 		});
 	});
-	
+        
+        
+	if(window.location.hash === "#new") $("#pst-ns").fadeIn();
 	$("#pst-ns").submit(function(e) {
 		e.preventDefault();
 		
@@ -121,16 +123,16 @@ $(function() {
 	});
 	
 	$("#pst-es-type").change(function() {
-		var data = { type : $(this).val(), id : $("#pid").val() };
-		$("#pst-es-fields").slideUp();
-		$.ajax({ url : window.location.href, method : "PATCH", data: data })
-		.done(function(pdata) {
-			$("#pst-es-fields").html(pdata.typefields);
-			createEditors();
-			if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
-			$("#pst-es-fields").slideDown();
-			if(data.type != "redirect") displaySaved();
-		});
+            var data = { type : $(this).val(), id : $("#pid").val() };
+            $("#pst-es-fields").slideUp();
+            $.ajax({ url : window.location.href, method : "PATCH", data: data })
+            .done(function(pdata) {
+                    $("#pst-es-fields").html(pdata.typefields);
+                    createEditors();
+                    if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
+                    $("#pst-es-fields").slideDown();
+                    if(data.type !== "redirect") displaySaved();
+            });
 	});
 	
 	$("#pst-es-title").change(function() {
@@ -177,4 +179,15 @@ $(function() {
 			$(".phr-progress").addClass("error");
 		});
 	});
+        
+        $("#phr-new-page").submit(function(e) {
+            document.location = $("#phr-new-page input").val() + "#new";
+        });
+        
+    $(".pageman-select").click(function(e) { e.preventDefault(); });
+    $(".pageman-select").change(function(e) {
+        var $this = $(this);
+        var data = { type : $(this).val(), id : $(this).parent().data("id") };
+        $.ajax({ url : $this.parent().attr("href"), method : "PATCH", data : data });
+    });
 });

@@ -161,9 +161,12 @@ abstract class Phroses {
 			},
 			
 			self::RESPONSES["PAGE"][301] => function($theme) {
-				http_response_code(301);
-				header("location: ".SITE["PAGE"]["CONTENT"]["destination"]);
-				die;
+                
+                if(isset(SITE["PAGE"]["CONTENT"]["destination"])) {
+                    http_response_code(301);
+                    header("location: ".SITE["PAGE"]["CONTENT"]["destination"]);
+                    die;
+                } else echo "incomplete redirect"; // todo: add a fixer form here
 			},
 		
 			self::RESPONSES["SYS"][200] => function(&$theme) {
@@ -276,7 +279,7 @@ abstract class Phroses {
 		foreach(["id"] as $type)
 			if(!in_array($type, array_keys($_REQUEST))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
 		
-		if(SITE["RESPONSE"] != "PAGE-200" && SITE["RESPONSE"] != "PAGE-301") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
+		if(SITE["RESPONSE"] != self::RESPONSES["PAGE"][200] && SITE["RESPONSE"] != self::RESPONSES["PAGE"][301]) JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
 		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]); }
 		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
 		

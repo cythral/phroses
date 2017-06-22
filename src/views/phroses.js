@@ -131,4 +131,6 @@ $(function() {
 			console.log(data);
 		});
 	});
+        
+        if(window.location.hash === "new") $("#pst-ns").fadeIn();
 });
