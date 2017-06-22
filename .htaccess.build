@@ -7,4 +7,6 @@ header unset x-powered-by
 
 RewriteEngine on
 RewriteBase /
+RewriteCond %{DOCUMENT_ROOT}/.maintenance -f
+RewriteRule ^(.*)$ .maintenance [L]
 RewriteRule ^(.*)$ phroses.phar [L]

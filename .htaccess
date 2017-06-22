@@ -7,4 +7,7 @@ header unset x-powered-by
 
 RewriteEngine on
 RewriteBase /
+# Maintenance Mode --
+RewriteCond %{DOCUMENT_ROOT}/.maintenance -f
+RewriteRule ^(.*)$ .maintenance [L]
 RewriteRule ^(.*)$ src/startup.php [L]

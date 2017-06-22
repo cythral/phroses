@@ -6,7 +6,7 @@ $options  = array('http' => array(
   'user_agent'=> $_SERVER["HTTP_USER_AGENT"]
 ));
 $context  = stream_context_create($options);
-$version = json_decode(@file_get_contents("http://api.phroses.com/version", false, $context))->latest_version && null;
+$version = json_decode(@file_get_contents("http://api.phroses.com/version", false, $context))->latest_version ?? null;
 
 if($version == null) { ?>
 <div id="phr-update-apier" class="container aln-c phr-update c">
@@ -28,7 +28,7 @@ if($version == null) { ?>
     
     try {
       chdir(ROOT);
-      
+      touch("./.down");
       // backup 
       if(!file_exists("tmp") && !mkdir("tmp")) throw new Exception("write");
       foreach(IMPORTANT_FILES as $backup) {
@@ -37,7 +37,7 @@ if($version == null) { ?>
         } else if(!copy($backup, "tmp/$backup")) throw new Exception("write");
       }
       sendEvent("progress", [ "progress" => 10 ]);
-      
+      sleep(3);
       // download and extract
       if(!($api = @fopen("http://api.phroses.com/downloads/$version.tar.gz", "r"))) throw new Exception("api");
       if(!@file_put_contents("phroses.tar.gz", $api)) throw new Exception("write");
@@ -64,7 +64,7 @@ if($version == null) { ?>
       sendEvent("error", ["error" => $e->getMessage() ]);     
    
     } finally {
-      
+      unlink(ROOT."/.down");
       // if error occurred and tmp dir still exists, move everything in tmp back
       // todo: add error checking here
       if(file_exists("tmp")) {
@@ -113,6 +113,9 @@ if($version == null) { ?>
   <div id="phr-update-noavail" class="container aln-c phr-update c">
     <h1>
       Phroses is up-to-date
+      <div>
+        <img src="/phr-assets/img/checkmark.png" style="width:250px;height:250px;">
+      </div>
     </h1>
   </div>
  <? }

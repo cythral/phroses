@@ -32,18 +32,18 @@ $p->stopBuffering();
 if(file_exists("phroses.tar")) unlink("phroses.tar");
 if(file_exists("phroses.tar.gz")) unlink("phroses.tar.gz");
 
-if(file_exists("themes.tmp")) rrmdir("themes.tmp");
-mkdir("themes.tmp");
-rcopy("themes", "themes.tmp/themes");
+if(file_exists("tmp")) Phroses\rrmdir("tmp");
+mkdir("tmp");
+rcopy("themes", "tmp/themes");
 
 $r = new PharData("phroses.tar");
-$r->buildFromDirectory("themes.tmp");
+$r->buildFromDirectory("tmp");
 $r->addFile("phroses.phar");
 $r->addFile(".htaccess.build", ".htaccess");
 $r->addFile("LICENSE");
 $r->addFile("README.md");
 $r = $r->compress(Phar::GZ);
-Phroses\rrmdir("themes.tmp");
+Phroses\rrmdir("tmp");
 unlink("phroses.tar");
 
 //opcache_compile_file("phroses.phar");

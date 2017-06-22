@@ -47,6 +47,8 @@ abstract class Phroses {
 			
 		} else {
 			if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "update") DB::Update();
+			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=on") copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
+			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=off") unlink(ROOT."/.maintenance");
 			exit(0);
 		}
 	}
