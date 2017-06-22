@@ -3,11 +3,7 @@ use Phroses\Phroses;
 use function Phroses\{sendEvent, rrmdir};
 use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES};
 
-$options  = array('http' => array(
-  'user_agent'=> $_SERVER["HTTP_USER_AGENT"]
-));
-$context  = stream_context_create($options);
-$version = json_decode(@file_get_contents("http://api.phroses.com/version", false, $context))->latest_version ?? null;
+$version = json_decode(@file_get_contents("http://api.phroses.com/version"))->latest_version ?? null;
 
 if($version == null) { ?>
 <div id="phr-update-apier" class="container aln-c phr-update c">
