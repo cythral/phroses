@@ -37,7 +37,7 @@ if($version == null) { ?>
         } else if(!copy($backup, "tmp/$backup")) throw new Exception("write");
       }
       sendEvent("progress", [ "progress" => 10 ]);
-      sleep(3);
+      
       // download and extract
       if(!($api = @fopen("http://api.phroses.com/downloads/$version.tar.gz", "r"))) throw new Exception("api");
       if(!@file_put_contents("phroses.tar.gz", $api)) throw new Exception("write");
