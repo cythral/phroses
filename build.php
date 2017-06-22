@@ -1,4 +1,7 @@
 <?php
+
+include __DIR__."/src/functions.php";
+exec("lessc --clean-css src/views/phr-assets/css/main.less src/views/phr-assets/css/main.css");
 function rcopy($src,$dst) { 
     $dir = opendir($src); 
     @mkdir($dst); 
@@ -15,46 +18,30 @@ function rcopy($src,$dst) {
     closedir($dir); 
 } 
 
-function rrmdir($src) {
-    $dir = opendir($src);
-    while(false !== ( $file = readdir($dir)) ) {
-        if (( $file != '.' ) && ( $file != '..' )) {
-            $full = $src . '/' . $file;
-            if ( is_dir($full) ) {
-                rrmdir($full);
-            }
-            else {
-                unlink($full);
-            }
-        }
-    }
-    closedir($dir);
-    rmdir($src);
-}
+
 
 
 $p = new Phar(__DIR__.'/phroses.phar', 0, 'phroses');
 $p->startBuffering();
 $p->buildFromDirectory(__DIR__."/src/");
-$p->setStub('<?php Phar::mapPhar("phroses"); include "phar://phroses/startup.php"; __HALT_COMPILER();');
+$p->setStub('#!/usr/bin/php'.PHP_EOL.'<?php ob_end_clean(); Phar::mapPhar("phroses"); include "phar://phroses/startup.php"; __HALT_COMPILER();');
 $p->stopBuffering();
 
 if(file_exists("phroses.tar")) unlink("phroses.tar");
 if(file_exists("phroses.tar.gz")) unlink("phroses.tar.gz");
 
-if(file_exists("themes.tmp")) rrmdir("themes.tmp");
-mkdir("themes.tmp");
-rcopy("themes", "themes.tmp/themes");
+if(file_exists("tmp")) Phroses\rrmdir("tmp");
+mkdir("tmp");
+rcopy("themes", "tmp/themes");
 
 $r = new PharData("phroses.tar");
-$r->buildFromDirectory("themes.tmp");
+$r->buildFromDirectory("tmp");
 $r->addFile("phroses.phar");
 $r->addFile(".htaccess.build", ".htaccess");
-$r->addFile("schema.sql");
 $r->addFile("LICENSE");
 $r->addFile("README.md");
 $r = $r->compress(Phar::GZ);
-rrmdir("themes.tmp");
+Phroses\rrmdir("tmp");
 unlink("phroses.tar");
 
-opcache_compile_file("phroses.phar");
+//opcache_compile_file("phroses.phar");

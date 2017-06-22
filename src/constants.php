@@ -1,6 +1,33 @@
 <?php
 namespace Phroses;
 
+define("Phroses", true);
+define("Phroses\VERSION", "v0.3.0");
+define("Phroses\SRC", __DIR__);
+define("Phroses\SCHEMAVER", 2);
+define("Phroses\DEPS", $deps);
+define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
+define("Phroses\INCLUDES", [
+	"THEMES" => ROOT."/themes",
+	"MODELS" => SRC."/models/classes",
+	"VIEWS" => SRC."/views",
+	"TPL" => SRC."/templates",
+	"META" => [ // ORDER OF THESE IS IMPORTANT
+		"TRAITS" => SRC."/models/traits",
+		"INTERFACES" => SRC."/models/interfaces"
+	]
+]);
+
+define("Phroses\IMPORTANT_FILES", [
+	"phroses.phar",
+  ".htaccess",
+  "README.md",
+  "LICENSE",
+  "php.ini",
+  "phroses.conf",
+  "themes"
+]);
+
 if(php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) {
 	$uri = strtok($_SERVER["REQUEST_URI"], "?");
 	$path = (strpos($uri, ".")) ? strstr($uri, ".", true) : $uri;

@@ -2,18 +2,8 @@
 
 namespace Phroses;
 
-define("Phroses\SRC", __DIR__);
-define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
-define("Phroses\INCLUDES", [
-	"THEMES" => ROOT."/themes",
-	"MODELS" => SRC."/models/classes",
-	"VIEWS" => SRC."/views",
-	"TPL" => SRC."/templates",
-	"META" => [ // ORDER OF THESE IS IMPORTANT
-		"TRAITS" => SRC."/models/traits",
-		"INTERFACES" => SRC."/models/interfaces"
-	]
-]);
+include __DIR__."/constants.php";
+include SRC."/functions.php";
 
 abstract class Phroses {
 	static private $ran = false;
@@ -44,8 +34,6 @@ abstract class Phroses {
 	
 	static public function Start() {
 		if(self::$ran) return; // only run once
-		include SRC."/functions.php"; // include functions
-		include SRC."/request.php";
 		
 		self::LoadModels();
 		if(!self::CheckReqs()) return;
@@ -56,6 +44,12 @@ abstract class Phroses {
 			self::SetupSession();
 			if(SITE["RESPONSE"] != self::RESPONSES["SYS"][200]) call_user_func("self::".REQ["METHOD"]);
 			else self::GET();
+			
+		} else {
+			if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "update") DB::Update();
+			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=on") copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
+			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=off") unlink(ROOT."/.maintenance");
+			exit(0);
 		}
 	}
 	
@@ -189,7 +183,10 @@ abstract class Phroses {
 							<div><input type="submit" value="Login"></div>
 						</form>
 					<? } else { 
-						if(REQ["METHOD"] == "GET") { ?>
+						if(REQ["METHOD"] == "GET") { 
+							$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+							$theme->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
+						?>
 						<div class="dashbar">
 							<div class="dashbar_brand">
 								<a href="/admin">Phroses Panel</a>
@@ -286,6 +283,11 @@ abstract class Phroses {
 		// if no change was made, dont update the db
 		if(!isset($_REQUEST["type"]) && !isset($_REQUEST["uri"]) && !isset($_REQUEST["title"]) && !isset($_REQUEST["content"]))
 			JsonOutput(["type" => "error", "error" => "no_change" ]);
+		
+		if(isset($_REQUEST["uri"])) {
+			$count = DB::Query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ SITE["ID"], $_REQUEST["uri"]])[0] ?? 0;
+			if($count->count > 0) JsonOutput(["type" => "error", "error" => "resource_exists"]);
+		}
 		
 		// do NOT update the database if the request is to change the page to a redirect and there is no content specifying the destination.
 		// if the page is a type redirect and there is no destination, an error will be displayed which we should be trying to avoid

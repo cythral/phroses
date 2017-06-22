@@ -1,4 +1,8 @@
 var editors = {};
+var errors = {
+	"write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
+	"api" : "There was a problem accessing the api.  Please try again later",
+};
 
 function displaySaved() {
 	$("#saved").addClass("active");
@@ -26,6 +30,7 @@ function createEditors() {
 }
 
 $(function() {
+	console.log("phroses initialized");
   createEditors();
 	
 	$("#pst-es").bind("keydown", function(e) {
@@ -129,5 +134,44 @@ $(function() {
 	
 	$("#pst-es-title").change(function() {
 		$("#pst-es").submit();
+	});
+	
+	
+	$(".phr-update-icon").click(function() {
+		$(this).addClass("done");
+		setTimeout(function() {
+			$("#phr-upgrade-screen").submit();
+		}, 1000);
+	});
+	$("#phr-upgrade-screen").submit(function(e) {
+		e.preventDefault();
+		$(this).fadeIn();
+		
+		var ev = new EventSource("/admin/update?start_upgrade");
+		ev.addEventListener("progress", function(e) {
+			$(".phr-progress-bar").css({width: JSON.parse(e.data).progress+"%" });
+			
+			// completion
+			if(JSON.parse(e.data).progress === 100) {
+				ev.close();
+				
+				$("#phr-upgrade-screen .phr-progress").addClass("done");
+				$("#phr-upgrade-screen h1").fadeOut(function() {
+					$(this).html("Phroses updated to "+JSON.parse(e.data).version);
+					$(this).fadeIn();
+				});
+				
+				setTimeout(function() {
+					location.reload();
+				}, 5000);
+			}
+		});
+
+		ev.addEventListener("error", function(e) {
+			ev.close();
+			var data = JSON.parse(e.data);
+			$(".phr-progress-error").html(errors[data.error]);
+			$(".phr-progress").addClass("error");
+		});
 	});
 });
