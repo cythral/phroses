@@ -1,4 +1,5 @@
 <?php
+use Phroses\Phroses;
 use function Phroses\{sendEvent, rrmdir};
 use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES};
 
@@ -28,7 +29,9 @@ if($version == null) { ?>
     
     try {
       chdir(ROOT);
-      touch("./.down");
+      
+     //Phroses::setMaintenance(Phroses::ON);
+      
       // backup 
       if(!file_exists("tmp") && !mkdir("tmp")) throw new Exception("write");
       foreach(IMPORTANT_FILES as $backup) {
@@ -43,12 +46,13 @@ if($version == null) { ?>
       if(!@file_put_contents("phroses.tar.gz", $api)) throw new Exception("write");
       $archive = new PharData("phroses.tar.gz");
       $archive->extractTo(ROOT, null, true);
-      if(!unlink("phroses.tar.gz")) throw new Exception("write5");
+      if(!unlink("phroses.tar.gz")) throw new Exception("write");
       sendEvent("progress", [ "progress" => 30 ]);
       
       // cleanup
       if(!rrmdir(INCLUDES["THEMES"])) throw new Exception("write");
-      if(!rename("tmp/themes", Phroses\INCLUDES["THEMES"])) throw new Exception("write");
+      sendEvent("progress", [ "progress" => 40 ]);
+      if(!rename("tmp/themes", INCLUDES["THEMES"])) throw new Exception("write");      
       if(!rename("tmp/phroses.conf", "phroses.conf")) throw new Exception ("write");
       if(!rrmdir("tmp")) throw new Exception("write");
       sendEvent("progress", [ "progress" => 70 ]);
@@ -64,7 +68,6 @@ if($version == null) { ?>
       sendEvent("error", ["error" => $e->getMessage() ]);     
    
     } finally {
-      unlink(ROOT."/.down");
       // if error occurred and tmp dir still exists, move everything in tmp back
       // todo: add error checking here
       if(file_exists("tmp")) {
@@ -81,6 +84,7 @@ if($version == null) { ?>
           }
         }
         unlink("tmp");
+        //Phroses::SetMaintenance(Phroses::OFF);
       }
     }
     

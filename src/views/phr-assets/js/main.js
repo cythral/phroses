@@ -1,7 +1,8 @@
 var editors = {};
 var errors = {
-	"write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
-	"api" : "There was a problem accessing the api.  Please try again later",
+    "write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
+    "api" : "There was a problem accessing the api.  Please try again later",
+    "extract" : "There was an issue extracting files from the archive.  Please check filesystem permissions and try again."
 };
 
 function displaySaved() {
@@ -149,6 +150,7 @@ $(function() {
 		
 		var ev = new EventSource("/admin/update?start_upgrade");
 		ev.addEventListener("progress", function(e) {
+                    console.log(e.data);
 			$(".phr-progress-bar").css({width: JSON.parse(e.data).progress+"%" });
 			
 			// completion
@@ -169,6 +171,7 @@ $(function() {
 
 		ev.addEventListener("error", function(e) {
 			ev.close();
+                        console.log(e.data);
 			var data = JSON.parse(e.data);
 			$(".phr-progress-error").html(errors[data.error]);
 			$(".phr-progress").addClass("error");

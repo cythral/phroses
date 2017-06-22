@@ -47,8 +47,8 @@ abstract class Phroses {
 			
 		} else {
 			if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "update") DB::Update();
-			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=on") copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
-			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=off") unlink(ROOT."/.maintenance");
+			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=on") self::SetMaintenance(self::ON);
+			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=off") self::SetMaintenance(self::OFF);
 			exit(0);
 		}
 	}
@@ -325,6 +325,13 @@ abstract class Phroses {
 		DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ REQ["PATH"], SITE["ID"] ]);
 		JsonOutputSuccess();
 	}
+    
+    const ON = true;
+    const OFF = false;
+    static public function SetMaintenance(bool $mode = self::ON) {
+        if($mode == self::ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
+        else unlink(ROOT."/.maintenance");
+    }
 }
 
 Phroses::start();
