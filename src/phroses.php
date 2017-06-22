@@ -330,7 +330,7 @@ abstract class Phroses {
     const OFF = false;
     static public function SetMaintenance(bool $mode = self::ON) {
         if($mode == self::ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
-        else unlink(ROOT."/.maintenance");
+        if($mode == self::OFF) unlink(ROOT."/.maintenance");
     }
 }
 

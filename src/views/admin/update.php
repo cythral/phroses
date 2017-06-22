@@ -80,8 +80,9 @@ if($version == null) { ?>
           }
         }
         unlink("tmp");
-        Phroses::SetMaintenance(Phroses::OFF);
       }
+      
+      Phroses::SetMaintenance(Phroses::OFF);
     }
     
     die;
