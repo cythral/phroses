@@ -6,3 +6,4 @@ themes/frost/
 themes.tmp/
 /schema.sql
 /deps.json
+/.developer

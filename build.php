@@ -37,7 +37,7 @@ rcopy("themes", "tmp/themes");
 $r = new PharData("phroses.tar");
 $r->buildFromDirectory("tmp");
 $r->addFile("phroses.phar");
-$r->addFile(".htaccess.build", ".htaccess");
+$r->addFile(".htaccess", ".htaccess");
 $r->addFile("LICENSE");
 $r->addFile("README.md");
 $r = $r->compress(Phar::GZ);

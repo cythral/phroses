@@ -8,6 +8,11 @@ header unset x-powered-by
 RewriteEngine on
 RewriteBase /
 # Maintenance Mode -- 
-RewriteCond %{DOCUMENT_ROOT}/.maintenance -f 
+RewriteCond %{DOCUMENT_ROOT}/.maintenance -f  
 RewriteRule ^(.*)$ .maintenance [L]
+# Developers Mode --
+RewriteCond %{DOCUMENT_ROOT}/.developer -f
+RewriteCond %{DOCUMENT_ROOT}/src/startup.php -f
 RewriteRule ^(.*)$ src/startup.php [L] 
+# Production
+RewriteRule ^(.*)$ phroses.phar [L]
