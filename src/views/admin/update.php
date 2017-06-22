@@ -30,7 +30,7 @@ if($version == null) { ?>
     try {
       chdir(ROOT);
       
-     //Phroses::setMaintenance(Phroses::ON);
+     Phroses::setMaintenance(Phroses::ON);
       
       // backup 
       if(!file_exists("tmp") && !mkdir("tmp")) throw new Exception("write");
@@ -84,7 +84,7 @@ if($version == null) { ?>
           }
         }
         unlink("tmp");
-        //Phroses::SetMaintenance(Phroses::OFF);
+        Phroses::SetMaintenance(Phroses::OFF);
       }
     }
     
