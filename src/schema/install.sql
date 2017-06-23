@@ -34,7 +34,8 @@ CREATE TABLE `pages` (
   `title` varchar(2000) NOT NULL,
   `uri` varchar(800) NOT NULL,
   `content` LONGTEXT NOT NULL,
-  
+  `public` BOOLEAN DEFAULT TRUE NOT NULL,
+
   CONSTRAINT `pagesite_un` UNIQUE (`siteID`, `uri`),  
   CONSTRAINT `pages_siteID_fk` 
     FOREIGN KEY (`siteID`) REFERENCES `sites` (`id`)

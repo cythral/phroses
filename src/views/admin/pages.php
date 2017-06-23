@@ -5,11 +5,12 @@ use const Phroses\{SITE, REQ};
 
 ?>
 
-<div class="container">
-	<div class="aln-r">
-		<a class="phr-btn btn" href="#" id="new" data-target="phr-new-page" data-action="fadeIn"><i class="fa fa-plus"></i> New Page</a>
-		<div class="clear"></div>
-	</div>
+<div class="container pages">
+    <div class="pages-top">
+        <a class="phr-btn btn pull-r" href="#" id="new" data-target="phr-new-page" data-action="fadeIn"><i class="fa fa-plus"></i> New Page</a>
+        <h1 class="c">Pages</h1>
+        <div class="clear"></div>
+    </div>
     
     
     
@@ -17,11 +18,11 @@ use const Phroses\{SITE, REQ};
 	$q = DB::Query("SELECT * FROM `pages` WHERE `siteID`=?", [ SITE["ID"] ]);
 	
 	if(count($q) == 0) {
-		?><em>No pages for <?= REQ["BASEURL"]; ?>.  <a href="/admin/pages/create"><strong>Create your first one?</strong></a></em><?
+		?><em>No pages for <?= REQ["BASEURL"]; ?></em><?
 	}
 	
 	foreach($q as $page) {
-		?><a href="<?= $page->uri; ?>" class="page_item" data-id="<?= $page->id; ?>"><?= $page->uri; ?> <strong><?= $page->title; ?></strong> 
+		?><a href="<?= $page->uri; ?>" class="page_item" data-id="<?= $page->id; ?>"><strong><?= $page->title; ?></strong> <?= $page->uri; ?> 
         
             <div class="pull-r">    
                 <select class="pageman-select">

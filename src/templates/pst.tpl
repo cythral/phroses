@@ -1,9 +1,13 @@
 
 <div id="pst" class="<{var:pst_type}>">
-  <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn">Delete</a>
-  <a href="#" id="pst-move" class="pst_btn" data-target="pst-ms" data-action="fadeIn">Move</a>
-  <a href="/admin/pages/<{var:id}>" id="pst-edit" class="pst_btn" data-target="pst-es" data-action="fadeIn">Edit</a>
-	<a href="#" id="pst-new" class="pst_btn txt" data-target="pst-ns" data-action="fadeIn">New</a>
+    <div id="pst-vis">
+        <input type="checkbox" <{var:visibility}> id="vs-cb">
+        <label for="vs-cb">Public</label>
+    </div>
+    <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn">Delete</a>
+    <a href="#" id="pst-move" class="pst_btn" data-target="pst-ms" data-action="fadeIn">Move</a>
+    <a href="#" id="pst-edit" class="pst_btn" data-target="pst-es" data-action="fadeIn">Edit</a>
+    <a href="#" id="pst-new" class="pst_btn txt" data-target="pst-ns" data-action="fadeIn">New</a>
 </div>
 <div id="saved">saved</div>
 <div id="error">error</div>

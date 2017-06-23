@@ -29,6 +29,7 @@
     &:hover:before {
         position: absolute;
         top: -30px;
+        left: 0;
         height: 20px;
         width: 70px;
         border-radius: 25px;
@@ -45,10 +46,10 @@
 }
 
 #pst {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  padding: 20px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 20px;
     opacity: .8;
     transition: opacity .3s;
     z-index: 99;
@@ -73,11 +74,58 @@
 
     &:hover { opacity: 1; }
     &.new { 
-        #pst-edit, #pst-move, #pst-delete { display: none; }
+        #pst-edit, #pst-move, #pst-delete, #pst-vis { display: none; }
     }
 
     &.existing {
         #pst-new { display: none; }
+    }
+    
+    #pst-vis {
+        display: inline-block;
+        height: 70px;
+        line-height: 70px;
+        
+        input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50px;
+            border: 5px solid @primary;
+            position: relative;
+            cursor: pointer;
+            vertical-align: middle;
+
+
+            &:before {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                opacity: 0;
+                transition: opacity .5s;
+                width: 100%;
+                content : "\f00c";
+                font-size: 30px;
+                text-align: center;
+                line-height: 40px;
+                font-family: fontAwesome;
+            }
+
+            &:checked:before { opacity: 1; }
+
+            + label {
+                vertical-align: middle;
+                display: inline-block;
+                height: 50px;
+                line-height: 50px;
+                font-size: 30px;
+                font-weight: bold;
+                color: @primary;
+            }
+        }
     }
 }
 
@@ -162,3 +210,4 @@
     text-align-last: center;
     text-transform: uppercase;
 }
+

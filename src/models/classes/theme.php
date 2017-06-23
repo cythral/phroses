@@ -10,6 +10,7 @@ final class Theme extends Template {
 	private $root;
 	private $types = ["redirect"];
 	private $useconst = true;
+    private $type;
 	
 	/**
 	* Theme constructor.  Sets up the theme root, loads stylesheets,
@@ -20,10 +21,11 @@ final class Theme extends Template {
 	*/
 	public function __construct(string $name, string $type) {
 		$this->root = INCLUDES["THEMES"]."/".strtolower($name);
-		
+		$this->SetType($type);
+        
 		// make sure theme directory and page type exists
 		if(!file_exists($this->root)) throw new \Exception("Theme doesn't exist");
-		if(!file_exists("{$this->root}/{$type}.tpl") && $type != "redirect") throw new \Exception("Theme template doesn't exist");
+		
 		
 		// load stylesheets, scripts and page types
 		$this->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "defer"]);
@@ -33,7 +35,7 @@ final class Theme extends Template {
 		
 		if($type != "redirect") {
 			parent::__construct("{$this->root}/{$type}.tpl"); // redirects wont have any filters
-			$this->SetupSessionTools($type);
+			
 		}
 	}
 	
@@ -42,8 +44,9 @@ final class Theme extends Template {
 	* 
 	* @param string $type the current page type
 	*/
-	private function SetupSessionTools(string $type) {
+	private function SetupSessionTools() {
 		if($_SESSION && REQ["METHOD"] == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404]])) {
+            $this->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);;
 			$this->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$this->Push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
 			$this->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
@@ -52,12 +55,13 @@ final class Theme extends Template {
 			$pst->id = SITE["PAGE"]["ID"];
 			$pst->title = SITE["PAGE"]["TITLE"];
 			$pst->uri = REQ["URI"];
+            $pst->visibility = SITE["PAGE"]["VISIBILITY"] ? "checked" : "";
 			
 			if(SITE["RESPONSE"] == Phroses::RESPONSES["PAGE"][200]) {
 				$pst->pst_type = "existing";
 
 				ob_start();
-				foreach($this->GetContentFields($type) as $key => $field) { 
+				foreach($this->GetContentFields($this->type) as $key => $field) { 
 					if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></div><? }
 					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= SITE["PAGE"]["CONTENT"][$key] ?? ""; ?>"><? }	
 				}
@@ -67,9 +71,10 @@ final class Theme extends Template {
 			} else {
 				$pst->pst_type = "new";
 				$pst->fields = "";
+                $pst->visibility = "checked";
 			}
 			
-			foreach($this->GetTypes() as $type2) $pst->Push("types", ["type" => $type2, "checked" => ($type == $type2) ? "selected" : "" ]);
+			foreach($this->GetTypes() as $type2) $pst->Push("types", ["type" => $type2, "checked" => ($this->type == $type2) ? "selected" : "" ]);
 			$this->tpl = str_replace("<body>", '<body><div id="phr-container">', $this->tpl);
 			$this->tpl = str_replace("</body>", "</div>".$pst."</body>", $this->tpl);
 		}
@@ -99,6 +104,7 @@ final class Theme extends Template {
 	}
 	
 	public function ErrorRead(string $error) {
+        $this->SetType("page", true);
 		if($this->ErrorExists($error)) {
 			ob_start();
 			include "{$this->root}/errors/{$error}.php";
@@ -131,6 +137,12 @@ final class Theme extends Template {
 	public function GetTypes() : array { 
 		return $this-> types; 
 	}
+    
+    public function SetType(string $type, bool $reload = false) {
+        if(!file_exists("{$this->root}/{$type}.tpl") && $type != "redirect") throw new \Exception("Theme template doesn't exist");
+        $this->type = $type;
+        if($reload) $this->tpl = file_get_contents("{$this->root}/{$this->type}.tpl");
+    }
 	
 	public function GetBody() {
 		$this->useconst = false;
@@ -138,6 +150,11 @@ final class Theme extends Template {
 		preg_match("/<body>(.*)?<\/body>/is", (String)$this, $matches);
 		return $matches[1] ?? "";
 	}
+    
+    protected function Process() {
+        $this->SetupSessionTools();
+        parent::Process();
+    }
 	
 	static public function List() : array {
 		$list = [];

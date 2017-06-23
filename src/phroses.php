@@ -39,9 +39,9 @@ abstract class Phroses {
 		if(!self::CheckReqs()) return;
 		self::SetupMode();
 		if(REQ["TYPE"] != "cli") {
-			self::LoadSiteInfo();
-			self::UrlFix();
 			self::SetupSession();
+            self::LoadSiteInfo();
+            self::UrlFix();
 			if(SITE["RESPONSE"] != self::RESPONSES["SYS"][200]) call_user_func("self::".REQ["METHOD"]);
 			else self::GET();
 			
@@ -97,7 +97,7 @@ abstract class Phroses {
 			return;
 		}
 		
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			REQ["PATH"],
 			REQ["BASEURL"]
 		]);
@@ -116,6 +116,7 @@ abstract class Phroses {
 		
 		if(REQ["PATH"] == "/api" && REQ["METHOD"] != "GET") $response = self::RESPONSES["THEME"];
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
+        if($response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) $response = self::RESPONSES["PAGE"][404]; 
 		
 		// Setup the site constant
 		// maybe should have this as an object instead?
@@ -132,7 +133,8 @@ abstract class Phroses {
 				"TYPE" => $info->type ?? "page",
 				"VIEWS" => $info->views,
 				"TITLE" => $info->title,
-				"CONTENT" => json_decode($info->content, true)
+				"CONTENT" => json_decode($info->content, true),
+                "VISIBILITY" => $info->public
 			]
 		]);
 	}
@@ -178,6 +180,8 @@ abstract class Phroses {
 				} else {
 					ob_start();
 					if(!$_SESSION && REQ["PATH"] != "/admin/login") { 
+                        $theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+                        $theme->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
 						http_response_code(401);
 	?>				<form id="phroses-login">
 							<h2>Login to Phroses Site Panel</h2>
@@ -219,6 +223,7 @@ abstract class Phroses {
 				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") $theme->AssetRead(REQ["PATH"]); // Assets
 				else if($theme->ErrorExists("404")) { $theme->ErrorRead("404"); die; } // Site-Level 404
 				else { // Generic Site 404
+                    $theme->SetType("page", true);
 					$theme->title = "404 Not Found";
 					$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
 				}
@@ -283,7 +288,7 @@ abstract class Phroses {
 		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
 		
 		// if no change was made, dont update the db
-		if(!isset($_REQUEST["type"]) && !isset($_REQUEST["uri"]) && !isset($_REQUEST["title"]) && !isset($_REQUEST["content"]))
+		if(!isset($_REQUEST["type"]) && !isset($_REQUEST["uri"]) && !isset($_REQUEST["title"]) && !isset($_REQUEST["content"]) && !isset($_REQUEST["public"]))
 			JsonOutput(["type" => "error", "error" => "no_change" ]);
 		
 		if(isset($_REQUEST["uri"])) {
@@ -295,16 +300,17 @@ abstract class Phroses {
 		// if the page is a type redirect and there is no destination, an error will be displayed which we should be trying to avoid
 		if(!(isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect" && (!isset($_REQUEST["content"]) || (isset($_REQUEST["content"]) && !isset(json_decode($_REQUEST["content"])->destination))))) {
 			
-			DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=? WHERE `id`=?", [
+			DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=?, `public`=? WHERE `id`=?", [
 				$_REQUEST["title"] ?? SITE["PAGE"]["TITLE"], 
 				urldecode($_REQUEST["uri"] ?? REQ["URI"]), 
 				(isset($_REQUEST["type"]) && $_REQUEST["type"] != "redirect") ? "{}" : (htmlspecialchars_decode($_REQUEST["content"] ?? json_encode(SITE["PAGE"]["CONTENT"]))), 
-				urldecode($_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]), 
+				urldecode($_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]),
+                $_REQUEST["public"] ?? SITE["PAGE"]["VISIBILITY"],
 				(int)$_REQUEST["id"]
 			]);
 		}
 		
-		$output = [ "type" => "success", "content" => $theme->GetBody() ];
+		$output = [ "type" => "success", "content" => $theme->GetBody(), "public" => $_REQUEST["public"] ];
 		if(isset($_REQUEST["type"])) {
 			
 			ob_start();

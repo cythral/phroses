@@ -213,4 +213,14 @@ $(function() {
            });
        });
     });
+    
+    $("#pst-vis input").change(function() {
+        console.log($(this).val());
+       var data = {
+         "id" : $("#pid").val(),
+         "public" : ($(this).is(":checked") === true) ? 1 : 0
+       };
+       
+       $.ajax({ url : window.location.href, data : data, method : "PATCH" });
+    });
 });
