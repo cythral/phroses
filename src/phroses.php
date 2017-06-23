@@ -211,7 +211,6 @@ abstract class Phroses {
 					$theme->title = $title ?? "Phroses System Page";
 					$theme->main = trim(ob_get_clean());
 					$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
-					$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 					$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "defer"]);
 				}
 			},

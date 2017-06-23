@@ -1,0 +1,164 @@
+.pst_btn {
+    position: relative;
+    display: inline-block;
+    height: 0;
+    width: 0;
+    border: none;
+    border-radius: 50px;
+    font-size: 0;
+    background-color: #673AB7;
+    background-size: 80% 80%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    text-decoration: none !important;
+    margin: 0 10px 0 10px;
+    vertical-align: bottom;
+    /*transform: scale(0, 0);*/
+    animation: bounceIn .3s forwards;
+    transition: transform .3s;
+    cursor: pointer;
+	
+    &.txt {
+        font-size: inherit;
+        text-align: center;
+        line-height: 70px;
+        color: white !important;
+    }
+	
+    &:hover { transform: scale(1.2,1.2); }
+    &:hover:before {
+        position: absolute;
+        top: -30px;
+        height: 20px;
+        width: 70px;
+        border-radius: 25px;
+        height: 20px;
+        background: #333;
+        color: white;
+        text-transform: uppercase;
+        text-align: center;
+        font-size: 10px !important;
+        line-height: 20px;
+    }
+    
+    &:active { box-shadow: inset 0 0 10px #000; }
+}
+
+#pst {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 20px;
+    opacity: .8;
+    transition: opacity .3s;
+    z-index: 99;
+
+    #pst-delete {
+        background-image: url(/phr-assets/img/delete.png);
+        animation-delay: 1s;
+        &:hover:before { content: "delete"; }
+    }
+
+    #pst-move {
+        background-image: url(/phr-assets/img/move.png);
+        animation-delay: 1.2s;
+        &:hover:before { content: "move"; }
+    }
+
+    #pst-edit {
+        background-image: url(/phr-assets/img/edit.png);
+        animation-delay: 1.4s;
+        &:hover:before { content: "edit"; }
+    }
+
+    &:hover { opacity: 1; }
+    &.new { 
+        #pst-edit, #pst-move, #pst-delete { display: none; }
+    }
+
+    &.existing {
+        #pst-new { display: none; }
+    }
+}
+
+
+
+#pst-es .pst_btn { animation: none; height: 70px; width: 70px; }
+#pst-es-save { background-image: url(/phr-assets/img/save.png); }
+#pst-es-done { background-image: url(/phr-assets/img/done.png); }
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,.95);
+    display: none;
+    z-index: 100;
+
+    .pst_btn { vertical-align: top; }
+}
+
+#pst-es-top {
+    height: 100px;	
+}
+
+#pst-es-title {
+    height: 70px;
+    line-height: 70px;
+    margin-top: 5px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: none;
+    border: none;
+    font-size: 2em;
+    font-weight: bold;
+    color: #673AB7;
+    padding-left: 20px;
+    transition: border .3s;
+    border: 5px solid transparent;
+    border-radius: 25px;
+    &:hover, &:focus { border: 5px solid #673AB7; }
+}
+
+#pst-es-actions {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+#pst-ds, #pst-ms, #pst-ns, #phr-new-page {
+    padding-top: 100px;
+    text-align: center;
+
+    .form_icfix {
+            width: 60%;
+            display: inline-block;
+            margin: 10px 0 10px 0;
+    }
+}
+
+#pst-ds p { margin-bottom: 30px; }
+
+#pst-es-type {
+    background: transparent;
+    height: 50px;
+    width: 200px;
+    padding: 0 10px 0 10px;
+    border-radius: 25px;
+    border: 5px solid #673AB7;
+    color: #673AB7;
+    font-weight: bold;
+    font-size: 1.05em;
+    position:relative;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    text-align: center;
+    margin-top: 10px;
+    cursor: pointer;
+    text-align-last: center;
+    text-transform: uppercase;
+}

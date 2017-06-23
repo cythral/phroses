@@ -32,7 +32,7 @@ function createEditors() {
 
 $(function() {
 	console.log("phroses initialized");
-  createEditors();
+    createEditors();
 	
 	$("#pst-es").bind("keydown", function(e) {
 		if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
@@ -100,11 +100,12 @@ $(function() {
 	});
         
         
-	if(window.location.hash === "#new") $("#pst-ns").fadeIn();
+	if(window.location.hash === "#new" && $("#pst").attr("class") === "new") $("#pst-ns").fadeIn();
 	$("#pst-ns").submit(function(e) {
 		e.preventDefault();
 		
 		var data = $(this).serializeArray();
+                var title = $("#pst-ns [name=title]").val();
 		$.ajax({ url : window.location.href, method: "POST", data : data })
 		.done(function(pdata) {
 			$("#pid").val(pdata.id);
@@ -114,9 +115,11 @@ $(function() {
 			$("#pst-es-fields").html(pdata.typefields);
 			$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
 			$("#pst-es-type").val($("#pst-ns select").val());
-			$("#pst-ns")[0].reset();
 			createEditors();
-			$("#pst-ns").fadeOut();
+                        document.title = title;
+			$("#pst-ns").fadeOut(function() {
+                            $("#pst-ns")[0].reset();
+                        });
 		}).fail(function(pdata) {
 			console.log(pdata);
 		});
@@ -189,6 +192,25 @@ $(function() {
         var $this = $(this);
         var $parent = $this.parent().parent();
         var data = { type : $(this).val(), id : $parent.data("id") };
-        $.ajax({ url : $parent.attr("href"), method : "PATCH", data : data });
+        $.ajax({ url : $parent.attr("href"), method : "PATCH", data : data })
+        .done(function() {
+         $parent.addClass("saved");
+            setTimeout(function() {
+                $parent.removeClass("saved");
+            }, 1000);
+        });
+    });
+    
+    $(".pageman-delete").click(function(e) {
+       e.preventDefault();
+       e.stopPropagation();
+       
+       var $this = $(this);
+       $.ajax({ url : $(this).parent().parent().attr("href"), method : "DELETE" })
+       .done(function() {
+           $this.parent().parent().slideUp(function() {
+               $(this).remove();
+           });
+       });
     });
 });

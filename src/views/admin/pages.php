@@ -17,21 +17,20 @@ use const Phroses\{SITE, REQ};
 	$q = DB::Query("SELECT * FROM `pages` WHERE `siteID`=?", [ SITE["ID"] ]);
 	
 	if(count($q) == 0) {
-		?>
-	<em>No pages for <?= REQ["BASEURL"]; ?>.  <a href="/admin/pages/create"><strong>Create your first one?</strong></a></em>
-		<?
+		?><em>No pages for <?= REQ["BASEURL"]; ?>.  <a href="/admin/pages/create"><strong>Create your first one?</strong></a></em><?
 	}
 	
 	foreach($q as $page) {
-		?><a href="<?= $page->uri; ?>" class="page_item" data-id="<?= $page->id; ?>"><input type="checkbox" value="<?= $page->id; ?>"> <?= $page->uri; ?> ( <strong><?= $page->title; ?></strong> ) 
+		?><a href="<?= $page->uri; ?>" class="page_item" data-id="<?= $page->id; ?>"><?= $page->uri; ?> <strong><?= $page->title; ?></strong> 
         
-            <div class="pull-r" style="margin-right: 30px; vertical-align: middle;">    
-                <select class="pageman-select" style="padding: 5px; height: 30px;">
+            <div class="pull-r">    
+                <select class="pageman-select">
                     <?
                     foreach($theme->GetTypes() as $type) {
                         ?><option <?= ($type == "redirect") ? "disabled" : ""; ?> <?= ($type == $page->type) ? "selected" : ""; ?>><?= $type; ?></option><?
                     } ?>
                 </select>
+                <i class="pageman-delete fa fa-times"></i>
             </div>
         </a><?
 	}
