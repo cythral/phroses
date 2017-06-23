@@ -20,7 +20,7 @@ HandleMethod("POST", function() {
   
   DB::Query("UPDATE `sites` SET `adminUsername`=? WHERE `id`=?", [
     $_POST["username"],
-    Phroses\SITE["ID"]
+    SITE["ID"]
   ]);
   
   JsonOutputSuccess();
@@ -29,45 +29,41 @@ HandleMethod("POST", function() {
 ?>
 
 <div class="container">
-  <div>
-		<a href="/admin/site" class="backbtn"><i class="fa fa-chevron-left"></i> Site Manager</a>
-	</div>
-  
-  <br>
-  
-  <form id="phroses_site_creds" class="sys form" data-method="POST" data-uri="/admin/site/credentials">
-    <h1>
+    
+  <form id="phroses_site_creds" class="sys form" data-method="POST" data-uri="/admin/creds">
+    <h1 class="c">
       Change Site Credentials
     </h1>
     <div id="saved">Saved Credentials!</div>
     <div id="error"></div>
     
     <section>
-      <div class="form_icfix">
+      <div class="form_icfix c">
           <div>Username:</div>
           <input name="username" required placeholder="Username" class="form_input form_field" autocomplete="off" value="<?= SITE["USERNAME"]; ?>">
       </div>
     </section>
     
     <section>
-      <h2>
+      <h2 class="c">
         Password
       </h2>
-      <div class="form_icfix">
+    <br>
+      <div class="form_icfix c">
           <div>Old:</div>
           <input name="old" type="password" placeholder="Old Password" class="form_input form_field" autocomplete="off">
       </div>
-      <div class="form_icfix">
+      <div class="form_icfix c">
           <div>New:</div>
           <input name="new" type="password" placeholder="New Password" class="form_input form_field" autocomplete="off">
       </div>
-      <div class="form_icfix">
+      <div class="form_icfix c">
           <div>Repeat:</div>
           <input name="repeat" type="password" placeholder="Repeat Password" class="form_input form_field" autocomplete="off">
       </div>
     </section>
     <div class="aln-c">
-      <button></button>
+        <a href="#" class="pst_btn txt" data-target="phroses_site_creds" data-action="submit">Submit</a>
     </div>
   </form>
 </div>

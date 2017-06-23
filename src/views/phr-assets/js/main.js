@@ -223,4 +223,10 @@ $(function() {
        
        $.ajax({ url : window.location.href, data : data, method : "PATCH" });
     });
+    
+    $("#theme-selector").change(function() {
+        $.post("/admin", { theme : $(this).val() }, function() {
+            displaySaved();
+        });
+    });
 });

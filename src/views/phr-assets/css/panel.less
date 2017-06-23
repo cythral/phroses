@@ -1,0 +1,40 @@
+.panel-heading {
+    padding: 10px 0 10px 0;
+}
+
+.panel-section {
+     display: inline-block;
+     width: ~"calc(50% - 20px)";
+     margin: 10px;
+     float: left;
+     min-width: 480px;
+     
+     &:after { clear: both; }
+}
+
+.panel-pages {
+   
+    background: #DDD;
+    border-radius: 5px;
+    border: 1px solid #AAA;
+    
+    h2 {
+        color: @primary;
+        padding: 10px;
+    }
+    
+    .panel-pages-line {
+        span {
+            font-size: 3em;
+            font-weight: bold;
+            display: block;
+        }
+    }
+    
+    a {
+        padding: 10px;
+        display: block;
+        font-weight: bold;
+    }
+}
+
