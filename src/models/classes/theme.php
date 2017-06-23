@@ -181,3 +181,14 @@ Theme::$filters["content"] = function($key, $fieldtype) {
 	if(array_key_exists($key, $content ?? [])) echo $content[$key];
 	else if(array_key_exists($key, $this->vars)) echo $this->vars[$key];
 };
+
+Theme::$filters["typelist"] = function($type, $field) {
+    $tlist = DB::Query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=?", [ SITE["ID"], $type ]);
+    foreach($tlist as $page) {
+        $out = $field;
+        
+        $callback = function($matches) { return $this->{$matches[1]} ?? ""; };
+        $out = preg_replace_callback("/@([a-zA-Z0-9]+)/", $callback->bindTo($page), $out);
+        echo $out;
+    }
+};
