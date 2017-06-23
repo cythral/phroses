@@ -24,7 +24,7 @@ function rcopy($src,$dst) {
 $p = new Phar(__DIR__.'/phroses.phar', 0, 'phroses');
 $p->startBuffering();
 $p->buildFromDirectory(__DIR__."/src/");
-$p->setStub('#!/usr/bin/php'.PHP_EOL.'<?php ob_end_clean(); Phar::mapPhar("phroses"); include "phar://phroses/startup.php"; __HALT_COMPILER();');
+$p->setStub('#!/usr/bin/php'.PHP_EOL.'<?php @ob_end_clean(); Phar::mapPhar("phroses"); include "phar://phroses/startup.php"; __HALT_COMPILER();');
 $p->stopBuffering();
 
 if(file_exists("phroses.tar")) unlink("phroses.tar");
