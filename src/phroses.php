@@ -220,8 +220,10 @@ abstract class Phroses {
 			},
 		
 			self::RESPONSES["PAGE"][404] => function(&$theme) {
-				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") $theme->AssetRead(REQ["PATH"]); // Assets
-				else if($theme->ErrorExists("404")) { $theme->ErrorRead("404"); die; } // Site-Level 404
+				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") {
+                    $theme->AssetRead(REQ["PATH"]); // Assets
+                    die;
+                } else if($theme->ErrorExists("404")) { $theme->ErrorRead("404"); die; } // Site-Level 404
 				else { // Generic Site 404
                     $theme->SetType("page", true);
 					$theme->title = "404 Not Found";
@@ -310,7 +312,8 @@ abstract class Phroses {
 			]);
 		}
 		
-		$output = [ "type" => "success", "content" => $theme->GetBody(), "public" => $_REQUEST["public"] ];
+		$output = [ "type" => "success" ];
+        if(!isset($_REQUEST["nocontent"])) $output["content"] = $theme->GetBody();
 		if(isset($_REQUEST["type"])) {
 			
 			ob_start();

@@ -191,7 +191,7 @@ $(function() {
     $(".pageman-select").change(function(e) {
         var $this = $(this);
         var $parent = $this.parent().parent();
-        var data = { type : $(this).val(), id : $parent.data("id") };
+        var data = { type : $(this).val(), id : $parent.data("id"), nocontent : true };
         $.ajax({ url : $parent.attr("href"), method : "PATCH", data : data })
         .done(function() {
          $parent.addClass("saved");
