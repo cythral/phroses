@@ -2,7 +2,11 @@ var editors = {};
 var errors = {
     "write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
     "api" : "There was a problem accessing the api.  Please try again later",
-    "extract" : "There was an issue extracting files from the archive.  Please check filesystem permissions and try again."
+    "extract" : "There was an issue extracting files from the archive.  Please check filesystem permissions and try again.",
+    "write2" : "write2",
+    "write3" : "write3",
+    "write4" : "write4",
+    "write5" : "write5"
 };
 
 function displaySaved() {

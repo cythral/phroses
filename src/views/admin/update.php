@@ -29,11 +29,11 @@ if($version == null) { ?>
      Phroses::setMaintenance(Phroses::ON);
       
       // backup 
-      if(!file_exists("tmp") && !mkdir("tmp")) throw new Exception("write");
+      if(!file_exists("tmp") && !mkdir("tmp")) throw new Exception("write1");
       foreach(IMPORTANT_FILES as $backup) {
         if(is_dir(ROOT."/$backup")) {
-          if(!rename(ROOT."/$backup", ROOT."/tmp/$backup")) throw new Exception("write");
-        } else if(!copy($backup, "tmp/$backup")) throw new Exception("write");
+          if(!rename(ROOT."/$backup", ROOT."/tmp/$backup")) throw new Exception("write2");
+        } else if(!copy($backup, "tmp/$backup")) throw new Exception("write:".$backup);
       }
       sendEvent("progress", [ "progress" => 10 ]);
       

@@ -2,7 +2,7 @@
 namespace Phroses;
 
 define("Phroses", true);
-define("Phroses\VERSION", "v0.4.0");
+define("Phroses\VERSION", "v0.4.1");
 define("Phroses\SRC", __DIR__);
 define("Phroses\SCHEMAVER", 2);
 define("Phroses\DEPS", $deps);
@@ -23,7 +23,6 @@ define("Phroses\IMPORTANT_FILES", [
     ".htaccess",
     "README.md",
     "LICENSE",
-    "php.ini",
     "phroses.conf",
     "themes"
 ]);
