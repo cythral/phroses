@@ -34,6 +34,7 @@ if(file_exists("tmp")) Phroses\rrmdir("tmp");
 mkdir("tmp");
 rcopy("themes", "tmp/themes");
 exec("chmod -R 775 tmp/themes");
+chmod(".htaccess", 0775);
 
 $r = new PharData("phroses.tar");
 $r->buildFromDirectory("tmp");
