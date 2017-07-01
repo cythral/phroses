@@ -45,7 +45,12 @@ $(function() {
 	$(".pst_btn, .phr-btn").click(function(e) {
 		e.preventDefault();
 		if($(this).data("target")) {
-			$("#"+$(this).data("target"))[$(this).data("action")]();
+                    if($(this).data("scroll") === "off") {
+                        $("body").addClass("noscroll");
+                    } else if($(this).data("scroll") === "on") {
+                        $("body").removeClass("noscroll");
+                    }
+                    $("#"+$(this).data("target"))[$(this).data("action")]();
 		}
 	});
 	
