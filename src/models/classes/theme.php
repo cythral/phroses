@@ -63,7 +63,7 @@ final class Theme extends Template {
 				ob_start();
 				foreach($this->GetContentFields($this->type) as $key => $field) { 
 					if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></div><? }
-					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= SITE["PAGE"]["CONTENT"][$key] ?? ""; ?>"><? }	
+					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= htmlspecialchars(SITE["PAGE"]["CONTENT"][$key]) ?? ""; ?>"><? }	
 				}
 				$pst->fields = trim(ob_get_clean());
 			
