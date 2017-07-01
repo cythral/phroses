@@ -150,7 +150,7 @@ final class Theme extends Template {
 	public function GetBody() {
 		$this->useconst = false;
 		$matches = [];
-		preg_match("/<body>(.*)?<\/body>/is", (String)$this, $matches);
+		preg_match("/<body[^>]*>(.*)?<\/body>/is", (String)$this, $matches);
 		return $matches[1] ?? "";
 	}
     
