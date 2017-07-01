@@ -212,6 +212,8 @@ abstract class Phroses {
 						} else if(file_exists(INCLUDES["VIEWS"].REQ['PATH'].'.php')) include INCLUDES["VIEWS"].REQ["PATH"].".php";
 						else echo "resource not found";
 					}
+                    
+                    if($theme->HasType("admin")) $theme->SetType("admin", true);
 					$theme->title = $title ?? "Phroses System Page";
 					$theme->main = trim(ob_get_clean());
 					$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);

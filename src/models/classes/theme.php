@@ -122,6 +122,9 @@ final class Theme extends Template {
 		if($this->HasAPI()) include "{$this->root}/api.php";
 	}
 	
+    public function HasType($type) {
+        return file_exists("{$this->root}/{$type}.tpl");
+    }
 	public function GetContentFields(string $tpl) {
 		if($tpl == "redirect") return ["destination" => "text"];
 		if(!file_exists("{$this->root}/{$tpl}.tpl")) return [];
