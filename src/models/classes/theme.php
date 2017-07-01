@@ -46,7 +46,7 @@ final class Theme extends Template {
 	*/
 	private function SetupSessionTools() {
 		if($_SESSION && REQ["METHOD"] == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404]])) {
-            $this->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);;
+            $this->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
 			$this->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$this->Push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
 			$this->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
@@ -187,7 +187,10 @@ Theme::$filters["typelist"] = function($type, $field) {
     foreach($tlist as $page) {
         $out = $field;
         
-        $callback = function($matches) { return $this->{$matches[1]} ?? ""; };
+        $callback = function($matches) { 
+            $content = json_decode($this->content);
+            return $this->{$matches[1]} ?? $content->{$matches[1]} ?? ""; 
+        };
         $out = preg_replace_callback("/@([a-zA-Z0-9]+)/", $callback->bindTo($page), $out);
         echo $out;
     }
