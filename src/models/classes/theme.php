@@ -62,7 +62,7 @@ final class Theme extends Template {
 
 				ob_start();
 				foreach($this->GetContentFields($this->type) as $key => $field) { 
-					if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></div><? }
+					if($field == "editor")  { ?><div class="form_field content editor" id="<?= $this->type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></div><? }
 					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= htmlspecialchars(SITE["PAGE"]["CONTENT"][$key]) ?? ""; ?>"><? }	
 				}
 				$pst->fields = trim(ob_get_clean());
@@ -75,6 +75,8 @@ final class Theme extends Template {
 			}
 			
 			foreach($this->GetTypes() as $type2) $pst->Push("types", ["type" => $type2, "checked" => ($this->type == $type2) ? "selected" : "" ]);
+            //header("content-type: text/plain");
+            //die($pst);
 			$this->tpl = preg_replace("/<body\b[^>]*>/is", '$0<div id="phr-container">', $this->tpl);
 			$this->tpl = str_replace("</body>", "</div>".$pst."</body>", $this->tpl);
 		}
@@ -128,7 +130,7 @@ final class Theme extends Template {
 	public function GetContentFields(string $tpl) {
 		if($tpl == "redirect") return ["destination" => "text"];
 		if(!file_exists("{$this->root}/{$tpl}.tpl")) return [];
-		preg_match_all("/<\{content((::((?!::).)+)+)?\}>/", file_get_contents("{$this->root}/{$tpl}.tpl"), $matches, PREG_SET_ORDER);
+		preg_match_all("/<{content(::((?!}>).)*)?}>/is", file_get_contents("{$this->root}/{$tpl}.tpl"), $matches, PREG_SET_ORDER);
 		$return = [];
 		foreach($matches as $match) {
 			$fields = explode("::", substr($match[1], 2));
@@ -161,8 +163,8 @@ final class Theme extends Template {
         return $dest->saveHTML();
 	}
     
-    protected function Process() {
-        $this->SetupSessionTools();
+    protected function Process($parseSession = true) {
+        if($parseSession) $this->SetupSessionTools();
         parent::Process();
     }
 	

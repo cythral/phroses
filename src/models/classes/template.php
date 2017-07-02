@@ -13,21 +13,22 @@ class Template {
         $this->tpl = (is_file($tpl)) ? file_get_contents($tpl) : $tpl;
 		$this->vars = $vars;
     }
-	
-	protected function Filter(string $name, callable $filter) {
-        $return = "";
-        $this->tpl = preg_replace_callback("/<\{{$name}((::((?!::).)+)+)?\}>/", function($matches) use (&$return, $filter) {
-            array_shift($matches);
-            ob_start();
-            $return = $filter->call($this, ...((isset($matches[0])) ? (explode("::", substr($matches[0], 2))) : []));
-            return trim(ob_get_clean());
-        }, $this->tpl);
-        
-        return $return;
-    } 
     
     protected function Process() {
-		foreach(self::$filters as $key => $filter) $this->Filter($key, $filter);
+        $callback = function($matches) {
+            array_shift($matches);
+            $filter = $matches[0];
+            $mods = substr($matches[1], 2);
+            ob_start();
+            if(isset(self::$filters[$filter])) {
+                $filter = self::$filters[$filter];
+                $filter->call($this, ...explode("::", $mods));
+                return trim(ob_get_clean());
+            }
+        };
+        
+        $this->tpl = preg_replace_callback("/<{([a-z]+)(::((?!}>).)*)?}>/is", $callback->bindTo($this), $this->tpl);
+        if(preg_match("/<{([a-z]+)(::((?!}>).)*)?}>/is", $this->tpl)) $this->Process(false);
     }
 	
 	public function Push($array, $value) {
