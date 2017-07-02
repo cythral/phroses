@@ -75,7 +75,7 @@ final class Theme extends Template {
 			}
 			
 			foreach($this->GetTypes() as $type2) $pst->Push("types", ["type" => $type2, "checked" => ($this->type == $type2) ? "selected" : "" ]);
-			$this->tpl = str_replace("<body>", '<body><div id="phr-container">', $this->tpl);
+			$this->tpl = preg_replace("/<body\b[^>]*>/is", '$0<div id="phr-container">', $this->tpl);
 			$this->tpl = str_replace("</body>", "</div>".$pst."</body>", $this->tpl);
 		}
 	}
@@ -148,10 +148,17 @@ final class Theme extends Template {
     }
 	
 	public function GetBody() {
-		$this->useconst = false;
-		$matches = [];
-		preg_match("/<body[^>]*>(.*)?<\/body>/is", (String)$this, $matches);
-		return $matches[1] ?? "";
+        
+        $this->useconst = false;
+        $src = new \DOMDocument;
+        $dest = new \DOMDocument;
+        @$src->loadHTML((String)$this);
+        $body = $src->getElementsByTagName('body')->item(0);
+        foreach ($body->childNodes as $child){
+            $dest->appendChild($dest->importNode($child, true));
+        }
+        
+        return $dest->saveHTML();
 	}
     
     protected function Process() {

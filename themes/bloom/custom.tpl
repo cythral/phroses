@@ -10,7 +10,7 @@
 	<{array:stylesheets:<link rel="stylesheet" href="@src" />}>
 	<{array:scripts:<script src="@src" @attrs></script>}>
 </head>
-<body>
+<body itemscope itemtype="http://schema.org/Organization">
 	<{include:header}>
 	<main>
 	blahblah
