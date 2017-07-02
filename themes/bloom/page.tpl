@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<{array::meta::<meta name="@name" content="@content">}>
 	
-	<title><{var::title}></title>
+	<title><{var::title}> <{site::name}></title>
 	
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 	<{array::stylesheets::<link rel="stylesheet" href="@src" />}>

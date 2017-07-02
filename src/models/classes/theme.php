@@ -210,3 +210,8 @@ Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertyp
         echo $out;
     }
 };
+
+
+Theme::$filters["site"] = function($var) {
+    echo SITE[strtoupper($var)] ?? "";
+};
