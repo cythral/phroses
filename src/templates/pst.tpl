@@ -1,7 +1,7 @@
 
-<div id="pst" class="<{var:pst_type}>">
+<div id="pst" class="<{var::pst_type}>">
     <div id="pst-vis">
-        <input type="checkbox" <{var:visibility}> id="vs-cb">
+        <input type="checkbox" <{var::visibility}> id="vs-cb">
         <label for="vs-cb">Public</label>
     </div>
     <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn" data-scroll="off">Delete</a>
@@ -13,19 +13,19 @@
 <div id="error">error</div>
 
 
-<input type="hidden" id="pid" value="<{var:id}>">
+<input type="hidden" id="pid" value="<{var::id}>">
 
 <form id="pst-es" class="container screen">
   <div id="pst-es-top">
-    <input id="pst-es-title" name="title" placeholder="Page Title" value="<{var:title}>">
+    <input id="pst-es-title" name="title" placeholder="Page Title" value="<{var::title}>">
     <div id="pst-es-actions">
-      <select id="pst-es-type"><{array:types:<option value="@type" @checked>@type</option>}></select>
+      <select id="pst-es-type"><{array::types::<option value="@type" @checked>@type</option>}></select>
       <a id="pst-es-save" href="#" class="pst_btn" data-target="pst-es" data-action="submit">Save</a>
       <a id="pst-es-done" href="#" class="pst_btn" data-target="pst-es" data-action="fadeOut" data-scroll="on">Done</a>
     </div>
   </div>
   
-  <div id="pst-es-fields"><{var:fields}></div>
+  <div id="pst-es-fields"><{var::fields}></div>
 </form>
 
 <form id="pst-ds" class="container screen">
@@ -59,7 +59,7 @@
 			<div>Type:</div>
 			<select name="type" class="c form_select form_field">
 				<option value="" disabled selected>Select a Page Type</option>
-				<{array:types:<option value="@type">@type</option>}>
+				<{array::types::<option value="@type">@type</option>}>
 			</select>
 		</div>
 	</div>

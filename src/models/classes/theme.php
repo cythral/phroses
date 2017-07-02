@@ -128,10 +128,10 @@ final class Theme extends Template {
 	public function GetContentFields(string $tpl) {
 		if($tpl == "redirect") return ["destination" => "text"];
 		if(!file_exists("{$this->root}/{$tpl}.tpl")) return [];
-		preg_match_all("/<\{content((:[a-zA-Z0-9_\-=<>\'\"@\/ ]+)+)?\}>/", file_get_contents("{$this->root}/{$tpl}.tpl"), $matches, PREG_SET_ORDER);
+		preg_match_all("/<\{content((::((?!::).)+)+)?\}>/", file_get_contents("{$this->root}/{$tpl}.tpl"), $matches, PREG_SET_ORDER);
 		$return = [];
 		foreach($matches as $match) {
-			$fields = explode(":", substr($match[1], 1));
+			$fields = explode("::", substr($match[1], 2));
 			$return[$fields[0]] = $fields[1];
 		} 
 		return $return;

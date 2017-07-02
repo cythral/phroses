@@ -16,10 +16,10 @@ class Template {
 	
 	protected function Filter(string $name, callable $filter) {
         $return = "";
-        $this->tpl = preg_replace_callback("/<\{{$name}((:[a-zA-Z0-9_\-=<>\'\"@\/ ]+)+)?\}>/", function($matches) use (&$return, $filter) {
+        $this->tpl = preg_replace_callback("/<\{{$name}((::((?!::).)+)+)?\}>/", function($matches) use (&$return, $filter) {
             array_shift($matches);
             ob_start();
-            $return = $filter->call($this, ...((isset($matches[0])) ? (explode(":", substr($matches[0], 1))) : []));
+            $return = $filter->call($this, ...((isset($matches[0])) ? (explode("::", substr($matches[0], 2))) : []));
             return trim(ob_get_clean());
         }, $this->tpl);
         
