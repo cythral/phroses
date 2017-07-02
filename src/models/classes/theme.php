@@ -194,8 +194,9 @@ Theme::$filters["content"] = function($key, $fieldtype) {
 	else if(array_key_exists($key, $this->vars)) echo $this->vars[$key];
 };
 
-Theme::$filters["typelist"] = function($type, $field) {
-    $tlist = DB::Query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=?", [ SITE["ID"], $type ]);
+Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertype = "ASC") {
+    if(!in_array(strtoupper($ordertype), ["ASC", "DESC"])) return;
+    $tlist = DB::Query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=? ORDER BY `{$orderby}` {$ordertype}", [ SITE["ID"], $type ]);
     foreach($tlist as $page) {
         $out = $field;
         
