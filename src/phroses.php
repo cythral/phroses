@@ -34,7 +34,7 @@ abstract class Phroses {
 	
 	static public function Start() {
 		if(self::$ran) return; // only run once
-		
+
 		self::LoadModels();
 		if(!self::CheckReqs()) return;
 		self::SetupMode();
@@ -55,9 +55,12 @@ abstract class Phroses {
 	
 	static public function SetupMode() {
 		if(self::$ran) return; // only run once
-		if(!array_key_exists(Config::Get("mode"), array_keys(self::$modes))) return false;
-		foreach(self::$modes as $key => $val) ini_set($key, $val);
-		die(Config::Get("mode"));
+		if(!array_key_exists(Config::Get("mode"), self::$modes)) return false;
+        foreach(self::$modes[Config::Get("mode")] as $key => $val) { ini_set($key, $val); }
+        
+        if(Config::Get("mode") == "development") {
+            header("X-Robots-Tag: noindex");
+        }
 	}
 	
 	static public function LoadModels() {
