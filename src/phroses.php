@@ -59,7 +59,7 @@ abstract class Phroses {
         foreach(self::$modes[Config::Get("mode")] as $key => $val) { ini_set($key, $val); }
         
         if(Config::Get("mode") == "development") {
-            header("X-Robots-Tag: noindex");
+            header("X-Robots-Tag: none");
         }
 	}
 	
@@ -100,7 +100,7 @@ abstract class Phroses {
 			return;
 		}
 		
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			REQ["PATH"],
 			REQ["BASEURL"]
 		]);
@@ -135,6 +135,8 @@ abstract class Phroses {
 				"ID" => $info->pageID,
 				"TYPE" => $info->type ?? "page",
 				"VIEWS" => $info->views,
+                "DATECREATED" => $info->dateCreated,
+                "DATEMODIFIED" => $info->dateModified,
 				"TITLE" => $info->title,
 				"CONTENT" => json_decode($info->content, true),
                 "VISIBILITY" => $info->public
