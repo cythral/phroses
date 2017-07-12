@@ -121,6 +121,7 @@ abstract class Phroses {
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
         if($response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) $response = self::RESPONSES["PAGE"][404]; 
 		
+        
 		// Setup the site constant
 		// maybe should have this as an object instead?
 		// todo: thinkabout that
@@ -221,7 +222,7 @@ abstract class Phroses {
                     if($theme->HasType("admin")) $theme->SetType("admin", true);
 					$theme->title = $title ?? "Phroses System Page";
 					$theme->main = trim(ob_get_clean());
-					$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" ]);
+					$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 					$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "defer"]);
 				}
 			},
@@ -230,8 +231,11 @@ abstract class Phroses {
 				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") {
                     $theme->AssetRead(REQ["PATH"]); // Assets
                     die;
-                } else if($theme->ErrorExists("404")) { $theme->ErrorRead("404"); die; } // Site-Level 404
-				else { // Generic Site 404
+                } else if($theme->ErrorExists("404")) { 
+                    header("content-type: text/html");
+                    $theme->ErrorRead("404"); die; 
+                } else { // Generic Site 404
+                    header("content-type: text/html");
                     $theme->SetType("page", true);
 					$theme->title = "404 Not Found";
 					$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
