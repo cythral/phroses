@@ -262,6 +262,12 @@ abstract class Phroses {
 	}
 	
 	static public function POST() {
+        if(($theme = new Theme(SITE["THEME"], "page"))->HasAPI()) {
+            $theme->RunAPI();
+            die;
+        }
+        unset($theme);
+        
 		// Validation
 		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
 		foreach(["title","type"] as $type)

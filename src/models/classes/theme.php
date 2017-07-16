@@ -62,7 +62,7 @@ final class Theme extends Template {
 
 				ob_start();
 				foreach($this->GetContentFields($this->type) as $key => $field) { 
-					if($field == "editor")  { ?><div class="form_field content editor" id="<?= $this->type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></div><? }
+					if($field == "editor")  { ?><pre class="form_field content editor" id="<?= $this->type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></pre><? }
 					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? ""); ?>"><? }	
 				}
 				$pst->fields = trim(ob_get_clean());
@@ -177,6 +177,12 @@ final class Theme extends Template {
 		}
 		return $list;
 	}
+    
+    /*public function __toString() : string {
+        $content = parent::__toString();
+        $content = preg_replace('%(?>[^\S ]\s*| \s{2,})(?=[^<]*+(?:<(?!/?(?:textarea|pre|script)\b)[^<]*+)*+(?:<(?>textarea|pre|script)\b| \z))%Six', '', $content);
+        return $content;
+    }*/
 }
 
 
