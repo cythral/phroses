@@ -262,7 +262,7 @@ abstract class Phroses {
 	}
 	
 	static public function POST() {
-        if(($theme = new Theme(SITE["THEME"], "page"))->HasAPI()) {
+        if(REQ["URI"] == "/api" && ($theme = new Theme(SITE["THEME"], "page"))->HasAPI()) {
             $theme->RunAPI();
             die;
         }
