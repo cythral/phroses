@@ -2,7 +2,7 @@
 namespace Phroses;
 
 define("Phroses", true);
-define("Phroses\VERSION", "v0.4.20");
+define("Phroses\VERSION", "v0.5.0");
 define("Phroses\SRC", __DIR__);
 define("Phroses\SCHEMAVER", 2);
 define("Phroses\DEPS", $deps);
