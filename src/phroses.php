@@ -390,12 +390,15 @@ abstract class Phroses {
     
     
     static public function HandleEmail() {
-        $sender = $_SERVER["argv"][2];
-        $recipient = $_SERVER["argv"][4];
         $data = file_get_contents("php://stdin");
         $m = new Parser((string)$data);
         
-        Events::Trigger("email", [ $m->headers['from'], $m->headers['to'], $m->headers['subject'], $m->bodies['text/plain'] ]);
+        Events::Trigger("email", [ 
+            (string)$m->headers['from'], 
+            (string)$m->headers['to'], 
+            (string)$m->headers['subject'], 
+            (string)$m->bodies['text/plain'] 
+        ]);
     }
 }
 

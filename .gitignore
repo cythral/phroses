@@ -5,6 +5,7 @@
 themes/frost/
 themes.tmp/
 /export.txt
+/export.log
 /schema.sql
 /deps.json
 /.developer
