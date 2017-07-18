@@ -33,6 +33,7 @@ if(file_exists("phroses.tar.gz")) unlink("phroses.tar.gz");
 if(file_exists("tmp")) Phroses\rrmdir("tmp");
 mkdir("tmp");
 rcopy("themes", "tmp/themes");
+rcopy("plugins", "tmp/plugins");
 exec("chmod -R 775 tmp/themes");
 chmod(".htaccess", 0775);
 

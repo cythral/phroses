@@ -12,6 +12,7 @@ define("Phroses\INCLUDES", [
 	"MODELS" => SRC."/models/classes",
 	"VIEWS" => SRC."/views",
 	"TPL" => SRC."/templates",
+    "PLUGINS" => ROOT."/plugins",
 	"META" => [ // ORDER OF THESE IS IMPORTANT
 		"TRAITS" => SRC."/models/traits",
 		"INTERFACES" => SRC."/models/interfaces"
@@ -24,7 +25,8 @@ define("Phroses\IMPORTANT_FILES", [
     "README.md",
     "LICENSE",
     "phroses.conf",
-    "themes"
+    "themes",
+    "plugins"
 ]);
 
 if(php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) {
@@ -87,6 +89,6 @@ define("Phroses\REQ", (php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) 
 if(REQ["TYPE"] != "cli") {
 	if(array_key_exists(strtolower(REQ["EXTENSION"]), MIME_TYPES)) header("content-type: ".MIME_TYPES[strtolower(REQ["EXTENSION"])]);
 	else header("content-type: ".MIME_TYPES[""]);
+    parse_str(file_get_contents('php://input'), $_REQUEST);
 }
 
-parse_str(file_get_contents('php://input'), $_REQUEST);

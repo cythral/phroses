@@ -34,8 +34,9 @@ abstract class Phroses {
 	
 	static public function Start() {
 		if(self::$ran) return; // only run once
-
-		self::LoadModels();
+        
+        self::LoadModels();
+        self::LoadPlugins();
 		if(!self::CheckReqs()) return;
 		self::SetupMode();
 		if(REQ["TYPE"] != "cli") {
@@ -46,9 +47,25 @@ abstract class Phroses {
 			else self::GET();
 			
 		} else {
-			if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "update") DB::Update();
-			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=on") self::SetMaintenance(self::ON);
-			else if(isset($_SERVER["argv"][1]) && $_SERVER["argv"][1] == "maintenance=off") self::SetMaintenance(self::OFF);
+            if(isset($_SERVER["argv"])) {
+                switch($_SERVER["argv"][1]) {
+                    case "update" : 
+                        DB::Update();
+                        break;
+                    
+                    case "maintenance=on" :
+                        self::SetMaintenance(self::ON);
+                        break;
+                    
+                    case "maintenance=off" :
+                        self::SetMaintenance(self::OFF);
+                        break;
+                    
+                    case "email" :
+                        self::HandleEmail();
+                        break;
+                }
+            }
 			exit(0);
 		}
 	}
@@ -62,6 +79,12 @@ abstract class Phroses {
             header("X-Robots-Tag: none");
         }
 	}
+    
+    static public function LoadPlugins() {
+        foreach(glob(INCLUDES["PLUGINS"]."/*", GLOB_ONLYDIR) as $dir) {
+            if(file_exists($dir."/bootstrap.php")) include $dir."/bootstrap.php";
+        }
+    }
 	
 	static public function LoadModels() {
 		if(self::$ran) return; // only run once
@@ -77,6 +100,8 @@ abstract class Phroses {
 	}
 	
 	static public function CheckReqs() {
+        Events::Trigger("checkReqs:start");
+        
 		if(!file_exists(INCLUDES["THEMES"]."/bloom")) {
 			http_response_code(500);
 			header("content-type: text/plain");
@@ -89,6 +114,8 @@ abstract class Phroses {
 			include SRC."/system/install.php";
 			return false;
 		}
+        
+        Events::Trigger("checkReqs:end");
 		return true;
 	}
 	
@@ -359,6 +386,16 @@ abstract class Phroses {
     static public function SetMaintenance(bool $mode = self::ON) {
         if($mode == self::ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
         if($mode == self::OFF) unlink(ROOT."/.maintenance");
+    }
+    
+    
+    static public function HandleEmail() {
+        $sender = $_SERVER["argv"][2];
+        $recipient = $_SERVER["argv"][4];
+        $data = file_get_contents("php://stdin");
+        $m = new Parser((string)$data);
+        
+        Events::Trigger("email", [ $m->headers['from'], $m->headers['to'], $m->headers['subject'], $m->bodies['text/plain'] ]);
     }
 }
 

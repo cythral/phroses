@@ -4,6 +4,7 @@
 /phroses.tar.gz
 themes/frost/
 themes.tmp/
+/export.txt
 /schema.sql
 /deps.json
 /.developer

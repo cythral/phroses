@@ -48,7 +48,8 @@ if($version == null) { ?>
       // cleanup
       if(!rrmdir(INCLUDES["THEMES"])) throw new Exception("write");
       sendEvent("progress", [ "progress" => 40 ]);
-      if(!rename("tmp/themes", INCLUDES["THEMES"])) throw new Exception("write");      
+      if(!rename("tmp/themes", INCLUDES["THEMES"])) throw new Exception("write");
+      if(!rename("tmp/plugins", INCLUDES["PLUGINS"])) throw new Exception("write");
       if(!rename("tmp/phroses.conf", "phroses.conf")) throw new Exception ("write");
       if(!rrmdir("tmp")) throw new Exception("write");
       sendEvent("progress", [ "progress" => 70 ]);
