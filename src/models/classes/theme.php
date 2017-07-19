@@ -8,6 +8,7 @@ namespace Phroses;
 */
 final class Theme extends Template {
 	private $root;
+    public $name;
 	private $types = ["redirect"];
 	private $useconst = true;
     private $type;
@@ -22,6 +23,7 @@ final class Theme extends Template {
 	public function __construct(string $name, string $type) {
 		$this->root = INCLUDES["THEMES"]."/".strtolower($name);
 		$this->SetType($type);
+        $this->name = $name;
         
 		// make sure theme directory and page type exists
 		if(!file_exists($this->root)) throw new \Exception("Theme doesn't exist");
@@ -98,7 +100,7 @@ final class Theme extends Template {
 	* @param $asset Filename of the asset
 	*/
 	public function AssetRead(string $asset) {
-		if($this->AssetExists($asset)) readfile("{$this->root}/assets{$asset}");
+		if($this->AssetExists($asset)) ReadfileCached("{$this->root}/assets{$asset}");
 	}
 	
 	public function ErrorExists(string $error) : bool {

@@ -39,6 +39,7 @@ abstract class Phroses {
         self::LoadPlugins();
 		if(!self::CheckReqs()) return;
 		self::SetupMode();
+        
 		if(REQ["TYPE"] != "cli") {
 			self::SetupSession();
             self::LoadSiteInfo();
@@ -208,8 +209,8 @@ abstract class Phroses {
 				if(!is_dir(INCLUDES["VIEWS"].REQ["PATH"]) && 
 					file_exists(INCLUDES["VIEWS"].REQ["PATH"]) && 
 					strtolower(REQ["EXTENSION"]) != "php") { 
-					readfile(INCLUDES["VIEWS"].REQ["PATH"]);
-					die;
+					ReadfileCached(INCLUDES["VIEWS"].REQ["PATH"]);
+					
 				} else {
 					ob_start();
 					if(!$_SESSION && REQ["PATH"] != "/admin/login") { 
@@ -257,10 +258,10 @@ abstract class Phroses {
 			self::RESPONSES["PAGE"][404] => function(&$theme) {
 				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") {
                     $theme->AssetRead(REQ["PATH"]); // Assets
-                    die;
                 } else if($theme->ErrorExists("404")) { 
                     header("content-type: text/html");
                     $theme->ErrorRead("404"); die; 
+                    
                 } else { // Generic Site 404
                     header("content-type: text/html");
                     $theme->SetType("page", true);
