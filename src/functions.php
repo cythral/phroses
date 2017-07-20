@@ -90,6 +90,8 @@ function ReadfileCached($file) {
     header("Last-Modified: $lastmodified");
     header("Etag: $etag");
     
+    if(!isset($_SERVER["HTTP_IF_MODIFIED_SINCE"]) && !isset($_SERVER["HTTP_IF_NONE_MATCH"])) die(readfile($file));
+    
     if(@strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $lastmodified || trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
         http_response_code(304);
         die;
