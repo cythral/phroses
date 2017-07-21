@@ -256,6 +256,7 @@ abstract class Phroses {
 			},
 		
 			self::RESPONSES["PAGE"][404] => function(&$theme) {
+                http_response_code(404);
 				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") {
                     $theme->AssetRead(REQ["PATH"]); // Assets
                 } else if($theme->ErrorExists("404")) { 
@@ -272,6 +273,7 @@ abstract class Phroses {
 		
 			self::RESPONSES["THEME"] => function(&$theme) {
 				if(!$theme->HasAPI()) {
+                    http_response_code(404);
 					$theme->title = "404 Not Found";
 					$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
 				} else {
