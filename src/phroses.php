@@ -256,14 +256,16 @@ abstract class Phroses {
 			},
 		
 			self::RESPONSES["PAGE"][404] => function(&$theme) {
-                http_response_code(404);
+                
 				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") {
                     $theme->AssetRead(REQ["PATH"]); // Assets
                 } else if($theme->ErrorExists("404")) { 
+                    http_response_code(404);
                     header("content-type: text/html");
                     $theme->ErrorRead("404"); die; 
                     
                 } else { // Generic Site 404
+                    http_response_code(404);
                     header("content-type: text/html");
                     $theme->SetType("page", true);
 					$theme->title = "404 Not Found";
