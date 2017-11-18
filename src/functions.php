@@ -83,17 +83,21 @@ function sendEvent(string $event, array $data) {
 function ReadfileCached($file) {
     if(!file_exists($file)) return false;
     
+    
     $lastmodified = filemtime($file);
+    $gmt_mtime = gmdate('r', $lastmodified);
     $etag = md5_file($file);
     
     header("Cache-Control: public");
-    header("Last-Modified: $lastmodified");
+    header("Last-Modified: $gmt_mtime");
     header("Etag: $etag");
     
-    if(!isset($_SERVER["HTTP_IF_MODIFIED_SINCE"]) && !isset($_SERVER["HTTP_IF_NONE_MATCH"])) die(readfile($file));
+    if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+        if ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime || str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $etag) {
+            http_response_code(304);
+            die;
+        }
+    }
     
-    if(@strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $lastmodified || trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
-        http_response_code(304);
-        die;
-    } else die(readfile($file));
+    die(readfile($file));
 }
