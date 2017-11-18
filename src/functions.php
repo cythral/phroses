@@ -91,6 +91,7 @@ function ReadfileCached($file) {
     header("Cache-Control: public");
     header("Last-Modified: $gmt_mtime");
     header("Etag: $etag");
+    header_remove("pragma");
     
     if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
         if ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime || str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $etag) {
