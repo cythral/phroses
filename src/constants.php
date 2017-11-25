@@ -1,6 +1,8 @@
 <?php
 namespace Phroses;
 
+use \reqc;
+
 define("Phroses", true);
 define("Phroses\VERSION", "v0.5.13");
 define("Phroses\SRC", __DIR__);
@@ -29,18 +31,6 @@ define("Phroses\IMPORTANT_FILES", [
     "plugins"
 ]);
 
-if(php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) {
-	$uri = strtok($_SERVER["REQUEST_URI"], "?");
-	$path = (strpos($uri, ".")) ? strstr($uri, ".", true) : $uri;
-	$parts = explode("/", $path);
-	$directory = implode("/", array_slice($parts, 0, -1));
-	$filename = array_reverse($parts)[0];
-	$extension = (ltrim(strstr($uri, "."), "."));
-	$extension = ($extension == "") ? null : $extension;
-	$domainParts = array_reverse(explode(".", $_SERVER["HTTP_HOST"]));
-	parse_str(strtok("?"), $_GET);
-}
-
 const MIME_TYPES = [
 	"" => "text/html; charset=utf8",
 	"php" => "text/html; charset=utf8",
@@ -63,32 +53,8 @@ const MIME_TYPES = [
 	"tpl" => "text/html; charset=utf8"
 ];
 
-define("Phroses\REQ", (php_sapi_name() != "cli" || isset($_ENV["PHR_TESTING"])) ? [
-	"PROTOCOL" => $_SERVER["SERVER_PROTOCOL"],
-	"H2PUSH" => (bool)($_SERVER["H2PUSH"] ?? false),
-	"SSL" => (bool)($_SERVER["HTTPS"] ?? false),
-	"HOST" => strtok($_SERVER["HTTP_HOST"], ":"),
-	"METHOD" => $_SERVER['REQUEST_METHOD'],
-	"BASEURL" => $_SERVER["SERVER_NAME"],
-	"FULLURL" => (((bool)($_SERVER["HTTPS"] ?? false)) ? "https://" : "http://").$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"],
-	"URI" => strtok($_SERVER["REQUEST_URI"], "?"),
-	"PORT" => (int)$_SERVER['SERVER_PORT'],
-	"IP" => $_SERVER["REMOTE_ADDR"],
-	"USERAGENT" => $_SERVER["HTTP_USER_AGENT"] ?? '',
-	"VARS" => $_REQUEST,
-	"ACCEPT" => explode(",", ($_SERVER["HTTP_ACCEPT"] ?? '')),
-	"DIRECTORY" => $directory,
-	"FILENAME" => $filename,
-	"EXTENSION" => $extension,
-	"FILE" => $filename.((isset($extension)) ? ".".$extension : ""),
-	"PATH" => $directory."/".$filename.((isset($extension)) ? ".".$extension : ""),
-	"SUBDOMAIN" => (count($domainParts) == 2) ? "main" : implode(".", array_slice($domainParts, 2)),
-	"TYPE" => (isset($extension)) ? "asset" : "page"
-] : ["TYPE" => "cli"]);
-
-if(REQ["TYPE"] != "cli") {
-	if(array_key_exists(strtolower(REQ["EXTENSION"]), MIME_TYPES)) header("content-type: ".MIME_TYPES[strtolower(REQ["EXTENSION"])]);
+if(reqc\TYPE != "cli") {
+	if(array_key_exists(strtolower(reqc\EXTENSION), MIME_TYPES)) header("content-type: ".MIME_TYPES[strtolower(reqc\EXTENSION)]);
 	else header("content-type: ".MIME_TYPES[""]);
-    parse_str(file_get_contents('php://input'), $_REQUEST);
 }
 

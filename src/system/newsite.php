@@ -28,7 +28,7 @@ http_response_code(404);
     </div>
     <div id="install-flow">
       <h1 class="c">Create a Site</h1>
-      <p>I couldn't find a site at <?= Phroses\REQ["HOST"]; ?>, so I'll help you create one.</p>
+      <p>I couldn't find a site at <?= reqc\HOST; ?>, so I'll help you create one.</p>
       
       <form action="" method="post" id="flow-site">
         <div class="form_icfix c aln-l">

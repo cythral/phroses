@@ -5,6 +5,8 @@ namespace Phroses;
 include __DIR__."/constants.php";
 include SRC."/functions.php";
 
+use \reqc;
+
 abstract class Phroses {
 	static private $ran = false;
 	static private $modes = [
@@ -35,16 +37,16 @@ abstract class Phroses {
 	static public function Start() {
 		if(self::$ran) return; // only run once
         
-        self::LoadModels();
+        //self::LoadModels();
         self::LoadPlugins();
 		if(!self::CheckReqs()) return;
 		self::SetupMode();
         
-		if(REQ["TYPE"] != "cli") {
+		if(reqc\TYPE != reqc\TYPES["CLI"]) {
 			self::SetupSession();
             self::LoadSiteInfo();
             self::UrlFix();
-			if(SITE["RESPONSE"] != self::RESPONSES["SYS"][200]) call_user_func("self::".REQ["METHOD"]);
+			if(SITE["RESPONSE"] != self::RESPONSES["SYS"][200]) call_user_func("self::".reqc\METHOD);
 			else self::GET();
 			
 		} else {
@@ -123,14 +125,15 @@ abstract class Phroses {
 	static public function LoadSiteInfo() {
 		if(self::$ran) return;
 		
-		if(REQ["TYPE"] == "cli") { // functionality tbd
+		if(reqc\TYPE == "cli") { // functionality tbd
 			define("Phroses\SITE", ["RESPONSE" => "CLI"]);
 			return;
 		}
+        
 		
 		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
-			REQ["PATH"],
-			REQ["BASEURL"]
+			reqc\PATH,
+			reqc\BASEURL
 		]);
 		
 		// if site doesn't exist, create a new one (script ends here)
@@ -139,13 +142,13 @@ abstract class Phroses {
 		// Determine Response Type
 		$response = self::RESPONSES["PAGE"][200];
 		if(!isset(($info = $info[0])->pageID)) $response = self::RESPONSES["PAGE"][404];
-		if(REQ["PATH"] != "/" && 
-			 (file_exists(INCLUDES["VIEWS"].REQ["PATH"].".php") || 
-		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]) || 
-		   file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php") ||
-		   substr(REQ["PATH"], 0, 13) == "/admin/pages/")) $response = self::RESPONSES["SYS"][200];
+		if(reqc\PATH != "/" && 
+			 (file_exists(INCLUDES["VIEWS"].reqc\PATH.".php") || 
+		   file_exists(INCLUDES["VIEWS"].reqc\PATH) || 
+		   file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php") ||
+		   substr(reqc\PATH, 0, 13) == "/admin/pages/")) $response = self::RESPONSES["SYS"][200];
 		
-		if(REQ["PATH"] == "/api" && REQ["METHOD"] != "GET") $response = self::RESPONSES["THEME"];
+		if(reqc\PATH == "/api" && reqc\METHOD != "GET") $response = self::RESPONSES["THEME"];
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
         if($response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) $response = self::RESPONSES["PAGE"][404]; 
 		
@@ -174,8 +177,8 @@ abstract class Phroses {
 	}
 	
 	static public function UrlFix() {
-		if(substr(REQ["PATH"], -1) == "/" && $_SERVER["REQUEST_URI"] != "/") {
-			header("location: ".substr(REQ["PATH"], 0, -1));
+		if(substr(reqc\PATH, -1) == "/" && $_SERVER["REQUEST_URI"] != "/") {
+			header("location: ".substr(reqc\PATH, 0, -1));
 			die;
 		}
 	}
@@ -206,14 +209,14 @@ abstract class Phroses {
 			},
 		
 			self::RESPONSES["SYS"][200] => function(&$theme) {
-				if(!is_dir(INCLUDES["VIEWS"].REQ["PATH"]) && 
-					file_exists(INCLUDES["VIEWS"].REQ["PATH"]) && 
-					strtolower(REQ["EXTENSION"]) != "php") { 
-					ReadfileCached(INCLUDES["VIEWS"].REQ["PATH"]);
+				if(!is_dir(INCLUDES["VIEWS"].reqc\PATH) && 
+					file_exists(INCLUDES["VIEWS"].reqc\PATH) && 
+					strtolower(reqc\EXTENSION) != "php") { 
+					ReadfileCached(INCLUDES["VIEWS"].reqc\PATH);
 					
 				} else {
 					ob_start();
-					if(!$_SESSION && REQ["PATH"] != "/admin/login") { 
+					if(!$_SESSION && reqc\PATH != "/admin/login") { 
                         $theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
                         $theme->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
 						http_response_code(401);
@@ -224,7 +227,7 @@ abstract class Phroses {
 							<div><input type="submit" value="Login"></div>
 						</form>
 					<? } else { 
-						if(REQ["METHOD"] == "GET") { 
+						if(reqc\METHOD == "GET") { 
 							$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 							$theme->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
 						?>
@@ -233,17 +236,17 @@ abstract class Phroses {
 								<a href="/admin">Phroses Panel</a>
 							</div>
 							<div class="dashbar_actions">
-								<?= REQ["HOST"]; ?> | <a href="/admin/logout">Logout</a>
+								<?= reqc\HOST; ?> | <a href="/admin/logout">Logout</a>
 							</div>
 							<div class="clear"></div>
 						</div>
 
 			<? 			}
-						if(file_exists(INCLUDES["VIEWS"].REQ["PATH"]."/index.php")) include INCLUDES["VIEWS"].REQ["PATH"]."/index.php";
-						else if(substr(REQ["PATH"], 0, 13) == "/admin/pages/") {
-							$_GET["id"] = substr(REQ["PATH"], 13);
+						if(file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php")) include INCLUDES["VIEWS"].reqc\PATH."/index.php";
+						else if(substr(reqc\PATH, 0, 13) == "/admin/pages/") {
+							$_GET["id"] = substr(reqc\PATH, 13);
 							include INCLUDES["VIEWS"]."/admin/pages/edit.php";
-						} else if(file_exists(INCLUDES["VIEWS"].REQ['PATH'].'.php')) include INCLUDES["VIEWS"].REQ["PATH"].".php";
+						} else if(file_exists(INCLUDES["VIEWS"].reqc\PATH.'.php')) include INCLUDES["VIEWS"].reqc\PATH.".php";
 						else echo "resource not found";
 					}
                     
@@ -257,8 +260,8 @@ abstract class Phroses {
 		
 			self::RESPONSES["PAGE"][404] => function(&$theme) {
                 
-				if($theme->AssetExists(REQ["PATH"]) && $_SERVER["REQUEST_URI"] != "/") {
-                    $theme->AssetRead(REQ["PATH"]); // Assets
+				if($theme->AssetExists(reqc\PATH) && $_SERVER["REQUEST_URI"] != "/") {
+                    $theme->AssetRead(reqc\PATH); // Assets
                 } else if($theme->ErrorExists("404")) { 
                     http_response_code(404);
                     header("content-type: text/html");
@@ -294,7 +297,7 @@ abstract class Phroses {
 	}
 	
 	static public function POST() {
-        if(REQ["URI"] == "/api" && ($theme = new Theme(SITE["THEME"], "page"))->HasAPI()) {
+        if(reqc\URI == "/api" && ($theme = new Theme(SITE["THEME"], "page"))->HasAPI()) {
             $theme->RunAPI();
             die;
         }
@@ -309,7 +312,7 @@ abstract class Phroses {
 		catch(\Exception $e) { JsonOutput(["type" => "error", "error" => "bad_value", "field" => "type" ]); }
 		
 		DB::Query("INSERT INTO `pages` (`uri`,`title`,`type`,`content`, `siteID`,`dateCreated`) VALUES (?, ?, ?, ?, ?, NOW())", [ 
-			REQ["PATH"],
+			reqc\PATH,
 			$_REQUEST["title"],
 			$_REQUEST["type"],
 			$_REQUEST["content"] ?? "{}",
@@ -353,7 +356,7 @@ abstract class Phroses {
 			
 			DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=?, `public`=? WHERE `id`=?", [
 				$_REQUEST["title"] ?? SITE["PAGE"]["TITLE"], 
-				urldecode($_REQUEST["uri"] ?? REQ["URI"]), 
+				urldecode($_REQUEST["uri"] ?? reqc\URI), 
 				(isset($_REQUEST["type"]) && $_REQUEST["type"] != "redirect") ? "{}" : (htmlspecialchars_decode($_REQUEST["content"] ?? json_encode(SITE["PAGE"]["CONTENT"]))), 
 				urldecode($_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]),
                 $_REQUEST["public"] ?? SITE["PAGE"]["VISIBILITY"],
@@ -382,7 +385,7 @@ abstract class Phroses {
 		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
 		if(SITE["RESPONSE"] != "PAGE-200" && SITE["RESPONSE"] != "PAGE-301") JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
 		
-		DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ REQ["PATH"], SITE["ID"] ]);
+		DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ reqc\PATH, SITE["ID"] ]);
 		JsonOutputSuccess();
 	}
     

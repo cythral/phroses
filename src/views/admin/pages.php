@@ -1,7 +1,7 @@
 <?php
 
 use Phroses\DB;
-use const Phroses\{SITE, REQ};
+use const Phroses\{SITE};
 
 ?>
 
@@ -18,7 +18,7 @@ use const Phroses\{SITE, REQ};
 	$q = DB::Query("SELECT * FROM `pages` WHERE `siteID`=?", [ SITE["ID"] ]);
 	
 	if(count($q) == 0) {
-		?><em>No pages for <?= REQ["BASEURL"]; ?></em><?
+		?><em>No pages for <?= reqc\BASEURL; ?></em><?
 	}
 	
 	foreach($q as $page) {

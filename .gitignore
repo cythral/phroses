@@ -9,3 +9,4 @@ themes.tmp/
 /schema.sql
 /deps.json
 /.developer
+vendor/

@@ -1,0 +1,15 @@
+{
+    "name": "cythral/phroses",
+    "description" : "A multi-site cms / content dispatcher",
+    "license" : "GPL-3.0",
+    "type" : "package",
+    "author" : {
+            "name" : "Cythral",
+            "email" : "talen@cythral.com"
+    },
+    "require" : {
+        "php" : ">=7.0",
+        "ext-curl" : "*",
+        "cythral/reqc" : "*"
+    }
+}

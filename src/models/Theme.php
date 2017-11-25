@@ -1,6 +1,7 @@
 <?php
 namespace Phroses;
 
+use \reqc;
 /**
 * This class is a custom implementation of templates that provides
 * an easy way to display a consistent look across a website.  This reads
@@ -47,7 +48,7 @@ final class Theme extends Template {
 	* @param string $type the current page type
 	*/
 	private function SetupSessionTools() {
-		if($_SESSION && REQ["METHOD"] == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404]])) {
+		if($_SESSION && reqc\METHOD == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404]])) {
             $this->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$this->Push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
@@ -56,7 +57,7 @@ final class Theme extends Template {
 			$pst = new Template(INCLUDES["TPL"]."/pst.tpl");
 			$pst->id = SITE["PAGE"]["ID"];
 			$pst->title = SITE["PAGE"]["TITLE"];
-			$pst->uri = REQ["URI"];
+			$pst->uri = reqc\URI;
             $pst->visibility = SITE["PAGE"]["VISIBILITY"] ? "checked" : "";
 			
 			if(SITE["RESPONSE"] == Phroses::RESPONSES["PAGE"][200]) {

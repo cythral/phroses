@@ -2,6 +2,11 @@
 
 include __DIR__."/src/functions.php";
 exec("lessc --clean-css src/views/phr-assets/css/main.less src/views/phr-assets/css/main.css");
+copy("composer.json", "src/composer.json");
+exec("cd src && composer update");
+
+
+
 function rcopy($src,$dst) { 
     $dir = opendir($src); 
     @mkdir($dst); 
@@ -16,11 +21,9 @@ function rcopy($src,$dst) {
         } 
     } 
     closedir($dir); 
-} 
+}
 
-
-
-
+rcopy("vendor", "src/vendor");
 $p = new Phar(__DIR__.'/phroses.phar', 0, 'phroses');
 $p->startBuffering();
 $p->buildFromDirectory(__DIR__."/src/");
@@ -44,7 +47,10 @@ $r->addFile(".htaccess", ".htaccess");
 $r->addFile("LICENSE");
 $r->addFile("README.md");
 $r = $r->compress(Phar::GZ);
+
 Phroses\rrmdir("tmp");
+Phroses\rrmdir("src/vendor");
+unlink("src/composer.json");
 unlink("phroses.tar");
 
 //opcache_compile_file("phroses.phar");

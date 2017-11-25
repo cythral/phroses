@@ -28,5 +28,11 @@ foreach($deps["EXTS"] as $ext) {
   }
 }
 
+// add autoloader
+if(INPHAR) $loader = include __DIR__."/vendor/autoload.php";
+else $loader = include dirname(__DIR__)."/vendor/autoload.php";
+$loader->addPsr4("Phroses\\", __DIR__."/models");
+
+
 // ok now i can really start coding
 include "phroses.php";
