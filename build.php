@@ -23,7 +23,6 @@ function rcopy($src,$dst) {
     closedir($dir); 
 }
 
-rcopy("vendor", "src/vendor");
 $p = new Phar(__DIR__.'/phroses.phar', 0, 'phroses');
 $p->startBuffering();
 $p->buildFromDirectory(__DIR__."/src/");
