@@ -7,20 +7,20 @@ exec("cd src && composer update");
 
 
 
-function rcopy($src,$dst) { 
-    $dir = opendir($src); 
-    @mkdir($dst); 
-    while(false !== ( $file = readdir($dir)) ) { 
-        if (( $file != '.' ) && ( $file != '..' )) { 
-            if ( is_dir($src . '/' . $file) ) { 
-                rcopy($src . '/' . $file,$dst . '/' . $file); 
-            } 
-            else { 
-                copy($src . '/' . $file,$dst . '/' . $file); 
-            } 
-        } 
-    } 
-    closedir($dir); 
+function rcopy($src,$dst) {
+    $dir = opendir($src);
+    @mkdir($dst);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            if ( is_dir($src . '/' . $file) ) {
+                rcopy($src . '/' . $file,$dst . '/' . $file);
+            }
+            else {
+                copy($src . '/' . $file,$dst . '/' . $file);
+            }
+        }
+    }
+    closedir($dir);
 }
 
 $p = new Phar(__DIR__.'/phroses.phar', 0, 'phroses');
@@ -52,4 +52,4 @@ Phroses\rrmdir("src/vendor");
 unlink("src/composer.json");
 unlink("phroses.tar");
 
-//opcache_compile_file("phroses.phar");
+echo "build complete".PHP_EOL;
