@@ -217,8 +217,8 @@ abstract class Phroses {
 				} else {
 					ob_start();
 					if(!$_SESSION && reqc\PATH != "/admin/login") {
-                        $theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-                        $theme->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
+                        $theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+                        $theme->push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
 						http_response_code(401);
 	?>				<form id="phroses-login">
 							<h2>Login to Phroses Site Panel</h2>
@@ -228,8 +228,8 @@ abstract class Phroses {
 						</form>
 					<? } else {
 						if(reqc\METHOD == "GET") {
-							$theme->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-							$theme->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
+							$theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+							$theme->push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
 						?>
 						<div class="dashbar">
 							<div class="dashbar_brand">
@@ -253,8 +253,8 @@ abstract class Phroses {
                     if($theme->HasType("admin")) $theme->SetType("admin", true);
 					$theme->title = $title ?? "Phroses System Page";
 					$theme->main = trim(ob_get_clean());
-					$theme->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-					$theme->Push("scripts", [ "src" => "/phroses.js", "attrs" => "defer"]);
+					$theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
+					$theme->push("scripts", [ "src" => "/phroses.js", "attrs" => "defer"]);
 				}
 			},
 

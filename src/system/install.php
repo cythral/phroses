@@ -12,7 +12,7 @@ Phroses\HandleMethod("POST", function() {
     $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
     if(version_compare($db->query("select version()")->fetchColumn(), Phroses\DEPS["MYSQL"], "<")) throw new Exception("version");
     
-    $schema = new Phroses\Template(Phroses\SRC."/schema/install.sql");
+    $schema = new phyrex\Template(Phroses\SRC."/schema/install.sql");
     $schema->schemaver = Phroses\SCHEMAVER;
     $db->query($schema);
     

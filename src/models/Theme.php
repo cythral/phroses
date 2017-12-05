@@ -1,12 +1,13 @@
-<?php
-namespace Phroses;
+<?php 
+namespace Phroses; 
 
-use \reqc;
+use \reqc; 
+use \phyrex\Template as Template;
 /**
-* This class is a custom implementation of templates that provides
-* an easy way to display a consistent look across a website.  This reads
-* files from a theme directory created in /themes
-*/
+ * This class is a custom implementation of templates that provides
+ * an easy way to display a consistent look across a website.  This reads
+ * files from a theme directory created in /themes */ 
+
 final class Theme extends Template {
 	private $root;
     public $name;
@@ -17,9 +18,9 @@ final class Theme extends Template {
 	/**
 	* Theme constructor.  Sets up the theme root, loads stylesheets,
 	* scripts, and page types.
-	* 
+	*
 	* @param string $name The name of the theme, there must be a theme directory with the same name.
-	* @param string $type The page type to use when outputting the theme 
+	* @param string $type The page type to use when outputting the theme
 	*/
 	public function __construct(string $name, string $type) {
 		$this->root = INCLUDES["THEMES"]."/".strtolower($name);
@@ -31,9 +32,9 @@ final class Theme extends Template {
 		
 		
 		// load stylesheets, scripts and page types
-		$this->Push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "defer"]);
-		foreach(FileList("{$this->root}/assets/css") as $style) $this->Push("stylesheets", [ "src" => "/css/".pathinfo($style, PATHINFO_BASENAME)]);
-		foreach(FileList("{$this->root}/assets/js") as $style) $this->Push("scripts", [ "src" => "/js/".pathinfo($style, PATHINFO_BASENAME), "attrs" => "defer"]);
+		$this->push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "defer"]);
+		foreach(FileList("{$this->root}/assets/css") as $style) $this->push("stylesheets", [ "src" => "/css/".pathinfo($style, PATHINFO_BASENAME)]);
+		foreach(FileList("{$this->root}/assets/js") as $style) $this->push("scripts", [ "src" => "/js/".pathinfo($style, PATHINFO_BASENAME), "attrs" => "defer"]);
 		foreach(glob("{$this->root}/*.tpl") as $ctype) $this->types[] = pathinfo($ctype, PATHINFO_FILENAME);
 		
 		if($type != "redirect") {
@@ -44,15 +45,15 @@ final class Theme extends Template {
 	
 	/**
 	* Sets up sessiontools (on page buttons/screens) for page deletion, editing and more.
-	* 
+	*
 	* @param string $type the current page type
 	*/
 	private function SetupSessionTools() {
 		if($_SESSION && reqc\METHOD == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404]])) {
-            $this->Push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-			$this->Push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-			$this->Push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
-			$this->Push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
+            $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
+			$this->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
+			$this->push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
 			
 			$pst = new Template(INCLUDES["TPL"]."/pst.tpl");
 			$pst->id = SITE["PAGE"]["ID"];
@@ -62,11 +63,12 @@ final class Theme extends Template {
 			
 			if(SITE["RESPONSE"] == Phroses::RESPONSES["PAGE"][200]) {
 				$pst->pst_type = "existing";
-
 				ob_start();
-				foreach($this->GetContentFields($this->type) as $key => $field) { 
-					if($field == "editor")  { ?><pre class="form_field content editor" id="<?= $this->type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></pre><? }
-					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? ""); ?>"><? }	
+				foreach($this->GetContentFields($this->type) as $key => $field) {
+					if($field == "editor") { ?><pre class="form_field content editor" id="<?= $this->type; ?>-main" data-id="<?= $key; ?>"><?= 
+trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></pre><? }
+					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" 
+class="form_input form_field content" value="<?= htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? ""); ?>"><? }
 				}
 				$pst->fields = trim(ob_get_clean());
 			
@@ -77,7 +79,7 @@ final class Theme extends Template {
                 $pst->visibility = "checked";
 			}
 			
-			foreach($this->GetTypes() as $type2) $pst->Push("types", ["type" => $type2, "checked" => ($this->type == $type2) ? "selected" : "" ]);
+			foreach($this->GetTypes() as $type2) $pst->push("types", ["type" => $type2, "checked" => ($this->type == $type2) ? "selected" : "" ]);
             //header("content-type: text/plain");
             //die($pst);
 			$this->tpl = preg_replace("/<body\b[^>]*>/is", '$0<div id="phr-container">', $this->tpl);
@@ -97,7 +99,7 @@ final class Theme extends Template {
 	
 	/**
 	* Reads an asset from the theme
-	* 
+	*
 	* @param $asset Filename of the asset
 	*/
 	public function AssetRead(string $asset) {
@@ -142,8 +144,8 @@ final class Theme extends Template {
 		return $return;
 	}
 	
-	public function GetTypes() : array { 
-		return $this-> types; 
+	public function GetTypes() : array {
+		return $this->types;
 	}
     
     public function SetType(string $type, bool $reload = false) {
@@ -168,9 +170,9 @@ final class Theme extends Template {
         return $dest->saveHTML();
 	}
     
-    protected function Process($parseSession = true) {
+    protected function process($parseSession = true) {
         if($parseSession) $this->SetupSessionTools();
-        parent::Process();
+        parent::process();
     }
 	
 	static public function List() : array {
@@ -187,15 +189,13 @@ final class Theme extends Template {
         return $content;
     }*/
 }
+/** ========================================== * Populate default theme filters
+ ================================================ */ 
 
-
-/** ==========================================
-* Populate default theme filters
- ================================================ */
-
-Theme::$filters["include"] = function($file) {
+ Theme::$filters["include"] = function($file) {
 	if(file_exists("{$this->root}/{$file}.php")) include "{$this->root}/{$file}.php";
 };
+
 
 Theme::$filters["content"] = function($key, $fieldtype) {
 	$content = SITE["PAGE"]["CONTENT"];
@@ -204,22 +204,20 @@ Theme::$filters["content"] = function($key, $fieldtype) {
 	if(array_key_exists($key, $content ?? [])) echo $content[$key];
 	else if(array_key_exists($key, $this->vars)) echo $this->vars[$key];
 };
-
 Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertype = "ASC") {
     if(!in_array(strtoupper($ordertype), ["ASC", "DESC"])) return;
     $tlist = DB::Query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=? ORDER BY `{$orderby}` {$ordertype}", [ SITE["ID"], $type ]);
     foreach($tlist as $page) {
         $out = $field;
         
-        $callback = function($matches) { 
+        $callback = function($matches) {
             $content = json_decode($this->content);
-            return $this->{$matches[1]} ?? $content->{$matches[1]} ?? ""; 
+            return $this->{$matches[1]} ?? $content->{$matches[1]} ?? "";
         };
         $out = preg_replace_callback("/@([a-zA-Z0-9]+)/", $callback->bindTo($page), $out);
         echo $out;
     }
 };
-
 
 Theme::$filters["site"] = function($var) {
     echo SITE[strtoupper($var)] ?? "";
