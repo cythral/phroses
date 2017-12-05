@@ -7,6 +7,10 @@ include SRC."/functions.php";
 
 use \reqc; 
 
+// hotfix until reqc fixed request parsing from within phar issues
+parse_str(file_get_contents("php://input"), $_REQUEST);
+
+
 abstract class Phroses {
 	static private $ran = false;
 	static private $modes = [

@@ -4,20 +4,50 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "850ba83d66325d0c534637bd7e329447",
+    "content-hash": "477cab1bb5370994641ac492d419814c",
     "packages": [
         {
-            "name": "cythral/reqc",
-            "version": "v1.1.0",
+            "name": "cythral/phyrex",
+            "version": "v0.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Cythral/reqc.git",
-                "reference": "bf10896e0f92c8bebaccfca4382d7cfb9637cb95"
+                "url": "https://github.com/cythral/phyrex.git",
+                "reference": "11664b402e8f8816a54410a842ab52b66aaaf5ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Cythral/reqc/zipball/bf10896e0f92c8bebaccfca4382d7cfb9637cb95",
-                "reference": "bf10896e0f92c8bebaccfca4382d7cfb9637cb95",
+                "url": "https://api.github.com/repos/cythral/phyrex/zipball/11664b402e8f8816a54410a842ab52b66aaaf5ee",
+                "reference": "11664b402e8f8816a54410a842ab52b66aaaf5ee",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "phyrex\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "description": "A simple templating library.",
+            "time": "2017-12-04T17:32:39+00:00"
+        },
+        {
+            "name": "cythral/reqc",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cythral/reqc.git",
+                "reference": "5d7df11e4310b505a83d47130a921cd3d2f5d1b5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cythral/reqc/zipball/5d7df11e4310b505a83d47130a921cd3d2f5d1b5",
+                "reference": "5d7df11e4310b505a83d47130a921cd3d2f5d1b5",
                 "shasum": ""
             },
             "require": {
@@ -27,7 +57,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "reqc\\": "src/"
+                    "reqc\\": "src/lib/"
                 },
                 "files": [
                     "src/reqc.php"
@@ -41,7 +71,7 @@
                 "GPL-3.0"
             ],
             "description": "A library for handling incoming and outgoing requests.",
-            "time": "2017-11-25T18:53:07+00:00"
+            "time": "2017-11-29T18:47:04+00:00"
         }
     ],
     "packages-dev": [],
