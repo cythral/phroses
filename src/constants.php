@@ -4,7 +4,7 @@ namespace Phroses;
 use \reqc;
 
 define("Phroses", true);
-define("Phroses\VERSION", "v0.5.17");
+define("Phroses\VERSION", "v0.5.18");
 define("Phroses\SRC", __DIR__);
 define("Phroses\SCHEMAVER", 2);
 define("Phroses\DEPS", $deps);
