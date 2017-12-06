@@ -6,10 +6,7 @@ include __DIR__."/constants.php";
 include SRC."/functions.php";
 
 use \reqc; 
-
-// hotfix until reqc fixed request parsing from within phar issues
-parse_str(file_get_contents("php://input"), $_REQUEST);
-
+use const \reqc\{VARS};
 
 abstract class Phroses {
 	static private $ran = false;
@@ -339,7 +336,7 @@ abstract class Phroses {
 		// Validation
 		if(!$_SESSION) JsonOutput(["type" => "error", "error" => "access_denied"], 401);
 		foreach(["id"] as $type)
-			if(!in_array($type, array_keys($_REQUEST))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
+			if(!in_array($type, array_keys(VARS))) JsonOutput([ "type" => "error", "error" => "missing_value", "field" => $type]);
 
 		if(SITE["RESPONSE"] != self::RESPONSES["PAGE"][200] && SITE["RESPONSE"] != self::RESPONSES["PAGE"][301]) JsonOutput([ "type" => "error", "error" => "resource_missing" ]);
 		try { $theme = new Theme(SITE["THEME"], $_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]); }
