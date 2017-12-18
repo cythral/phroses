@@ -4,8 +4,41 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "477cab1bb5370994641ac492d419814c",
+    "content-hash": "12317c35a9b4d1abbb8ea44ca691e1a4",
     "packages": [
+        {
+            "name": "cythral/inix",
+            "version": "v0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cythral/inix.git",
+                "reference": "8cc979106b4a38a9fbe2b9a4da6dd483d4509afa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cythral/inix/zipball/8cc979106b4a38a9fbe2b9a4da6dd483d4509afa",
+                "reference": "8cc979106b4a38a9fbe2b9a4da6dd483d4509afa",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "satooshi/php-coveralls": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "inix\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "description": "An object-oriented configuration utility for php applications",
+            "time": "2017-12-18T18:20:33+00:00"
+        },
         {
             "name": "cythral/phyrex",
             "version": "v0.1.0",
@@ -38,26 +71,29 @@
         },
         {
             "name": "cythral/reqc",
-            "version": "v1.1.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cythral/reqc.git",
-                "reference": "bf10896e0f92c8bebaccfca4382d7cfb9637cb95"
+                "reference": "421e0594179dcfcadf495c9a8d5e8d30c649937e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cythral/reqc/zipball/bf10896e0f92c8bebaccfca4382d7cfb9637cb95",
-                "reference": "bf10896e0f92c8bebaccfca4382d7cfb9637cb95",
+                "url": "https://api.github.com/repos/cythral/reqc/zipball/421e0594179dcfcadf495c9a8d5e8d30c649937e",
+                "reference": "421e0594179dcfcadf495c9a8d5e8d30c649937e",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "php": ">=7.0"
             },
+            "require-dev": {
+                "kherge/box": "^2.7"
+            },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "reqc\\": "src/"
+                    "reqc\\": "src/lib/"
                 },
                 "files": [
                     "src/reqc.php"
@@ -71,7 +107,7 @@
                 "GPL-3.0"
             ],
             "description": "A library for handling incoming and outgoing requests.",
-            "time": "2017-11-25T18:53:07+00:00"
+            "time": "2017-12-06T16:51:03+00:00"
         }
     ],
     "packages-dev": [],

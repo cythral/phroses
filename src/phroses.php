@@ -5,7 +5,8 @@ namespace Phroses;
 include __DIR__."/constants.php";
 include SRC."/functions.php";
 
-use \reqc; 
+use \reqc;
+use \inix\Config as inix;
 use const \reqc\{VARS};
 
 abstract class Phroses {
@@ -76,10 +77,10 @@ abstract class Phroses {
 
 	static public function SetupMode() {
 		if(self::$ran) return; // only run once
-		if(!array_key_exists(Config::Get("mode"), self::$modes)) return false;
-        foreach(self::$modes[Config::Get("mode")] as $key => $val) { ini_set($key, $val); }
+		if(!array_key_exists(inix::get("mode"), self::$modes)) return false;
+        foreach(self::$modes[inix::get("mode")] as $key => $val) { ini_set($key, $val); }
 
-        if(Config::Get("mode") == "development") {
+        if(inix::get("mode") == "development") {
             header("X-Robots-Tag: none");
         }
 	}
@@ -112,9 +113,9 @@ abstract class Phroses {
 			echo "Default theme 'bloom' was not detected.  Please re-add the default bloom theme to its proper directory.";
 			exit(1);
 		}
-
+		
 		// if no configuration file found, run installer
-		if(!Config::Load()) {
+		if(!inix::load(ROOT."/phroses.conf")) {
 			include SRC."/system/install.php";
 			return false;
 		}
@@ -291,7 +292,7 @@ abstract class Phroses {
 		][SITE["RESPONSE"]]($theme);
 		echo $theme;
 
-		if(Config::Get("mode") == "production") {
+		if(inix::get("mode") == "production") {
 			ob_end_flush();
 			flush();
 		}

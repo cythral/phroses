@@ -1,5 +1,7 @@
 <?php
 namespace Phroses;
+
+use \inix\Config as inix;
 use \PDO;
 
 abstract class DB {
@@ -10,7 +12,7 @@ abstract class DB {
 	
 	static public function Setup() {
 		if(self::$setup) return; // only run once
-		$conf = Config::Get("database");
+		$conf = inix::get("database");
 		self::$db = new PDO("mysql:host=".$conf["host"].";dbname=".$conf["name"], $conf["user"], $conf["password"]);
 		$versions = self::$db->query("select version() AS `dbver`, `value` AS `sver` FROM `options` WHERE `key`='schemaver'")->fetchAll(PDO::FETCH_OBJ)[0];
 		self::$version = $versions->dbver;
