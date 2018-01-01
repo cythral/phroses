@@ -1,7 +1,8 @@
 <?php
-use Phroses\Events;
+
+use listen\Events;
 use Phroses\DB;
 
-Events::Listen("email", function($from = '', $to = '', $subject = '', $message = '') {
+Events::listen("email", function($from = '', $to = '', $subject = '', $message = '') {
     DB::Query("REPLACE INTO `options` (`key`, `value`) VALUES (?, ?)", [ 'announcement', $message ]);
 });

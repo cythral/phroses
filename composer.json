@@ -12,6 +12,7 @@
         "ext-curl" : "*",
         "cythral/reqc" : "^1.3.0",
         "cythral/phyrex": "^0.1.0",
-        "cythral/inix": "^0.1.1"
+        "cythral/inix": "^0.1.1",
+        "cythral/listen": "^0.1.0"
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "12317c35a9b4d1abbb8ea44ca691e1a4",
+    "content-hash": "156a86f0f7dfcdc0a45a18dbf478d29e",
     "packages": [
         {
             "name": "cythral/inix",
@@ -38,6 +38,39 @@
             ],
             "description": "An object-oriented configuration utility for php applications",
             "time": "2017-12-18T18:20:33+00:00"
+        },
+        {
+            "name": "cythral/listen",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cythral/listen.git",
+                "reference": "bfe03b8639d74f04a858e25386413cbe046ff9e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cythral/listen/zipball/bfe03b8639d74f04a858e25386413cbe046ff9e1",
+                "reference": "bfe03b8639d74f04a858e25386413cbe046ff9e1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "satooshi/php-coveralls": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "listen\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "description": "A lightweight, simple, and object-oriented hooks system for PHP applications.",
+            "time": "2018-01-01T19:30:58+00:00"
         },
         {
             "name": "cythral/phyrex",

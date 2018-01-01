@@ -6,6 +6,7 @@ include __DIR__."/constants.php";
 include SRC."/functions.php";
 
 use \reqc;
+use \listen\Events;
 use \inix\Config as inix;
 use const \reqc\{VARS};
 
@@ -105,7 +106,7 @@ abstract class Phroses {
 	}
 
 	static public function CheckReqs() {
-        Events::Trigger("checkReqs:start");
+        Events::trigger("checkReqs:start");
 
 		if(!file_exists(INCLUDES["THEMES"]."/bloom")) {
 			http_response_code(500);
@@ -120,7 +121,7 @@ abstract class Phroses {
 			return false;
 		}
 
-        Events::Trigger("checkReqs:end");
+        Events::trigger("checkReqs:end");
 		return true;
 	}
 
@@ -403,7 +404,7 @@ abstract class Phroses {
         $data = file_get_contents("php://stdin");
         $m = new Parser((string)$data);
 
-        Events::Trigger("email", [
+        Events::trigger("email", [
             (string)$m->headers['from'],
             (string)$m->headers['to'],
             (string)$m->headers['subject'],
