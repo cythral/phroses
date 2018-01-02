@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "156a86f0f7dfcdc0a45a18dbf478d29e",
+    "content-hash": "8f44a3b2d1daffa6ac5a234549070eea",
     "packages": [
         {
             "name": "cythral/inix",
@@ -104,16 +104,16 @@
         },
         {
             "name": "cythral/reqc",
-            "version": "v1.3.0",
+            "version": "v1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cythral/reqc.git",
-                "reference": "421e0594179dcfcadf495c9a8d5e8d30c649937e"
+                "reference": "55f843331f52e72901a185546cf82ef49ffd9b2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cythral/reqc/zipball/421e0594179dcfcadf495c9a8d5e8d30c649937e",
-                "reference": "421e0594179dcfcadf495c9a8d5e8d30c649937e",
+                "url": "https://api.github.com/repos/cythral/reqc/zipball/55f843331f52e72901a185546cf82ef49ffd9b2a",
+                "reference": "55f843331f52e72901a185546cf82ef49ffd9b2a",
                 "shasum": ""
             },
             "require": {
@@ -121,7 +121,8 @@
                 "php": ">=7.0"
             },
             "require-dev": {
-                "kherge/box": "^2.7"
+                "kherge/box": "^2.7",
+                "satooshi/php-coveralls": "^2.0"
             },
             "type": "library",
             "autoload": {
@@ -140,7 +141,7 @@
                 "GPL-3.0"
             ],
             "description": "A library for handling incoming and outgoing requests.",
-            "time": "2017-12-06T16:51:03+00:00"
+            "time": "2018-01-01T23:21:03+00:00"
         }
     ],
     "packages-dev": [],

@@ -181,9 +181,13 @@ $(function() {
 
 		ev.addEventListener("error", function(e) {
 			ev.close();
-                        console.log(e.data);
+            console.log(e.data);
 			var data = JSON.parse(e.data);
-			$(".phr-progress-error").html(errors[data.error]);
+
+			var extra = "";
+			if(data.error == "write") extra = "<br>debug: operation " + data.action + " on file " + data.file;
+
+			$(".phr-progress-error").html(errors[data.error] + extra);
 			$(".phr-progress").addClass("error");
 		});
 	});

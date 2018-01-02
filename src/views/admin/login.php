@@ -1,7 +1,10 @@
 <?php
 namespace Phroses;
 
-HandleMethod("POST", function() {
+// TODO: SWITCH TO JSON
+
+
+HandleMethod("POST", function($out) {
   header("content-type: text/plain");
  
   if(password_verify($_POST["password"], SITE["PASSWORD"]) && $_POST["username"] == SITE["USERNAME"]) {
@@ -10,6 +13,6 @@ HandleMethod("POST", function() {
     return;
   }
 
-  http_response_code(401);
+  $out->setCode(401);
   echo "fail";
 });

@@ -4,13 +4,12 @@ use Phroses\DB;
 use function Phroses\{HandleMethod, JsonOutput, JsonOutputSuccess};
 use const Phroses\SITE;
 
-HandleMethod("POST", function() {
-  
-  if($_POST["username"] == "") JsonOutput(["type" => "error", "error" => "bad_value", "field" => "username" ]);
+HandleMethod("POST", function($out) {
+  if($_POST["username"] == "") $out->send(["type" => "error", "error" => "bad_value", "field" => "username" ], 400);
 	
   if($_POST["old"] != "" || $_POST["new"] != "" || $_POST["repeat"] != "") {
-    if(!password_verify($_POST["old"], SITE["PASSWORD"])) JsonOutput(["type" => "error", "error" => "bad_value", "field" => "old"]);
-    if($_POST["new"] != $_POST["repeat"]) JsonOutput(["type" => "error", "error" => "bad_value", "field" => "repeat"]);
+    if(!password_verify($_POST["old"], SITE["PASSWORD"])) $out->send(["type" => "error", "error" => "bad_value", "field" => "old"], 400);
+    if($_POST["new"] != $_POST["repeat"]) $out->send(["type" => "error", "error" => "bad_value", "field" => "repeat"], 400);
     
     DB::Query("UPDATE `sites` SET `adminPassword`=? WHERE `id`=?", [
       password_hash($_POST["new"], PASSWORD_DEFAULT),
@@ -23,7 +22,7 @@ HandleMethod("POST", function() {
     SITE["ID"]
   ]);
   
-  JsonOutputSuccess();
+  $out->send(["type" => "success"], 200);
 }, ["username", "old", "new", "repeat"]);
  
 ?>

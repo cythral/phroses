@@ -2,6 +2,6 @@
 
 Phroses\Session::end();
 
-http_response_code(301);
+self::$out->setCode(301);
 header("location: /");
 die;

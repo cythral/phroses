@@ -6,10 +6,10 @@ use const \Phroses\{ SITE, INCLUDES };
 
 
 
-HandleMethod("POST", function() {
-    if(!file_exists(INCLUDES["THEMES"]."/".$_POST["theme"])) JsonOutput(["type" => "error", "error" => "bad_theme"]);
+HandleMethod("POST", function($out) {
+    if(!file_exists(INCLUDES["THEMES"]."/".$_POST["theme"])) $out->send(["type" => "error", "error" => "bad_theme"], 400);
     DB::Query("UPDATE `sites` SET `theme`=? WHERE `id`=?", [ $_POST["theme"], SITE["ID"] ]);
-    JsonOutputSuccess();
+    $out->send(["type" => "success"], 200);
 });
 
 $vars = DB::Query("SELECT SUM(`views`) AS viewcount, COUNT(`id`) AS pagecount FROM `pages` WHERE `siteID`=?", [ SITE["ID"] ])[0];

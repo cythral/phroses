@@ -10,7 +10,7 @@
     "require" : {
         "php" : ">=7.0",
         "ext-curl" : "*",
-        "cythral/reqc" : "^1.3.0",
+        "cythral/reqc" : "^1.4.1",
         "cythral/phyrex": "^0.1.0",
         "cythral/inix": "^0.1.1",
         "cythral/listen": "^0.1.0"

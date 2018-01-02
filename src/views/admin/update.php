@@ -1,5 +1,6 @@
 <?php
 use Phroses\Phroses;
+use Phroses\Exceptions\WriteException;
 use function Phroses\{sendEvent, rrmdir};
 use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES};
 
@@ -16,10 +17,11 @@ if($version == null) { ?>
   if(isset($_GET["start_upgrade"])) {
     ob_end_clean();
     ob_end_clean();
-    header("Content-Type: text/event-stream\n\n");
-    
+
+    self::$out = new reqc\EventStream\Server();
+ 
     if(!is_writable(ROOT) || (file_exists(ROOT."/phroses.tar.gz") && !unlink(ROOT."/phroses.tar.gz"))) {
-      sendEvent("error", ["error" => "write"]);
+      self::$out->send("error", ["error" => "write"]);
       die;
     }
     
@@ -29,41 +31,44 @@ if($version == null) { ?>
      Phroses::setMaintenance(Phroses::ON);
       
       // backup 
-      if(!file_exists("tmp") && !mkdir("tmp")) throw new Exception("write");
+      if(!file_exists("tmp") && !mkdir("tmp")) throw new WriteException("create", ROOT."/tmp/");
       foreach(IMPORTANT_FILES as $backup) {
         if(is_dir(ROOT."/$backup")) {
-          if(!rename(ROOT."/$backup", ROOT."/tmp/$backup")) throw new Exception("write");
-        } else if(!copy($backup, "tmp/$backup")) throw new Exception("write");
+          if(!rename(ROOT."/$backup", ROOT."/tmp/$backup")) throw new WriteException("move", ROOT."/tmp/$backup");
+        } else if(!copy($backup, "tmp/$backup")) throw new WriteException("move", ROOT."/tmp/$backup");
       }
-      sendEvent("progress", [ "progress" => 10 ]);
+      self::$out->send("progress", [ "progress" => 10 ]);
       
       // download and extract
       if(!($api = @fopen("http://api.phroses.com/downloads/$version.tar.gz", "r"))) throw new Exception("api");
-      if(!@file_put_contents("phroses.tar.gz", $api)) throw new Exception("write");
+      if(!@file_put_contents("phroses.tar.gz", $api)) throw new WriteException("create", ROOT."/phroses.tar.gz");
       $archive = new PharData("phroses.tar.gz");
       $archive->extractTo(ROOT, null, true);
-      if(!unlink("phroses.tar.gz")) throw new Exception("write");
-      sendEvent("progress", [ "progress" => 30 ]);
+      if(!unlink("phroses.tar.gz")) throw new WriteException("delete", ROOT."/phroses.tar.gz");
+      self::$out->send("progress", [ "progress" => 30 ]);
       
       // cleanup
-      if(!rrmdir(INCLUDES["THEMES"])) throw new Exception("write");
-      if(!rrmdir(INCLUDES["PLUGINS"])) throw new Exception("write");
-      sendEvent("progress", [ "progress" => 40 ]);
-      if(!rename("tmp/themes", INCLUDES["THEMES"])) throw new Exception("write");
-      if(!rename("tmp/plugins", INCLUDES["PLUGINS"])) throw new Exception("write");
-      if(!rename("tmp/phroses.conf", "phroses.conf")) throw new Exception ("write");
-      if(!rrmdir("tmp")) throw new Exception("write");
-      sendEvent("progress", [ "progress" => 70 ]);
+      if(!rrmdir(INCLUDES["THEMES"])) throw new WriteException("delete", INCLUDES["THEMES"]);
+      if(!rrmdir(INCLUDES["PLUGINS"])) throw new WriteException("delete", INCLUDES["PLUGINS"]);
+      self::$out->send("progress", [ "progress" => 40 ]);
+      if(!rename("tmp/themes", INCLUDES["THEMES"])) throw new WriteException("restore", INCLUDES["THEMES"]);
+      if(!rename("tmp/plugins", INCLUDES["PLUGINS"])) throw new WriteException("restore", INCLUDES["PLUGINS"]);
+      if(!rename("tmp/phroses.conf", "phroses.conf")) throw new WriteException("restore", ROOT."/tmp/phroses.conf");
+      if(!rrmdir("tmp")) throw new WriteException("delete", ROOT."/tmp");
+      self::$out->send("progress", [ "progress" => 70 ]);
       
       // finish update
       shell_exec("php phroses.phar update");
-      sendEvent("progress", [ "progress" => 100, "version" => $version ]);
+      self::$out->send("progress", [ "progress" => 100, "version" => $version ]);
       
     } catch(PharException $e) {
-      sendEvent("error", ["error" => "extract"]);
+      self::$out->send("error", ["error" => "extract"]);
+
+    } catch(WriteException $e) {
+      self::$out->send("error", ["error" => "write", "action" => $e->action, "file" => $e->file ]);
       
     } catch(Exception $e) {
-      sendEvent("error", ["error" => $e->getMessage() ]);     
+      self::$out->send("error", ["error" => $e->getMessage() ]);     
    
     } finally {
       // if error occurred and tmp dir still exists, move everything in tmp back
