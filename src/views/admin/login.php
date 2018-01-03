@@ -2,11 +2,7 @@
 namespace Phroses;
 
 
-if($_SESSION) {
-  self::$out->setCode(301);
-  self::$out->setHeader("location", "/admin");
-  die;
-}
+if($_SESSION) self::$out->redirect("/admin");
 
 // todo: switch to json
 HandleMethod("POST", function($out) {

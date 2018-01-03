@@ -188,8 +188,7 @@ abstract class Phroses {
 
 	static public function UrlFix() {
 		if(substr(reqc\PATH, -1) == "/" && $_SERVER["REQUEST_URI"] != "/") {
-			self::$out->setHeader("location", substr(reqc\PATH, 0, -1));
-			die;
+			self::$out->redirect(substr(reqc\PATH, 0, -1));
 		}
 	}
 

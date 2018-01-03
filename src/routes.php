@@ -27,10 +27,8 @@ Phroses::route("get", Phroses::RESPONSES["PAGE"][301], function() {
 	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
 
 	if(isset(SITE["PAGE"]["CONTENT"]["destination"])) {
-		self::$out->setCode(301);
-		self::$out->setHeader("location", SITE["PAGE"]["CONTENT"]["destination"]);
-		
-		die;
+        self::$out->redirect(SITE["PAGE"]["CONTENT"]["destination"]);
+        
 	} else echo "incomplete redirect"; // todo: add a fixer form here
 
 	echo $theme;
