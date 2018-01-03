@@ -1,9 +1,14 @@
 <?php
 namespace Phroses;
 
-// TODO: SWITCH TO JSON
 
+if($_SESSION) {
+  self::$out->setCode(301);
+  self::$out->setHeader("location", "/admin");
+  die;
+}
 
+// todo: switch to json
 HandleMethod("POST", function($out) {
   header("content-type: text/plain");
  
@@ -16,3 +21,13 @@ HandleMethod("POST", function($out) {
   $out->setCode(401);
   echo "fail";
 });
+
+
+?>
+
+<form id="phroses-login">
+  <h2>Login to Phroses Site Panel</h2>
+  <div><input name="username" type="text" placeholder="Username"></div>
+  <div><input name="password" type="password" placeholder="Password"></div>
+  <div><input type="submit" value="Login"></div>
+</form>
