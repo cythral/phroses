@@ -28,6 +28,9 @@ abstract class Phroses {
 		]
 	];
 
+
+	const ON = true;
+    const OFF = false;
 	const RESPONSES = [
 		"DEFAULT" => 0,
 
@@ -138,7 +141,6 @@ abstract class Phroses {
 			return;
 		}
 
-
 		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			reqc\PATH,
 			reqc\BASEURL
@@ -196,8 +198,7 @@ abstract class Phroses {
 		register_shutdown_function("session_write_close");
 	}
 
-    const ON = true;
-    const OFF = false;
+    
     static public function SetMaintenance(bool $mode = self::ON) {
         if($mode == self::ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
         if($mode == self::OFF) unlink(ROOT."/.maintenance");
