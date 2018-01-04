@@ -8,6 +8,7 @@ if(!is_writable(Phroses\ROOT)) {
 }
   
 Phroses\HandleMethod("POST", function() {
+  $out = new \reqc\JSON\Server();
   try {
     $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
     if(version_compare($db->query("select version()")->fetchColumn(), Phroses\DEPS["MYSQL"], "<")) throw new Exception("version");
@@ -26,7 +27,7 @@ Phroses\HandleMethod("POST", function() {
     chown(Phroses\ROOT."/phroses.conf", posix_getpwuid(posix_geteuid())['name']);
     chmod(Phroses\ROOT."/phroses.conf", 0775);
     
-    Phroses\JsonOutputSuccess();
+    $out->send(["type" => "success"], 200);
   } catch(Exception $e) {
     $output = [ "type" => "error", "error" => "credentials" ];
     if($e->getMessage() == "version") {
@@ -34,7 +35,7 @@ Phroses\HandleMethod("POST", function() {
       $output["minver"] = Phroses\DEPS["MYSQL"];
     }
     
-    Phroses\JsonOutput($output);
+    $out->send($output, 400);
   }
 }, ["host", "database", "username", "password"]);
   

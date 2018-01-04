@@ -56,7 +56,7 @@ abstract class Phroses {
 		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
 		Events::attach("modeset", [ (bool)(inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
 		
-
+		// page or asset
 		if(reqc\TYPE != reqc\TYPES["CLI"]) {
 			Events::trigger("routesmapped", [include SRC."/routes.php"]);
 			Events::trigger("sessionstarted", [self::setupSession()]);
@@ -64,6 +64,7 @@ abstract class Phroses {
 			if(((bool)(inix::get("notrailingslashes") ?? true))) self::urlFix();
 			Events::attach("routestrace", [ reqc\METHOD, SITE["RESPONSE"] ], "\Phroses\Phroses::traceRoutes");
 
+		// command line
 		} else {
 			Events::trigger("commandsmapped", [include SRC."/commands.php"]);
             Events::attach("commandstrace", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::traceCommands");
@@ -95,7 +96,7 @@ abstract class Phroses {
 		if(!file_exists($defaultTheme)) {
 			self::$out->setCode(500);
 			self::$out->setContentType(MIME_TYPES["TXT"]);
-			die("Default theme 'bloom' was not detected.  Please re-add the default bloom theme to its proper directory.");
+			die("Default theme ".basename($defaultTheme)." was not detected.  Please re-add the default bloom theme to its proper directory.");
 		}
 		
 		// if no configuration file found, run installer
@@ -144,9 +145,9 @@ abstract class Phroses {
 		$response = self::RESPONSES["PAGE"][200];
 		if(!isset(($info = $info[0])->pageID)) $response = self::RESPONSES["PAGE"][404];
 		if(reqc\PATH != "/" &&
-			 (file_exists(INCLUDES["VIEWS"].reqc\PATH.".php") ||
-		   file_exists(INCLUDES["VIEWS"].reqc\PATH) ||
-		   file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php"))) $response = self::RESPONSES["SYS"][200];
+			(file_exists(INCLUDES["VIEWS"].reqc\PATH.".php") ||
+		   	file_exists(INCLUDES["VIEWS"].reqc\PATH) ||
+		   	file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php"))) $response = self::RESPONSES["SYS"][200];
 
 		if(reqc\PATH == "/api" && reqc\METHOD != "GET") $response = self::RESPONSES["THEME"];
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
