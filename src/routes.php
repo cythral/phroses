@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file sets up phroses' routing / method mapping.  This is included
+ * from within the start method of the phroses class, so self here refers to 
+ * \Phroses\Phroses
+ */
 
 namespace Phroses;
 
@@ -9,7 +14,7 @@ use \inix\Config as inix;
 use \phyrex\Template;
 use const \reqc\{ VARS, MIME_TYPES };
 
-Phroses::route("get", Phroses::RESPONSES["PAGE"][200], function() {
+self::route("get", self::RESPONSES["PAGE"][200], function() {
 	ob_start("ob_gzhandler");
 
 	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
@@ -22,7 +27,7 @@ Phroses::route("get", Phroses::RESPONSES["PAGE"][200], function() {
 	}
 });
 
-Phroses::route("get", Phroses::RESPONSES["PAGE"][301], function() {
+self::route("get", self::RESPONSES["PAGE"][301], function() {
 	ob_start("ob_gzhandler");
 	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
 
@@ -38,7 +43,7 @@ Phroses::route("get", Phroses::RESPONSES["PAGE"][301], function() {
 	}
 });
 
-Phroses::route("get", Phroses::RESPONSES["SYS"][200], function() {
+self::route("get", self::RESPONSES["SYS"][200], function() {
 	ob_start("ob_gzhandler");
 	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
 
@@ -86,7 +91,7 @@ Phroses::route("get", Phroses::RESPONSES["SYS"][200], function() {
 	}
 });
 
-Phroses::route("get", Phroses::RESPONSES["PAGE"][404], function() {
+self::route("get", self::RESPONSES["PAGE"][404], function() {
 	ob_start("ob_gzhandler");
 	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
 
@@ -114,7 +119,7 @@ Phroses::route("get", Phroses::RESPONSES["PAGE"][404], function() {
 	}
 });
 
-Phroses::route("get", Phroses::RESPONSES["THEME"], function() {
+self::route("get", self::RESPONSES["THEME"], function() {
 	ob_start("ob_gzhandler");
 	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
 
@@ -135,7 +140,7 @@ Phroses::route("get", Phroses::RESPONSES["THEME"], function() {
 });
 
 
-Phroses::route("post", Phroses::RESPONSES["DEFAULT"], function() {
+self::route("post", self::RESPONSES["DEFAULT"], function() {
 	self::$out = new reqc\JSON\Server();
 
 	if(reqc\URI == "/api" && ($theme = new Theme(SITE["THEME"], "page"))->HasAPI()) {
@@ -182,7 +187,7 @@ Phroses::route("post", Phroses::RESPONSES["DEFAULT"], function() {
 	self::$out->send($output, 200);
 });
 
-Phroses::route("patch", Phroses::RESPONSES["DEFAULT"], function() {
+self::route("patch", self::RESPONSES["DEFAULT"], function() {
 	self::$out = new reqc\JSON\Server();
 
 	// Validation
@@ -249,7 +254,7 @@ Phroses::route("patch", Phroses::RESPONSES["DEFAULT"], function() {
 });
 
 
-Phroses::route("delete", Phroses::RESPONSES["DEFAULT"], function() {
+self::route("delete", self::RESPONSES["DEFAULT"], function() {
 	self::$out = new reqc\JSON\Server();
 	if(!$_SESSION) self::$out->send(["type" => "error", "error" => "access_denied"], 401);
 	if(SITE["RESPONSE"] != self::RESPONSES["PAGE"][200] && SITE["RESPONSE"] != self::RESPONSES["PAGE"][301]) self::$out->send([ "type" => "error", "error" => "resource_missing" ], 400);
@@ -257,3 +262,6 @@ Phroses::route("delete", Phroses::RESPONSES["DEFAULT"], function() {
 	DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ reqc\PATH, SITE["ID"] ]);
 	self::$out->send(["type" => "success"], 200);
 });
+
+
+return self::$handlers;

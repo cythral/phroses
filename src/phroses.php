@@ -15,6 +15,7 @@ use const \reqc\{ VARS, MIME_TYPES };
 abstract class Phroses {
 	static private $out;
 	static private $handlers = [];
+	static private $cmds = [];
 	static private $ran = false;
 	static private $modes = [
 		"development" => [
@@ -47,83 +48,62 @@ abstract class Phroses {
 		"THEME" => 5
 	];
 
-	static public function Start() {
+	static public function start() {
 		if(self::$ran) return; // only run once
 		self::$out = new Output();
 		
-        self::LoadPlugins();
-		if(!self::CheckReqs()) return;
-		self::SetupMode();
-
-		include SRC."/routes.php";
+		Events::trigger("pluginsloaded", [self::loadPlugins()]);
+		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
+		Events::attach("modeset", [ (bool)(inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
+		
 
 		if(reqc\TYPE != reqc\TYPES["CLI"]) {
-			self::SetupSession();
-            self::LoadSiteInfo();
-			self::UrlFix();
-			
-			// route to proper response
-			if(SITE["RESPONSE"] != self::RESPONSES["SYS"][200]) {
-				(isset(self::$handlers[reqc\METHOD][SITE["RESPONSE"]])) ? self::$handlers[reqc\METHOD][SITE["RESPONSE"]]() : self::$handlers[reqc\METHOD][self::RESPONSES["DEFAULT"]]();
-			} else self::$handlers["GET"][SITE["RESPONSE"]]();
+			Events::trigger("routesmapped", [include SRC."/routes.php"]);
+			Events::trigger("sessionstarted", [self::setupSession()]);
+            Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
+			if(((bool)(inix::get("notrailingslashes") ?? true))) self::urlFix();
+			Events::attach("routestrace", [ reqc\METHOD, SITE["RESPONSE"] ], "\Phroses\Phroses::traceRoutes");
 
 		} else {
-            if(isset($_SERVER["argv"])) {
-                switch($_SERVER["argv"][1]) {
-                    case "update" :
-                        DB::Update();
-                        break;
-
-                    case "maintenance=on" :
-                        self::SetMaintenance(self::ON);
-                        break;
-
-                    case "maintenance=off" :
-                        self::SetMaintenance(self::OFF);
-                        break;
-
-                    case "email" :
-                        self::HandleEmail();
-                        break;
-                }
-            }
+			Events::trigger("commandsmapped", [include SRC."/commands.php"]);
+            Events::attach("commandstrace", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::traceCommands");
 			exit(0);
 		}
 	}
 
-	static public function SetupMode() {
+	static public function setupMode(bool $noindex) {
 		if(self::$ran) return; // only run once
 		if(!array_key_exists(inix::get("mode"), self::$modes)) return false;
         foreach(self::$modes[inix::get("mode")] as $key => $val) { ini_set($key, $val); }
 
-        if(inix::get("mode") == "development") {
+        if($noindex && inix::get("mode") == "development") {
             self::$out->setHeader("X-Robots-Tag", "none");
         }
 	}
 
-    static public function LoadPlugins() {
+    static public function loadPlugins(): array {
         foreach(glob(INCLUDES["PLUGINS"]."/*", GLOB_ONLYDIR) as $dir) {
-            if(file_exists($dir."/bootstrap.php")) include $dir."/bootstrap.php";
-        }
+			static $list = [];
+			if(file_exists($dir."/bootstrap.php")) include $dir."/bootstrap.php";
+			$list[] = basename($dir);
+		}
+
+		return $list;
 	}
 
-	static public function CheckReqs() {
-        Events::trigger("checkReqs:start");
-
-		if(!file_exists(INCLUDES["THEMES"]."/bloom")) {
+	static public function checkReqs(string $defaultTheme, string $configFile) {
+		if(!file_exists($defaultTheme)) {
 			self::$out->setCode(500);
 			self::$out->setContentType(MIME_TYPES["TXT"]);
-
 			die("Default theme 'bloom' was not detected.  Please re-add the default bloom theme to its proper directory.");
 		}
 		
 		// if no configuration file found, run installer
-		if(!inix::load(ROOT."/phroses.conf")) {
+		if(!inix::load($configFile)) {
 			include SRC."/system/install.php";
 			return false;
 		}
 
-        Events::trigger("checkReqs:end");
 		return true;
 	}
 
@@ -133,7 +113,12 @@ abstract class Phroses {
 		self::$handlers[$method][$response] = $handler;
 	}
 
-	static public function LoadSiteInfo() {
+	static public function addCmd(string $cmd, callable $handler) {
+		self::$cmds[$cmd] = $handler;
+	}
+
+
+	static public function loadSiteInfo(bool $showNewSite) {
 		if(self::$ran) return;
 
 		if(reqc\TYPE == "cli") { // functionality tbd
@@ -147,7 +132,13 @@ abstract class Phroses {
 		]);
 
 		// if site doesn't exist, create a new one (script ends here)
-		if(count($info) == 0) include "system/newsite.php";
+		if(count($info) == 0) {
+			if($showNewSite) include "system/newsite.php";
+			else {
+				self::$out->setCode(404);
+				die("Resource not found (404)"); // todo: make this more interesting
+			}
+		}
 
 		// Determine Response Type
 		$response = self::RESPONSES["PAGE"][200];
@@ -155,8 +146,7 @@ abstract class Phroses {
 		if(reqc\PATH != "/" &&
 			 (file_exists(INCLUDES["VIEWS"].reqc\PATH.".php") ||
 		   file_exists(INCLUDES["VIEWS"].reqc\PATH) ||
-		   file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php") ||
-		   substr(reqc\PATH, 0, 13) == "/admin/pages/")) $response = self::RESPONSES["SYS"][200];
+		   file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php"))) $response = self::RESPONSES["SYS"][200];
 
 		if(reqc\PATH == "/api" && reqc\METHOD != "GET") $response = self::RESPONSES["THEME"];
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
@@ -186,25 +176,26 @@ abstract class Phroses {
 		]);
 	}
 
-	static public function UrlFix() {
+	static public function urlFix() {
 		if(substr(reqc\PATH, -1) == "/" && $_SERVER["REQUEST_URI"] != "/") {
 			self::$out->redirect(substr(reqc\PATH, 0, -1));
 		}
 	}
 
-	static public function SetupSession() {
+	static public function setupSession(): string {
 		Session::start();
 		register_shutdown_function("session_write_close");
+		return session_id();
 	}
 
     
-    static public function SetMaintenance(bool $mode = self::ON) {
+    static public function setMaintenance(bool $mode = self::ON) {
         if($mode == self::ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
         if($mode == self::OFF) unlink(ROOT."/.maintenance");
     }
 
 
-    static public function HandleEmail() {
+    static public function handleEmail() {
         $data = file_get_contents("php://stdin");
         $m = new Parser((string)$data);
 
@@ -214,7 +205,37 @@ abstract class Phroses {
             (string)$m->headers['subject'],
             (string)$m->bodies['text/plain']
         ]);
-    }
+	}
+	
+	static public function traceRoutes($method, $route) {
+		if($route != self::RESPONSES["SYS"][200]) {
+			(isset(self::$handlers[$method][$route])) ? self::$handlers[$method][$route]() : self::$handlers[$method][self::RESPONSES["DEFAULT"]]();
+		} else self::$handlers["GET"][$route]();
+	}
+
+	static public function traceCommands($cliArgs) {
+		array_shift($cliArgs); // remove filename
+		if(count($cliArgs) == 0) {
+			echo "no command given";
+			exit(1);
+		}
+
+		$cmd = array_shift($cliArgs);
+		$args = [];
+		$flags = [];
+
+		foreach($cliArgs as $part) {
+			if(substr($part, 0, 2) == "--") $flags[] = $part;
+			else {
+				$subparts = explode("=", $part);
+				if(count($subparts) > 1) $args[$subparts[0]] = $subparts[1];
+				else $args[$subparts[0]] = true;
+			}
+		}
+		
+		if(isset(self::$cmds[$cmd])) self::$cmds[$cmd]($args, $flags);
+	}
 }
+
 
 Phroses::start();

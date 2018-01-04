@@ -117,3 +117,11 @@ function ReadfileCached($file) {
     
     die(readfile($file));
 }
+
+function mapValue($value, $map) {
+    foreach($map as $key => $val) {
+        if($value == $key) return $val;
+    }
+
+    return false;
+}
