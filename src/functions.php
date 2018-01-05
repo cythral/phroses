@@ -34,10 +34,10 @@ function JsonOutputSuccess($array = [ "type" => "success" ], $code = 200) {
 }
 
 
-function HandleMethod(string $method, callable $handler, array $filters = []) {
+function handleMethod(string $method, callable $handler, array $filters = []) {
     if(reqc\TYPE == "cli") return;
     
-    if(strtolower($_SERVER["REQUEST_METHOD"]) == strtolower($method)) {
+    if(strtolower(reqc\METHOD) == strtolower($method)) {
         $out = new reqc\JSON\Server();
         
         if(count($filters) > 0) {
