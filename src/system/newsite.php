@@ -1,6 +1,8 @@
 <?php
 
 Phroses\HandleMethod("POST", function() {
+  $out = new \reqc\JSON\Server();
+  
   Phroses\DB::Query("INSERT INTO `sites` (`url`, `theme`, `name`,`adminUsername`, `adminPassword`) VALUES (?, 'bloom', ?, ?, ?)", [
     strtok($_SERVER["HTTP_HOST"], ":"),
     $_POST["name"],
@@ -8,7 +10,7 @@ Phroses\HandleMethod("POST", function() {
     password_hash($_POST["password"], PASSWORD_DEFAULT)
   ]);
   
-  JsonOutputSuccess();
+  $out->send(["type" => "success"], 200);
 }, ["name", "username", "password"]);
 
 http_response_code(404);

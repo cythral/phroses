@@ -1,8 +1,9 @@
 <?php 
-http_response_code(404);
+$out = new \reqc\Output();
+$out->setCode(404);
 
 if(!is_writable(Phroses\ROOT)) {
-  header("content-type: text/plain");
+  $out->setContentType(\reqc\MIME_TYPES["TXT"]);
   echo "No write access to ".Phroses\ROOT.". Please fix directory permissions";
   exit(1);
 }
@@ -10,26 +11,31 @@ if(!is_writable(Phroses\ROOT)) {
 Phroses\HandleMethod("POST", function() {
   $out = new \reqc\JSON\Server();
   try {
+
+    // setup database
     $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
     if(version_compare($db->query("select version()")->fetchColumn(), Phroses\DEPS["MYSQL"], "<")) throw new Exception("version");
-    
     $schema = new phyrex\Template(Phroses\SRC."/schema/install.sql");
     $schema->schemaver = Phroses\SCHEMAVER;
     $db->query($schema);
     
-    $c = file_get_contents(Phroses\SRC."/phroses.conf");
-    $c = str_replace("<mode>", (INPHAR) ? "production" : "development", $c);
-    $c = str_replace("<host>", $_POST["host"], $c);
-    $c = str_replace("<username>", $_POST["username"], $c);
-    $c = str_replace("<password>", $_POST["password"], $c);
-    $c = str_replace("<database>", $_POST["database"], $c);
+    // setup configuration file
+    $c = new phyrex\Template(Phroses\SRC."/phroses.conf");
+    $c->mode = (INPHAR) ? "production" : "development";
+    $c->host = $_POST["host"];
+    $c->username = $_POST["username"];
+    $c->password = $_POST["password"];
+    $c->database = $_POST["database"];
+    
     file_put_contents(Phroses\ROOT."/phroses.conf", $c);
     chown(Phroses\ROOT."/phroses.conf", posix_getpwuid(posix_geteuid())['name']);
     chmod(Phroses\ROOT."/phroses.conf", 0775);
     
     $out->send(["type" => "success"], 200);
+
   } catch(Exception $e) {
     $output = [ "type" => "error", "error" => "credentials" ];
+    
     if($e->getMessage() == "version") {
       $output["error"] = "version";
       $output["minver"] = Phroses\DEPS["MYSQL"];
