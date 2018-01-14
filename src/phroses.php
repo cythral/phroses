@@ -45,7 +45,8 @@ abstract class Phroses {
 			200 => 4
 		],
 
-		"THEME" => 5
+		"THEME" => 5,
+		"API" => 6
 	];
 
 	static public function start() {
@@ -149,7 +150,7 @@ abstract class Phroses {
 		   	file_exists(INCLUDES["VIEWS"].reqc\PATH) ||
 		   	file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php"))) $response = self::RESPONSES["SYS"][200];
 
-		if(reqc\PATH == "/api" && reqc\METHOD != "GET") $response = self::RESPONSES["THEME"];
+		if(substr(reqc\PATH, 0, 4) == "/api") $response = self::RESPONSES["API"];
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
         if($response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) $response = self::RESPONSES["PAGE"][404];
 

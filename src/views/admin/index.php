@@ -1,44 +1,25 @@
 <?
 
+use phyrex\Template;
 use \Phroses\{ DB, Theme };
-use function Phroses\{HandleMethod, JsonOutput };
+use function Phroses\{ HandleMethod };
 use const \Phroses\{ SITE, INCLUDES };
 
-
-
-HandleMethod("POST", function($out) {
+handleMethod("POST", function($out) {
     if(!file_exists(INCLUDES["THEMES"]."/".$_POST["theme"])) $out->send(["type" => "error", "error" => "bad_theme"], 400);
     DB::Query("UPDATE `sites` SET `theme`=? WHERE `id`=?", [ $_POST["theme"], SITE["ID"] ]);
     $out->send(["type" => "success"], 200);
 });
 
+
 $vars = DB::Query("SELECT SUM(`views`) AS viewcount, COUNT(`id`) AS pagecount FROM `pages` WHERE `siteID`=?", [ SITE["ID"] ])[0];
-?>
-<h1 class="c panel-heading">Phroses Panel Home</h1>
-<br>
 
-<div id="saved">Saved</div>
-<div id="error">Error</div>
+$index = new Template(INCLUDES["TPL"]."/admin/index.tpl");
+$index->pagecount = $vars->pagecount;
+$index->viewcount = $vars->viewcount ?? 0;
 
-<div class="container">
-    <div class="panel-row">
-        <section class="panel-section panel-pages aln-c">
-            <h2>Page Stats</h2>
-            <div class="panel-pages-line"><span><?= $vars->pagecount; ?></span> Pages</div>
-            <div class="panel-pages-line"><span><?= $vars->viewcount ?? 0; ?></span> Page Views</div>
-            <br><a href="/admin/pages">Manage Pages <i class="fa fa-chevron-right"></i></a>
-        </section>
-        <section class="panel-section">
-            <div class="form_icfix aln-l c">
-                <div>Theme:</div>
-                <select class="c form_field form_select" id="theme-selector">
-                    <? 
-                    foreach(Theme::List() as $thm) {
-                    ?><option value="<?= $thm; ?>" <? if($thm == SITE["THEME"]) { ?>selected<? } ?>><?= ucfirst($thm); ?></option><?
-                    } ?>
-                </select>
-            </div>
-            <div class="aln-c bold"><br><a href="/admin/creds">Change Site Login <i class="fa fa-chevron-right"></i></a>
-        </section>
-    </div>
-</div>
+foreach(Theme::List() as $thm) {
+    $index->push("themes", [ "name" => $thm, "selected" => ($thm == SITE["THEME"]) ? "selected" : "" ]);
+}
+
+echo $index;

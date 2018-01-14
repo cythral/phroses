@@ -1,29 +1,21 @@
 <?php
-namespace Phroses;
 
+use phyrex\Template;
+use function \Phroses\{ handleMethod };
+use const \Phroses\{ SITE, INCLUDES };
 
 if($_SESSION) self::$out->redirect("/admin");
 
-// todo: switch to json
-HandleMethod("POST", function($out) {
-  header("content-type: text/plain");
- 
+handleMethod("POST", function($out) {
+
   if(password_verify($_POST["password"], SITE["PASSWORD"]) && $_POST["username"] == SITE["USERNAME"]) {
     $_SESSION["live"] = "true";
-    echo "success";
-    return;
+    $out->send(["type" => "success"], 200);
   }
 
-  $out->setCode(401);
-  echo "fail";
+  $out->send(["type" => "error"], 401);
+
 });
 
 
-?>
-
-<form id="phroses-login">
-  <h2>Login to Phroses Site Panel</h2>
-  <div><input name="username" type="text" placeholder="Username"></div>
-  <div><input name="password" type="password" placeholder="Password"></div>
-  <div><input type="submit" value="Login"></div>
-</form>
+echo new Template(INCLUDES["TPL"]."/admin/login.tpl");

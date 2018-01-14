@@ -1,4 +1,6 @@
 <?php
 
-Phroses\Session::end();
+use Phroses\Session;
+
+Session::end();
 self::$out->redirect("/");

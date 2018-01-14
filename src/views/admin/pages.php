@@ -1,50 +1,28 @@
 <?php
 
+use phyrex\Template;
 use Phroses\DB;
-use const Phroses\{SITE};
+use const Phroses\{ SITE, INCLUDES };
+use const reqc\{ BASEURL };
 
-?>
+$q = DB::Query("SELECT * FROM `pages` WHERE `siteID`=?", [ SITE["ID"] ]);
 
-<div class="container pages">
-    <div class="pages-top">
-        <a class="phr-btn btn pull-r" href="#" id="new" data-target="phr-new-page" data-action="fadeIn"><i class="fa fa-plus"></i> New Page</a>
-        <h1 class="c">Pages</h1>
-        <div class="clear"></div>
-    </div>
-    
-    
-    
-	<?php
-	$q = DB::Query("SELECT * FROM `pages` WHERE `siteID`=?", [ SITE["ID"] ]);
-	
-	if(count($q) == 0) {
-		?><em>No pages for <?= reqc\BASEURL; ?></em><?
-	}
-	
-	foreach($q as $page) {
-		?><a href="<?= $page->uri; ?>" class="page_item" data-id="<?= $page->id; ?>"><strong><?= $page->title; ?></strong> <?= $page->uri; ?> 
-        
-            <div class="pull-r">    
-                <select class="pageman-select">
-                    <?
-                    foreach($theme->GetTypes() as $type) {
-                        ?><option <?= ($type == "redirect") ? "disabled" : ""; ?> <?= ($type == $page->type) ? "selected" : ""; ?>><?= $type; ?></option><?
-                    } ?>
-                </select>
-                <i class="pageman-delete fa fa-times"></i>
-            </div>
-        </a><?
-	}
-	?>
-</div>
+$pages = new Template(INCLUDES["TPL"]."/admin/pages.tpl");
 
-<div id="phr-new-page" class="container screen">
-    <h1>Enter new page URI:</h1>
-    <div class="form_icfix c aln-l">
-        <div>URI:</div>
-        <input name="title" class="form_input form_field" placeholder="/" autocomplete="off">
-    </div>
-    <br>
-    <a href="#" class="pst_btn txt" data-target="phr-new-page" data-action="submit">Go</a>
-    <a href="#" class="pst_btn txt" data-target="phr-new-page" data-action="fadeOut">Cancel</a>
-</div>
+if(count($q) == 0) $pages->empty = "<em>No pages for ".BASEURL."</em>";
+
+foreach($q as $page) {
+    ob_start();
+    foreach($theme->GetTypes() as $type) {
+        ?><option <?= ($type == "redirect") ? "disabled" : ""; ?> <?= ($type == $page->type) ? "selected" : ""; ?>><?= $type; ?></option><?
+    } 
+    
+    $pages->push("pages", [ 
+        "uri" => $page->uri, 
+        "id" => $page->id, 
+        "title" => $page->title,
+        "types" => ob_get_clean()
+    ]);
+}
+
+echo $pages;

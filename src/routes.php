@@ -119,7 +119,8 @@ self::route("get", self::RESPONSES["PAGE"][404], function() {
 	}
 });
 
-self::route("get", self::RESPONSES["THEME"], function() {
+
+$api = function() {
 	ob_start("ob_gzhandler");
 	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
 
@@ -137,7 +138,13 @@ self::route("get", self::RESPONSES["THEME"], function() {
 		ob_end_flush();
 		flush();
 	}
-});
+};
+
+self::route("get", self::RESPONSES["API"], $api);
+self::route("post", self::RESPONSES["API"], $api);
+self::route("put", self::RESPONSES["API"], $api);
+self::route("delete", self::RESPONSES["API"], $api);
+self::route("patch", self::RESPONSES["API"], $api);
 
 
 self::route("post", self::RESPONSES["DEFAULT"], function() {

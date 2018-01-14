@@ -12,3 +12,4 @@ themes.tmp/
 vendor/
 /composer.lock
 /src/composer.lock
+themes/untitled/
