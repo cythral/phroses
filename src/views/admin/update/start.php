@@ -1,4 +1,8 @@
 <?php
+use Phroses\Phroses;
+use Phroses\Exceptions\WriteException;
+use function Phroses\{sendEvent, rrmdir};
+use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES};
 
 ob_end_clean();
 ob_end_clean();
