@@ -158,7 +158,7 @@ $(function() {
 		e.preventDefault();
 		$(this).fadeIn();
 		
-		var ev = new EventSource("/admin/update?start_upgrade");
+		var ev = new EventSource("/admin/update/start");
 		ev.addEventListener("progress", function(e) {
                     console.log(e.data);
 			$(".phr-progress-bar").css({width: JSON.parse(e.data).progress+"%" });
