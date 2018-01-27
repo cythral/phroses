@@ -4,11 +4,11 @@ namespace Phroses;
 use \reqc;
 
 define("Phroses", true);
-define("Phroses\VERSION", "v0.5.21");
+define("Phroses\VERSION", "v0.5.22");
 define("Phroses\SRC", __DIR__);
 define("Phroses\SCHEMAVER", 2);
 define("Phroses\DEPS", $deps);
-define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
+define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRCpi/test));
 define("Phroses\INCLUDES", [
 	"THEMES" => ROOT."/themes",
 	"MODELS" => SRC."/models/classes",
