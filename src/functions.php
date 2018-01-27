@@ -102,14 +102,13 @@ function ReadfileCached($file) {
     $gmt_mtime = gmdate('r', $lastmodified);
     $etag = md5_file($file);
     
-    header("Cache-Control: public");
-    header("Last-Modified: $gmt_mtime");
-    header("Etag: $etag");
+    header("cache-control: public, max-age=86400");
+    header("etag: $etag");
     header_remove("pragma");
     header_remove("expires");
     
-    if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
-        if ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime || str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $etag) {
+    if(isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+        if (str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $etag) {
             http_response_code(304);
             die;
         }
