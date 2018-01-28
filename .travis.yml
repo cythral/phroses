@@ -11,8 +11,8 @@ before_script:
   - composer install
   
 script:
-  - lessc --clean-css src/views/phr-assets/css/main.less src/views/phr-assets/css/main.css
-  - rm src/views/phr-assets/css/main.less && rm src/views/phr-assets/css/animations.less
+  - lessc --clean-css src/views/phr-assets/less/main.less src/views/phr-assets/css/main.css
+  - rm -rf src/views/phr-assets/less
   - php build.php
   - php phroses.phar
   - php tests/bootstrap.php
