@@ -57,5 +57,5 @@ CREATE TABLE `sessions` (
 /** SET DATABASE SCHEMA VERSION **/
 INSERT INTO `options` (`key`, `value`) VALUES (
   'schemaver',
-  '<{var:schemaver}>'
+  '<{var::schemaver}>'
 );

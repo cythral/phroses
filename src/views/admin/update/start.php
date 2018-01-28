@@ -6,7 +6,8 @@ use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES};
 
 ob_end_clean();
 ob_end_clean();
-
+ob_end_clean();
+ini_set("memory_limit", "50M");
 self::$out = new reqc\EventStream\Server();
 
 if(!is_writable(ROOT) || (file_exists(ROOT."/phroses.tar.gz") && !unlink(ROOT."/phroses.tar.gz"))) {
@@ -50,7 +51,7 @@ try {
     self::$out->send("progress", [ "progress" => 70 ]);
     
     // finish update
-    shell_exec("php phroses.phar update");
+    @shell_exec("php phroses.phar update");
     self::$out->send("progress", [ "progress" => 100, "version" => $version ]);
     
 } catch(PharException $e) {
