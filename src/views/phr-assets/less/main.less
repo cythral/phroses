@@ -191,12 +191,14 @@ body.noscroll { overflow: hidden; }
 
 #phroses-login {
     padding-top: 20vh;
+    padding-bottom: 20vh;
     width: 100%;
     text-align: center;
     display: inline-block;
     .oxygen;
     color: @primary;
     overflow: hidden;
+    
 
     h1 {
         font-size: 3em;
@@ -223,6 +225,10 @@ body.noscroll { overflow: hidden; }
             color: white;
             margin-top: 60px;
             cursor: pointer;
+
+            &:hover {
+                background: @primary + #111;
+            }
         }
     }
 }
