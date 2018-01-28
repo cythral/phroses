@@ -23,4 +23,5 @@
             <div class="aln-c bold"><br><a href="/admin/creds">Change Site Login <i class="fa fa-chevron-right"></i></a>
         </section>
     </div>
+    <div class="clear"></div>
 </div>

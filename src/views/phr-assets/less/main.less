@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Oxygen');
+
 @primary: #673AB7; 
 @saved: #009688;
 
@@ -6,6 +8,7 @@
 @import "panel";
 
 .c { color: @primary; }
+.oxygen { font-family: Oxygen; }
 
 body.noscroll { overflow: hidden; }
 
@@ -187,22 +190,39 @@ body.noscroll { overflow: hidden; }
 #error { background: red; }
 
 #phroses-login {
-    padding-top: 30vh;
+    padding-top: 20vh;
     width: 100%;
     text-align: center;
+    display: inline-block;
+    .oxygen;
+    color: @primary;
+    overflow: hidden;
 
+    h1 {
+        font-size: 3em;
+        margin-bottom: 30px;
+    }
     input {
+        background: none;
+        border: none;
+        outline: none !important;
+        border-bottom: 3px solid @primary;
         display: inline-block;
         height: 50px;
         width: 50%;
         padding: 10px;
         text-align: center;
         margin: 10px;
+        font-size: 1.3em;
+        color: @primary;
+        margin-bottom: 30px;
 
         &[type="submit"] {
-            background: #260E3F;
+            background: @primary;
             border: none;
             color: white;
+            margin-top: 60px;
+            cursor: pointer;
         }
     }
 }

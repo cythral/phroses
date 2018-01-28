@@ -5,6 +5,18 @@ var errors = {
     "extract" : "There was an issue extracting files from the archive.  Please check filesystem permissions and try again."
 };
 
+jQuery.fn.shake = function(interval,distance,times){
+	interval = typeof interval == "undefined" ? 100 : interval;
+	distance = typeof distance == "undefined" ? 10 : distance;
+	times = typeof times == "undefined" ? 3 : times;
+	var jTarget = $(this);
+	jTarget.css('position','relative');
+	for(var iter=0;iter<(times+1);iter++){
+	   jTarget.animate({ left: ((iter%2==0 ? distance : distance*-1))}, interval);
+	}
+	return jTarget.animate({ left: 0},interval);
+ };
+
 function displaySaved() {
 	$("#saved").addClass("active");
 		setTimeout(function() {
@@ -237,5 +249,21 @@ $(function() {
         $.post("/admin", { theme : $(this).val() }, function() {
             displaySaved();
         });
-    });
+	});
+	
+	$("#phroses-login").submit(function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var data = $(this).serializeArray();
+		$.post("/admin/login", data, { async: false })
+		.done(function(data) {
+			$("#phroses-login").animate({width:0}, function() {
+				location.reload();
+			});
+			
+		}).fail(function(data) {
+			$("#phroses-login").shake();
+		});
+	});
 });

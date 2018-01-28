@@ -41,7 +41,7 @@
 		<div class="container">
 			<div class="form_icfix c aln-l">
 				<div>URI:</div>
-				<input id="puri" name="uri" class="form_input form_field" placeholder="Page URI" value="<{var:uri}>" autocomplete="off">     
+				<input id="puri" name="uri" class="form_input form_field" placeholder="Page URI" value="<{var::uri}>" autocomplete="off">     
 			</div>
 		</div>
     <a id="pst-ms-s" href="#" class="pst_btn txt" data-target="pst-ms" data-action="submit" data-scroll="on">Submit</a>

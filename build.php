@@ -1,4 +1,4 @@
-<?php include __DIR__."/src/functions.php"; exec("lessc --clean-css src/views/phr-assets/css/main.less src/views/phr-assets/css/main.css"); copy("composer.json", 
+<?php include __DIR__."/src/functions.php"; exec("lessc --clean-css src/views/phr-assets/less/main.less src/views/phr-assets/css/main.css"); copy("composer.json", 
 "src/composer.json"); exec("cd src && composer update"); function rcopy($src,$dst) {
     $dir = opendir($src);
     @mkdir($dst);

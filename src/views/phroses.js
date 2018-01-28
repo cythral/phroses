@@ -117,20 +117,7 @@ $(function() {
 		});
 	});
 	
-	$("#phroses-login").submit(function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		
-		var data = $(this).serializeArray();
-		$.post("/admin/login", data, { async: false })
-		.done(function(data) {
-			console.log(data);
-			location.reload();
-		})
-		.fail(function(data) {
-			console.log(data);
-		});
-	});
+	
         
         if(window.location.hash === "new") $("#pst-ns").fadeIn();
 });
