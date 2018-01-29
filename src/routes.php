@@ -56,14 +56,14 @@ self::route("get", self::RESPONSES["SYS"][200], function() {
 		ob_start();
 		if(!$_SESSION) {
 			$theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-			$theme->push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
+			$theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
 			self::$out->setCode(401);
 			include INCLUDES["VIEWS"]."/admin/login.php";
 		
 		} else {
 			if(reqc\METHOD == "GET") {
 				$theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-				$theme->push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
+				$theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
 				
 				$dashbar = new Template(INCLUDES["TPL"]."/dashbar.tpl");
 				$dashbar->host = reqc\HOST;

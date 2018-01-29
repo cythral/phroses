@@ -2,6 +2,7 @@
 namespace Phroses; 
 
 use \reqc; 
+use \inix\Config as inix;
 use \phyrex\Template as Template;
 /**
  * This class is a custom implementation of templates that provides
@@ -53,7 +54,7 @@ final class Theme extends Template {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
-			$this->push("scripts", [ "src" => "/phr-assets/js/main.js", "attrs" => "defer" ]);
+			$this->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
 			
 			$pst = new Template(INCLUDES["TPL"]."/pst.tpl");
 			$pst->id = SITE["PAGE"]["ID"];
