@@ -5,7 +5,8 @@ Phroses.errors = {
 	"write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
     "api" : "There was a problem accessing the api.  Please try again later",
 	"extract" : "There was an issue extracting files from the archive.  Please check filesystem permissions and try again.",
-	"pw_length" : "Password is too long, please keep it less than or equal to 50 characters."
+	"pw_length" : "Password is too long, please keep it less than or equal to 50 characters.",
+	"access_denied" : "You do not have permission to do that."
 };
 
 Phroses.formify = function(options) {
@@ -30,11 +31,29 @@ Phroses.formify = function(options) {
 			url : $(this).data("url"),
 			data : collect(),
 			method : $(this).data("method")
-		}).then(options.success.bind(this)).catch(options.failure.bind(this));
+		}).then(options.success.bind(this)).catch((options.failure) ? options.failure.bind(this) : Phroses.genericError);
 	});
 
 	console.log("Formified element "+options.selector);
-}
+};
+
+Phroses.genericError = function(message) {
+	if(typeof message === 'object') {
+		if(message.responseJSON) message = message.responseJSON;
+
+		if(message.error && Object.keys(Phroses.errors).includes(message.error)) message = Phroses.errors[message.error];
+		else message = "Unknown Error: "+JSON.stringify(message);
+	}
+
+	$("body").append('<div id="phroses-error" class="phroses-generic-error screen dflts"><h1>Error:</h1><p>'+message+'</p></div>');
+	$("#phroses-error").fadeIn();
+	setTimeout(function() {
+		$("#phroses-error").fadeOut(400, function() {
+			$(this).remove();
+		});
+	}, 5000);
+	
+};
 
 jQuery.fn.shake = function(interval,distance,times){
 	interval = typeof interval == "undefined" ? 100 : interval;
@@ -76,7 +95,7 @@ function createEditors() {
 
 
 $(function() {
-	console.log("phroses initialized");
+	console.log("-== Phroses Initialized ==-");
     createEditors();
 	
 	$(".pst_btn, .phr-btn").click(function(e) {
@@ -127,8 +146,7 @@ $(function() {
 			displaySaved();
 			if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
 			document.title = $("#pst-es-title").val();
-		},
-		failure: function(pdata) {}
+		}
 	});
 
 	/**
@@ -141,9 +159,6 @@ $(function() {
 		},
 		success: function(data) {
 			location.reload();
-		},
-		failure: function(data) {
-			console.error("delete page error");
 		}
 	});
 	
@@ -160,8 +175,7 @@ $(function() {
 			history.replaceState({}, document.title, $("#puri").val());
 			$("#pst-ms").fadeOut();
 			displaySaved();
-		},
-		failure : function(data) {}
+		}
 	});
 	
     /**
@@ -192,9 +206,6 @@ $(function() {
 			$("#pst-ns").fadeOut(function() {
 				$("#pst-ns")[0].reset();
 			});
-		},
-		failure: function(pdata) {
-			console.error(pdata);
 		}
 	});
 
@@ -214,8 +225,7 @@ $(function() {
 			if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
 			$("#pst-es-fields").slideDown();
 			if(data.type !== "redirect") displaySaved();
-		},
-		failure: function() {}
+		}
 	});
 
 	/**
@@ -230,8 +240,7 @@ $(function() {
 				"public" : ($(this).is(":checked") === true) ? 1 : 0
 			};
 		},
-		success: function() {},
-		error: function() {}
+		success: function() {}
 	});
 
 	/**
@@ -264,8 +273,7 @@ $(function() {
 			var parent = $(this).parent().parent();
 			parent.addClass("saved");
 			setTimeout(function() { parent.removeClass("saved"); }, 1000);
-		},
-		failure: function() {}
+		}
 	});
 	$(".pageman-select").click(function(e) { e.preventDefault(); });
 
@@ -280,8 +288,7 @@ $(function() {
 			$(this).parent().parent().slideUp(function() {
 				$(this).remove();
 			});
-		},
-		failure: function() {}
+		}
 	});
 
 	/**
@@ -291,8 +298,7 @@ $(function() {
 		selector: "#theme-selector",
 		action: "change",
 		collect: function() { return { theme : $(this).val() }; },
-		success: displaySaved,
-		failure: function() {}
+		success: displaySaved
 	});
 
 	/**
