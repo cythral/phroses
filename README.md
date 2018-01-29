@@ -1,9 +1,9 @@
 # Phroses [![Build Status](https://travis-ci.org/cythral/phroses.svg?branch=master)](https://travis-ci.org/cythral/phroses)
-Phroses is a multi-site content management system and dispatcher.  It is currently still in early development, with many initial features and systems still being implemented and ironed out. Phroses is easy to use, and fully customizable with customizable themes using [phyrex](https://github.com/cythral/phyrex) templating, along with plugins using [listen](https://github.com/cythral/listen).  Phroses has only been tested on apache, support for nginx is coming later on. 
+Phroses is a multi-site content management system and dispatcher.  It is currently still in early development, with many initial features and systems still being implemented and ironed out. Phroses is easy to use, and extensible with customizable themes using [phyrex](https://github.com/cythral/phyrex) templating, along with plugins using [listen](https://github.com/cythral/listen).  Phroses has only been tested on apache, support for nginx is coming later on. 
 
 ## Installation
 ### Recommended Method
-The recommended way to install phroses is to download the tarball of the latest version from http://api.phroses.com/latest and extract it. Then set apache's DocumentRoot to the directory where you extracted the tarball.  Visit a URL that is pointed to the directory and complete the onsite setup. The tarball has a compiled phar archive instead of the source files.
+The recommended way to install phroses is to download the gzipped tarball of the latest version from http://api.phroses.com/latest and extract it. Then set apache's DocumentRoot to the directory where you extracted the tarball.  Visit a URL that is pointed to the directory and complete the onsite setup. The tarball has a compiled phar archive instead of the source files.
 
 
 ### From Source
