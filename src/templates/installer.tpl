@@ -68,6 +68,8 @@
         <button class="pst_btn txt">
         Install
         </button>
+
+        <div class="ns-error"></div>
       </form>
     </div>
     

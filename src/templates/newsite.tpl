@@ -32,10 +32,13 @@
           <input class="form_field form_input" placeholder="Password" name="password" id="spassword" required type="password" autocomplete="new-password">
           <div class="clear"></div>
         </div>
+
         <br>
         <button class="pst_btn txt">
         Submit
         </button>
+
+        <div class="ns-error"></div>
       </form>
     </div>
     

@@ -266,4 +266,55 @@ $(function() {
 			$("#phroses-login").shake();
 		});
 	});
+
+	$(".sys.form").submit(function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var data = $(this).serializeArray(), 
+            content = {}, 
+            method = $(this).data("method"),
+            uri = $("[name='uri']").val() || $(this).data("uri"),
+						id = $(this).attr("id");	
+                    
+		$("#phroses_editor .content").each(function() {
+			if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
+			else content[$(this).attr("id")] = $(this).val();
+		});
+		
+   	 	data.push({ name : "content", value : JSON.stringify(content) });
+		
+		$.ajax({url : uri, data: data, method : method })
+		.done(function(postdata) {
+      		if(id == "phroses_editor" || id == "phroses_site_creds") {
+				$("#saved").addClass("active");
+				setTimeout(function() {
+					$("#saved").removeClass("active");
+				}, 5000);
+			} else if(id == "phroses_creator") {
+				document.location = "/admin/pages/"+postdata.id;
+			}
+		})
+		.fail(function(data) {
+			data = data.responseJSON;
+			
+			if(id =="phroses_site_creds") {
+				$("#error").html({ 
+					"username" : "Please enter a value for the username field.",
+					"old" : "The value for the old password was incorrect.",
+					"repeat" : "The two new passwords do not match."
+				}[data.field] || {
+					"pw_length" : "New password is too long, please keep it less than or equal to 50 characters."
+				}[data.error]);
+				$("#error").addClass("active");
+				setTimeout(function() {
+					$("#error").removeClass("active");
+				}, 5000);
+			}
+		});
+	});
+	
+	
+        
+	if(window.location.hash === "new") $("#pst-ns").fadeIn();
 });

@@ -32,6 +32,7 @@ handleMethod("post", function($out) {
     $c->username = $_POST["username"];
     $c->password = $_POST["password"];
     $c->database = $_POST["database"];
+    $c->pepper = bin2hex(openssl_random_pseudo_bytes(10));
 
     file_put_contents(ROOT."/phroses.conf", $c);
     chown(ROOT."/phroses.conf", posix_getpwuid(posix_geteuid())['name']);

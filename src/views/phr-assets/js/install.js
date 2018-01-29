@@ -10,6 +10,10 @@ jQuery.fn.shake = function(interval,distance,times){
    return jTarget.animate({ left: 0},interval);
 }
 
+var errors = {
+  "pw_length" : "Your password is too long, please keep it less than 50 characters."
+};
+
 $(function() {
   $("#flow-db").submit(function(e) {
     e.preventDefault();
@@ -37,7 +41,10 @@ $(function() {
         document.location = "/admin";
       }, 4000);
     }).fail(function(d) {
+      $(".ns-error").html(errors[d.responseJSON.error]);
       $("#flow-site").shake();
+      $(".ns-error").fadeIn();
+      setTimeout(() => $(".ns-error").fadeOut(), 5000);
     });
   })
 });
