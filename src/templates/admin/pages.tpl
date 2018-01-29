@@ -10,10 +10,10 @@
     <{array::pages::
         <a href="@uri" class="page_item" data-id="@id"><strong>@title</strong> @uri 
             <div class="pull-r">    
-                <select class="pageman-select">
+                <select class="pageman-select" data-method="PATCH" data-url="@uri">
                     @types
                 </select>
-                <i class="pageman-delete fa fa-times"></i>
+                <i class="pageman-delete fa fa-times" data-method="DELETE" data-url="@uri"></i>
             </div>
         </a>
     }>

@@ -81,7 +81,6 @@ self::route("get", self::RESPONSES["SYS"][200], function() {
 		$theme->title = $title ?? "Phroses System Page";
 		$theme->main = trim(ob_get_clean());
 		$theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-		$theme->push("scripts", [ "src" => "/phroses.js", "attrs" => "defer"]);
 	}
 
 	echo $theme;
