@@ -5,7 +5,7 @@ Phroses.errors = {
 	"write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
     "api" : "There was a problem accessing the api.  Please try again later",
 	"extract" : "There was an issue extracting files from the archive.  Please check filesystem permissions and try again.",
-	"pw_length" : "New password is too long, please keep it less than or equal to 50 characters."
+	"pw_length" : "Password is too long, please keep it less than or equal to 50 characters."
 };
 
 Phroses.formify = function(options) {
@@ -285,6 +285,17 @@ $(function() {
 	});
 
 	/**
+	 * Theme selector on /admin
+	 */
+	Phroses.formify({
+		selector: "#theme-selector",
+		action: "change",
+		collect: function() { return { theme : $(this).val() }; },
+		success: displaySaved,
+		failure: function() {}
+	});
+
+	/**
 	 * Upgrade screen
 	 * uses EventSource to track progress, so formify doesnt work here.
 	 */
@@ -335,12 +346,6 @@ $(function() {
         
 	$("#phr-new-page").submit(function(e) {
 		document.location = $("#phr-new-page input").val() + "#new";
-	});
-	
-    $("#theme-selector").change(function() {
-        $.post("/admin", { theme : $(this).val() }, function() {
-            displaySaved();
-        });
 	});
 	
 

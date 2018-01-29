@@ -15,7 +15,7 @@
         <section class="panel-section">
             <div class="form_icfix aln-l c">
                 <div>Theme:</div>
-                <select class="c form_field form_select" id="theme-selector">
+                <select class="c form_field form_select" id="theme-selector" data-method="POST" data-url="/admin">
                     <{array::themes::<option value="@name" @selected>@name</option>}>
                     
                 </select>
