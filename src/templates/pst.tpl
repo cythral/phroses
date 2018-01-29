@@ -7,7 +7,7 @@
     <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn" data-scroll="off">Delete</a>
     <a href="#" id="pst-move" class="pst_btn" data-target="pst-ms" data-action="fadeIn" data-scroll="off">Move</a>
     <a href="#" id="pst-edit" class="pst_btn" data-target="pst-es" data-action="fadeIn" data-scroll="off">Edit</a>
-    <a href="#" id="pst-new" class="pst_btn txt" data-target="pst-ns" data-action="fadeIn" data-scroll="off">New</a>
+    <a href="#" id="pst-new" class="pst_btn" data-target="pst-ns" data-action="fadeIn" data-scroll="off">New</a>
 </div>
 <div id="saved">saved</div>
 <div id="error">error</div>
