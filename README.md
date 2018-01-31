@@ -7,14 +7,15 @@ The recommended way to install phroses is to download the gzipped tarball of the
 
 
 ### From Source
-Phroses can be installed from source by simply cloning the repository, setting apache's DocumentRoot to the cloned one, and running ```composer install```. Create a file named **.developer** in the cloned directory. Visit a URL you pointed to the directory and complete the onsite setup.  If you want to build the phar and use that instead, run the following command to build and delete the **.developer** file:
+Phroses can be installed from source by simply cloning the repository, setting apache's DocumentRoot to the cloned one, and running ```composer install```. Create a file named **.developer** in the cloned directory. Visit a URL you pointed to the directory and complete the onsite setup.  A bash script will be created in the future to automate this process.  If you want to build the phar and use that instead, run the following command to build and delete the **.developer** file:
 
 ```bash
 php build.php && rm .developer
 ```
 
+
 ## Updating
-You can update Phroses to new versions by visiting /admin/update on any configured website to do updates.  Please note that this does not update source files if you installed from source.  If you want to update the source files, you will have to clone the repository again, cd into the **src** folder and do:
+You can update Phroses to new versions by visiting /admin/update on any configured website to do updates.  Please note that this does not update source files if you installed from source.  If you want to update the source files, you will have to clone the repository again, run ```composer update```, cd into the **src** folder and do:
 
 ```bash
 php startup.php update
