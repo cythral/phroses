@@ -20,7 +20,7 @@ main {
 header {
 	height: 50px;
 	background: #260E3F;
-	color: white;
+	color: black !important;
 }
 
 .navlist {
@@ -43,7 +43,7 @@ header {
 }
 
 .header_sitename_link, .header.navlist_link {
-	color: white;
+	color:white;
 }
 
 .header_nav {

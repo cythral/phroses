@@ -37,6 +37,40 @@ Phroses.formify = function(options) {
 	console.log("Formified element "+options.selector);
 };
 
+Phroses.updatePage = function(title, content) {
+	if(typeof title !== 'undefined') document.title = title;
+	if(typeof content !== 'undefined') $("#phr-container").html(content);
+	this.reloadStyles();
+};
+
+Phroses.reloadStyles = function() {
+	$("head link").each(function() {
+		var href = $(this).attr("href"), pass = false;
+		var origin = window.location.origin.replace(/http(s)?\:/g, "");
+
+		// only reload internal stylesheets
+		if(href.substring(0, 1) === "/" && href.substring(1, 2) !== "/") pass = true; // relative
+		if(href.replace(/http(s)?\:/g, "").substring(0, origin.length) === origin) pass = true; // on the same domain
+
+
+		if(href !== "/phr-assets/css/main.css" && pass) {
+			
+			$.get(href, function(body) {
+				$("head").append('<style class="phr-reloaded" data-href="'+href+'">'+body+'</style>');
+				$(this).remove();
+				console.log("Reloaded " + href);
+			}.bind(this));
+		}
+	});
+
+	$(".phr-reloaded").each(function() {
+		$.get($(this).data("href"), function(body) {
+			$(this).html(body);
+			console.log("Reloaded " + $(this).data("href"));
+		}.bind(this));
+	});
+}
+
 Phroses.genericError = function(message) {
 	if(typeof message === 'object') {
 		if(message.responseJSON) message = message.responseJSON;
@@ -144,8 +178,7 @@ $(function() {
 		},
 		success: function(pdata) {
 			displaySaved();
-			if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
-			document.title = $("#pst-es-title").val();
+			Phroses.updatePage($("#pst-es-title").val(), pdata.content);
 		}
 	});
 
