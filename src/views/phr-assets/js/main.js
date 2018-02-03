@@ -34,7 +34,7 @@ Phroses.formify = function(options) {
 		}).then(options.success.bind(this)).catch((options.failure) ? options.failure.bind(this) : Phroses.genericError);
 	});
 
-	console.log("Formified element "+options.selector);
+	console.log("Formified element <"+options.selector+">");
 };
 
 Phroses.updatePage = function(title, content) {
@@ -66,7 +66,7 @@ Phroses.reloadStyles = function() {
 	$(".phr-reloaded").each(function() {
 		$.get($(this).data("href"), function(body) {
 			$(this).html(body);
-			console.log("Reloaded " + $(this).data("href"));
+			console.log("Reloaded Stylesheet <" + $(this).data("href") + ">");
 		}.bind(this));
 	});
 }
@@ -89,6 +89,23 @@ Phroses.genericError = function(message) {
 	
 };
 
+
+Phroses.setupButtons = function() {
+	$(".pst_btn, .phr-btn").click(function(e) {
+		e.preventDefault();
+		if($(this).data("target")) {
+			if($(this).data("scroll") === "off") {
+				$("body").addClass("noscroll");
+			} else if($(this).data("scroll") === "on") {
+				$("body").removeClass("noscroll");
+			}
+			$("#"+$(this).data("target"))[$(this).data("action")]();
+		}
+	});
+	
+	$(".pst_btn").on("dragstart", function() { return false; });	
+};
+
 jQuery.fn.shake = function(interval,distance,times){
 	interval = typeof interval == "undefined" ? 100 : interval;
 	distance = typeof distance == "undefined" ? 10 : distance;
@@ -108,7 +125,7 @@ function displaySaved() {
 	}, 5000);
 }
 
-function createEditors() {
+Phroses.createEditors = function() {
 	$(".editor").each(function() {
 		var id = $(this).attr("id");
 		editors[id] = ace.edit(id);
@@ -130,151 +147,153 @@ function createEditors() {
 
 $(function() {
 	console.log("-== Phroses Initialized ==-");
-    createEditors();
 	
-	$(".pst_btn, .phr-btn").click(function(e) {
-		e.preventDefault();
-		if($(this).data("target")) {
-			if($(this).data("scroll") === "off") {
-				$("body").addClass("noscroll");
-			} else if($(this).data("scroll") === "on") {
-				$("body").removeClass("noscroll");
-			}
-			$("#"+$(this).data("target"))[$(this).data("action")]();
-		}
-	});
 	
-	$(".pst_btn").on("dragstart", function() { return false; });
-
-	$("#pst-es").bind("keydown", function(e) {
-		if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
-			e.preventDefault();
-			e.stopImmediatePropagation();
-			$("#pst-es").submit();
-		}
-	});
-	
-
-	$("#pst-es-title").change(function() { $("#pst-es").submit() });
-
-
-	/**
-	 * Editor Screen
-	 */
-	Phroses.formify({
-		selector : "#pst-es",
-		collect: function() {
-			var data = $(this).serializeArray(), content = {};
+	var content = $("body").html();
+	$("body").html('<div id="phr-container">'+content+"</div>");
+	$.post("/admin/api/pst", { uri : window.location.pathname }, function(data) {
+		$("body").append(data.content);
 		
-			$("#pst-es .content").each(function() {
-				if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
-				else content[$(this).attr("id")] = $(this).val();
-			});
+		Phroses.setupButtons();
+		Phroses.createEditors();
+
+		$("#pst-es").bind("keydown", function(e) {
+			if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				$("#pst-es").submit();
+			}
+		});
+	
+		$("#pst-es-title").change(function() { $("#pst-es").submit() });
+
+		/**
+		 * Editor Screen
+		 */
+		Phroses.formify({
+			selector : "#pst-es",
+			collect: function() {
+				var data = $(this).serializeArray(), content = {};
 			
-			data.push({name : "id", value : $("#pid").val() });
-			data.push({name : "content", value : JSON.stringify(content) });
-			if($("#pst-es-type").val() === "redirect") data.push({name : "type", value : "redirect" });
-			return data;
-		},
-		success: function(pdata) {
-			displaySaved();
-			Phroses.updatePage($("#pst-es-title").val(), pdata.content);
-		}
-	});
-
-	/**
-	 * Deletion Screen
-	 */
-	Phroses.formify({
-		selector: "#pst-ds",
-		collect: function() {
-			return $(this).serializeArray();
-		},
-		success: function(data) {
-			location.reload();
-		}
+				$("#pst-es .content").each(function() {
+					if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
+					else content[$(this).attr("id")] = $(this).val();
+				});
+				
+				data.push({name : "id", value : $("#pid").val() });
+				data.push({name : "content", value : JSON.stringify(content) });
+				if($("#pst-es-type").val() === "redirect") data.push({name : "type", value : "redirect" });
+				return data;
+			},
+			success: function(pdata) {
+				displaySaved();
+				Phroses.updatePage($("#pst-es-title").val(), pdata.content);
+			}
+		});
+	
+		/**
+		 * Deletion Screen
+		 */
+		Phroses.formify({
+			selector: "#pst-ds",
+			collect: function() {
+				return $(this).serializeArray();
+			},
+			success: function(data) {
+				location.reload();
+			}
+		});
+		
+		/**
+		 * Move Screen
+		 */
+		Phroses.formify({
+			selector: "#pst-ms",
+			collect : function() {
+				var data = $(this).serializeArray();
+				data.push({ name : "id", value : $("#pid").val() });
+				return data;
+			},
+			success: function(data) {
+				history.replaceState({}, document.title, $("#puri").val());
+				$("#pst-ms").fadeOut();
+				displaySaved();
+			}
+		});
+		
+		/**
+		 * New Page Screen
+		 */
+		Phroses.formify({
+			selector: "#pst-ns",
+			hash: "#new",
+			hashreqclass: {
+				element: "#pst",
+				class : "new"
+			},
+			collect: function() {
+				return $(this).serializeArray();
+			},
+			success: function(pdata) {
+				var title = $("#pst-ns [name=title]").val();
+				$("#pid").val(pdata.id);
+				$("#pst").removeClass("new");
+				$("#pst").addClass("existing");
+				$("#phr-container").html(pdata.content);
+				$("#pst-es-fields").html(pdata.typefields);
+				$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
+				$("#pst-es-type").val($("#pst-ns select").val());
+				Phroses.createEditors();
+				document.title = title;
+	
+				$("#pst-ns").fadeOut(function() {
+					$("#pst-ns")[0].reset();
+				});
+			}
+		});
+	
+		/**
+		 * Type changer on the edit screen
+		 */
+		Phroses.formify({
+			selector:  "#pst-es-type",
+			action: "change",
+			collect: function() {
+				$("#pst-es-fields").slideUp();
+				return { type : $(this).val(), id : $("#pid").val() };
+			},
+			success: function(pdata) {
+				$("#pst-es-fields").html(pdata.typefields);
+				createEditors();
+				if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
+				$("#pst-es-fields").slideDown();
+				if(data.type !== "redirect") displaySaved();
+			}
+		});
+	
+		/**
+		 * Public / Private Switcher
+		 */
+		Phroses.formify({
+			selector: "#pst-vis input",
+			action: "change",
+			collect: function() {
+				return {
+					"id" : $("#pid").val(),
+					"public" : ($(this).is(":checked") === true) ? 1 : 0
+				};
+			},
+			success: function() {}
+		});
 	});
 	
-	/**
-	 * Move Screen
-	 */
-	Phroses.formify({
-		selector: "#pst-ms",
-		collect : function() {
-			var data = $(this).serializeArray();
-			data.push({ name : "id", value : $("#pid").val() });
-		},
-		success: function(data) {
-			history.replaceState({}, document.title, $("#puri").val());
-			$("#pst-ms").fadeOut();
-			displaySaved();
-		}
-	});
 	
-    /**
-	 * New Page Screen
-	 */
-    Phroses.formify({
-		selector: "#pst-ns",
-		hash: "#new",
-		hashreqclass: {
-			element: "#pst",
-			class : "new"
-		},
-		collect: function() {
-			return $(this).serializeArray();
-		},
-		success: function(pdata) {
-			var title = $("#pst-ns [name=title]").val();
-			$("#pid").val(pdata.id);
-			$("#pst").removeClass("new");
-			$("#pst").addClass("existing");
-			$("#phr-container").html(pdata.content);
-			$("#pst-es-fields").html(pdata.typefields);
-			$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
-			$("#pst-es-type").val($("#pst-ns select").val());
-			createEditors();
-			document.title = title;
 
-			$("#pst-ns").fadeOut(function() {
-				$("#pst-ns")[0].reset();
-			});
-		}
-	});
+	
 
-	/**
-	 * Type changer on the edit screen
-	 */
-	Phroses.formify({
-		selector:  "#pst-es-type",
-		action: "change",
-		collect: function() {
-			$("#pst-es-fields").slideUp();
-			return { type : $(this).val(), id : $("#pid").val() };
-		},
-		success: function(pdata) {
-			$("#pst-es-fields").html(pdata.typefields);
-			createEditors();
-			if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
-			$("#pst-es-fields").slideDown();
-			if(data.type !== "redirect") displaySaved();
-		}
-	});
 
-	/**
-	 * Public / Private Switcher
-	 */
-	Phroses.formify({
-		selector: "#pst-vis input",
-		action: "change",
-		collect: function() {
-			return {
-				"id" : $("#pid").val(),
-				"public" : ($(this).is(":checked") === true) ? 1 : 0
-			};
-		},
-		success: function() {}
-	});
+	
+	
 
 	/**
 	 * Login Screen

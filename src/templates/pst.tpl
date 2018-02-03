@@ -1,4 +1,3 @@
-
 <div id="pst" class="<{var::pst_type}>">
     <div id="pst-vis" >
         <input type="checkbox" <{var::visibility}> id="vs-cb" data-method="PATCH" data-url="">

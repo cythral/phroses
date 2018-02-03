@@ -55,36 +55,6 @@ final class Theme extends Template {
 			$this->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
 			$this->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
-			
-			$pst = new Template(INCLUDES["TPL"]."/pst.tpl");
-			$pst->id = SITE["PAGE"]["ID"];
-			$pst->title = SITE["PAGE"]["TITLE"];
-			$pst->uri = reqc\URI;
-            $pst->visibility = SITE["PAGE"]["VISIBILITY"] ? "checked" : "";
-			
-			if(SITE["RESPONSE"] == Phroses::RESPONSES["PAGE"][200]) {
-				$pst->pst_type = "existing";
-				ob_start();
-				foreach($this->GetContentFields($this->type) as $key => $field) {
-					if($field == "editor") { ?><pre class="form_field content editor" id="<?= $this->type; ?>-main" data-id="<?= $key; ?>"><?= 
-trim(htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? "")); ?></pre><? }
-					else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" 
-class="form_input form_field content" value="<?= htmlspecialchars(SITE["PAGE"]["CONTENT"][$key] ?? ""); ?>"><? }
-				}
-				$pst->fields = trim(ob_get_clean());
-			
-			// 404
-			} else {
-				$pst->pst_type = "new";
-				$pst->fields = "";
-                $pst->visibility = "checked";
-			}
-			
-			foreach($this->GetTypes() as $type2) $pst->push("types", ["type" => $type2, "checked" => ($this->type == $type2) ? "selected" : "" ]);
-            //header("content-type: text/plain");
-            //die($pst);
-			$this->tpl = preg_replace("/<body\b[^>]*>/is", '$0<div id="phr-container">', $this->tpl);
-			$this->tpl = str_replace("</body>", "</div>".$pst."</body>", $this->tpl);
 		}
 	}
 	
