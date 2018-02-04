@@ -226,7 +226,7 @@ $(function() {
 
 			failure: function(data) {
 				data = data.responseJSON;
-				Phroses.genericError(Phroses.errors["pst-ms"][data.error] || "An unknown error occurred.");
+				Phroses.genericError(Phroses.errors["pst-ms"][data.error] || Phroses.errors[data.error] || "An unknown error occurred.");
 			}
 		});
 		
