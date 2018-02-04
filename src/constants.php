@@ -15,6 +15,7 @@ define("Phroses\INCLUDES", [
 	"VIEWS" => SRC."/views",
 	"TPL" => SRC."/templates",
     "PLUGINS" => ROOT."/plugins",
+    "UPLOADS" => ROOT."/uploads",
 	"META" => [ // ORDER OF THESE IS IMPORTANT
 		"TRAITS" => SRC."/models/traits",
 		"INTERFACES" => SRC."/models/interfaces"

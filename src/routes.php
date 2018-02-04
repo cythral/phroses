@@ -17,6 +17,10 @@ use const \reqc\{ VARS, MIME_TYPES };
 self::route("get", self::RESPONSES["PAGE"][200], function() {
 	ob_start("ob_gzhandler");
 
+	// pages with an extension may have their content type autoset by reqc
+	// since this is a page make sure its set to html
+	self::$out->setContentType(reqc\MIME_TYPES["HTML"]); 
+
 	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
 	$theme->title = SITE["PAGE"]["TITLE"];
 	echo $theme;
@@ -37,6 +41,7 @@ self::route("get", self::RESPONSES["PAGE"][301], function() {
 	} else echo "incomplete redirect"; // todo: add a fixer form here
 
 	echo $theme;
+
 	if(inix::get("mode") == "production") {
 		ob_end_flush();
 		flush();
@@ -86,6 +91,7 @@ self::route("get", self::RESPONSES["SYS"][200], function() {
 	}
 
 	echo $theme;
+
 	if(inix::get("mode") == "production") {
 		ob_end_flush();
 		flush();
@@ -271,5 +277,9 @@ self::route("delete", self::RESPONSES["DEFAULT"], function() {
 	self::$out->send(["type" => "success"], 200);
 });
 
+
+self::route("get", self::RESPONSES["UPLOAD"], function() {
+	ReadfileCached(INCLUDES["UPLOADS"]."/".reqc\BASEURL."/".substr(reqc\PATH, 8));
+});
 
 return self::$handlers;

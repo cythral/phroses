@@ -26,7 +26,7 @@ Phroses.formify = function(options) {
 		}
 	}
 
-	$(options.selector)[options.action || "submit"](function(e) {
+	$(document).on(options.action || "submit", options.selector, function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		var data = (options.collect || function() { return $(this).serializeArray(); }).bind(this)();
@@ -293,9 +293,10 @@ $(function() {
 				success: function() {}
 			});
 		});
-		
+
 	} else {
-	
+
+		Phroses.setupButtons();
 
 		/**
 		 * Login Screen
@@ -429,6 +430,102 @@ $(function() {
 					$("#error").removeClass("active");
 				}, 5000);
 			}
+		});
+
+
+
+
+		$(document).on("click", ".upload", function() {
+			var file = $(this).data("filename");
+			var ext = file.substring(file.indexOf(".") + 1);
+
+			if(["png", "jpg", "gif"].includes(ext)) {
+				$("#preview img").attr('src', "/uploads/"+file);
+			} else {
+				$("#preview img").attr("src", "https://www.adcosales.com/files/products/no-preview-available.jpg");
+			}
+
+			$("#seefull").attr("href", "/uploads/"+file);
+			$("#preview").fadeIn();
+		});
+
+		$(document).on("click", ".upload input", function(e) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+		});
+
+		Phroses.formify({
+			selector: ".upload input",
+			action: "change",
+			collect: function() {
+				return { action : "rename", filename : $(this).parent().data("filename"), to : $(this).val() };
+			},
+			success: function() {
+				console.log($(this).parent().selector);
+				var upel = $(this).parent();
+				upel.data("filename", $(this).val());
+
+				upel.addClass("saved");
+				setTimeout(function() {
+					upel.removeClass("saved");
+				}.bind(this), 1000);
+			}
+		});
+
+		Phroses.formify({
+			selector: ".upload-delete",
+			action: "click",
+			collect: function() {
+				return { action: "delete", filename: $(this).parent().parent().data("filename") };
+			},
+			success: function() {
+				$(this).parent().parent().slideUp(); 
+			}
+		});
+
+		$("#upload").on("drag dragstart dragend dragover dragenter dragleave drop submit", function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+		});
+
+		$("#upload").on("dragenter", function() { $(this).addClass("dragover"); });
+		$("#upload").on("dragleave", function() { $(this).removeClass("dragover"); });
+		$("#upload").on("drop", function(e, byclick) {
+			$(this).removeClass("dragover");
+			
+			file = (typeof byclick === 'undefined') ? e.originalEvent.dataTransfer.files[0] : $("#file").prop("files")[0];
+			$(this).find("#upload-namer").fadeIn();
+
+			$("#upload").on("submit", function() {
+				var data = new FormData(), filename = $("[name='filename']").val();
+				data.append("filename", filename);
+				data.append("file", file);
+				data.append("action", "new");
+	
+				$.ajax({
+					url : "",
+					data : data,
+					method : "post",
+					processData : false,
+					dataType : 'json',
+					contentType : false,
+					success : function() {
+						
+						$("#upload").fadeOut();
+						$("#upload").off("submit");
+						$("#upload-namer").fadeOut();
+						$("#upload-namer").val('');
+	
+						$(".admin-page.uploads ul").append('<li class="upload" data-filename="'+filename+'"><input value="'+filename+'" data-method="post"><div class="upload-icons"><a href="/uploads/'+filename+'" class="fa fa-link"></a><a href="#" class="fa fa-search-plus"></a><a href="#" class="fa fa-times upload-delete" data-method="post"></a></div></li>');
+					}
+				});
+			});
+		});
+
+		
+
+		$("#upload #file").change(function() {
+			$("#upload").trigger('drop', true);
 		});
 	}
 });

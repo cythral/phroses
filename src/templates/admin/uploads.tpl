@@ -1,0 +1,44 @@
+<div class="admin-page uploads">
+    <div class="uploads-top">
+        <h2>Uploads</h2>
+        <a class="pst_btn txt" data-target="upload" data-action="fadeIn">New</a>
+    </div>
+
+    <ul>
+        <{array::files::
+            <li class="upload" data-filename="@filename">
+                <input value="@filename" data-method="post"> 
+                <div class="upload-icons">
+                    <a href="/uploads/@filename" class="fa fa-link"></a>
+                    <a href="#" class="fa fa-search-plus"></a>
+                    <a href="#" class="fa fa-times upload-delete" data-method="post"></a>
+                </div>
+            </li>}>
+    </ul>
+</div>
+
+<div id="preview" class="container screen aln-c">
+    <div><img src="https://www.adcosales.com/files/products/no-preview-available.jpg"></div>
+    <a id="seefull" class="c" href="https://www.adcosales.com/files/products/no-preview-available.jpg">Go to file <i class="fa fa-chevron-right"></i></a>
+    
+    <div class="actions">
+        <a class="pst_btn txt" data-target="preview" data-action="fadeOut">Close</a>
+    </div>
+</div>
+
+
+<form id="upload" class="container screen aln-c">
+    <input id="file" name="file" type="file">
+    <label for="file"><strong>Choose a file</strong> or drag it here</label>
+
+    <div id="upload-namer">
+        <div class="container">
+            <div class="form_icfix c aln-l">
+                <div>Filename:</div>
+                <input name="filename" class="form_input form_field" placeholder="filename.jpg" autocomplete="off">     
+            </div>
+
+            <a class="pst_btn txt" data-target="upload" data-action="submit">Upload</a>
+        </div>
+    </div>
+</form>

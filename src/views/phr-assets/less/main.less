@@ -9,6 +9,7 @@
 
 .c { color: @primary; }
 .oxygen { font-family: Oxygen; }
+.underline { text-decoration: underline; }
 
 body.noscroll { overflow: hidden; }
 
@@ -508,4 +509,135 @@ select.c {
     margin-top: 30px;
     letter-spacing: 1px;
     text-transform: uppercase;
+}
+
+.admin-page {
+    padding: 30px;
+
+    h2 {
+        .c;
+        font-size: 2em;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    &.uploads {
+
+        .uploads-top {
+            position: relative;
+            margin-bottom: 60px;
+
+            a {
+                position: absolute;
+                top: -10px;
+                right: 0;
+            }
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 30px 0 30px 0;
+
+            li {
+                border-bottom: 3px solid @primary;
+                padding: 15px;
+                color: @primary;
+                font-weight: bold;
+                position: relative;
+                cursor: pointer;
+                transition: background .5s, color .5s;
+                height: 60px;
+
+                input {
+                    border: none;
+                    background: none;
+                    font-size: 1.2em;
+                    font-weight: bold;
+                }
+
+                .upload-icons {
+                    position: absolute;
+                    right: 15px;
+                    top: 0;
+                    line-height: 60px;
+                    height: 60px;
+                }
+
+                a {
+                    color: white;
+                    font-size: 1.8em;
+                    line-height: 60px;
+                    cursor: pointer;
+                    margin: 0 10px 0 10px;
+                }
+
+                &:hover, &.saved {
+                    background: @primary;
+                    color: white;
+                    input { color: white; }
+                }
+
+                &.saved {
+                    background: @saved;
+                }
+            }
+        }
+    }
+}
+
+#preview {
+    img {
+        margin-top: 10vh;
+        height: 50vh;
+        max-width: 90%;
+        display: inline-block;
+    }
+
+    #seefull {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: bold;
+        font-size: 1.3em;
+        margin-top: 30px;
+        display: inline-block;
+    }
+
+    .actions {
+        margin-top: 60px;
+    }
+}
+
+#upload {
+    transition: background .5s;
+    padding-top: 20vh;
+
+    label {
+        .c;
+        font-size: 2.3em;
+        cursor: pointer;
+    }
+
+    input[type="file"] { 
+        display: none;
+    }
+
+    &.dragover {
+        background: @primary - #000 !important;
+        label { color: white; }
+    }
+
+    #upload-namer {
+        display: none;
+        margin: 30px;
+        text-align: center;
+
+        .container {
+            width: 80%;
+            display: inline-block;
+        }
+
+        a {
+            margin-top: 30px;
+        }
+    }
 }
