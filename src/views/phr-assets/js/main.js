@@ -156,275 +156,279 @@ $(function() {
 	console.log("-== Phroses Initialized ==-");
 	
 	
-	var content = $("body").html();
-	$("body").html('<div id="phr-container">'+content+"</div>");
-	$.post("/admin/api/pst", { uri : window.location.pathname }, function(data) {
-		$("body").append(data.content);
-		
-		Phroses.setupButtons();
-		Phroses.createEditors();
-
-		$("#pst-es").bind("keydown", function(e) {
-			if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
-				e.preventDefault();
-				e.stopImmediatePropagation();
-				$("#pst-es").submit();
-			}
-		});
-	
-		$("#pst-es-title").change(function() { $("#pst-es").submit() });
-
-		/**
-		 * Editor Screen
-		 */
-		Phroses.formify({
-			selector : "#pst-es",
-			collect: function() {
-				var data = $(this).serializeArray(), content = {};
+	if(!$("#phr-admin-page").val()) {
+		var content = $("body").html();
+		$("body").html('<div id="phr-container">'+content+"</div>");
+		$.post("/admin/api/pst", { uri : window.location.pathname }, function(data) {
+			$("body").append(data.content);
 			
-				$("#pst-es .content").each(function() {
-					if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
-					else content[$(this).attr("id")] = $(this).val();
-				});
+			Phroses.setupButtons();
+			Phroses.createEditors();
+
+			$("#pst-es").bind("keydown", function(e) {
+				if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					$("#pst-es").submit();
+				}
+			});
+		
+			$("#pst-es-title").change(function() { $("#pst-es").submit() });
+
+			/**
+			 * Editor Screen
+			 */
+			Phroses.formify({
+				selector : "#pst-es",
+				collect: function() {
+					var data = $(this).serializeArray(), content = {};
 				
-				data.push({name : "id", value : $("#pid").val() });
-				data.push({name : "content", value : JSON.stringify(content) });
-				if($("#pst-es-type").val() === "redirect") data.push({name : "type", value : "redirect" });
-				return data;
-			},
-			success: function(pdata) {
-				Phroses.displaySaved();
-				Phroses.updatePage($("#pst-es-title").val(), pdata.content);
-			}
-		});
-	
-		/**
-		 * Deletion Screen
-		 */
-		Phroses.formify({
-			selector: "#pst-ds",
-			success: function(data) {
-				location.reload();
-			}
+					$("#pst-es .content").each(function() {
+						if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
+						else content[$(this).attr("id")] = $(this).val();
+					});
+					
+					data.push({name : "id", value : $("#pid").val() });
+					data.push({name : "content", value : JSON.stringify(content) });
+					if($("#pst-es-type").val() === "redirect") data.push({name : "type", value : "redirect" });
+					return data;
+				},
+				success: function(pdata) {
+					Phroses.displaySaved();
+					Phroses.updatePage($("#pst-es-title").val(), pdata.content);
+				}
+			});
+		
+			/**
+			 * Deletion Screen
+			 */
+			Phroses.formify({
+				selector: "#pst-ds",
+				success: function(data) {
+					location.reload();
+				}
+			});
+			
+			/**
+			 * Move Screen
+			 */
+			Phroses.formify({
+				selector: "#pst-ms",
+				collect : function() {
+					var data = $(this).serializeArray();
+					data.push({ name : "id", value : $("#pid").val() });
+					return data;
+				},
+				success: function(data) {
+					history.replaceState({}, document.title, $("#puri").val());
+					$("#pst-ms").fadeOut();
+					Phroses.displaySaved();
+				},
+
+				failure: function(data) {
+					data = data.responseJSON;
+					Phroses.genericError(Phroses.errors["pst-ms"][data.error] || Phroses.errors[data.error] || "An unknown error occurred.");
+				}
+			});
+			
+			/**
+			 * New Page Screen
+			 */
+			Phroses.formify({
+				selector: "#pst-ns",
+				hash: "#new",
+				hashreqclass: {
+					element: "#pst",
+					class : "new"
+				},
+				success: function(pdata) {
+					var title = $("#pst-ns [name=title]").val();
+					$("#pid").val(pdata.id);
+					$("#pst").removeClass("new");
+					$("#pst").addClass("existing");
+					$("#phr-container").html(pdata.content);
+					$("#pst-es-fields").html(pdata.typefields);
+					$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
+					$("#pst-es-type").val($("#pst-ns select").val());
+					Phroses.createEditors();
+					document.title = title;
+		
+					$("#pst-ns").fadeOut(function() {
+						$("#pst-ns")[0].reset();
+					});
+				}
+			});
+		
+			/**
+			 * Type changer on the edit screen
+			 */
+			Phroses.formify({
+				selector:  "#pst-es-type",
+				action: "change",
+				collect: function() {
+					$("#pst-es-fields").slideUp();
+					return { type : $(this).val(), id : $("#pid").val() };
+				},
+				success: function(pdata) {
+					$("#pst-es-fields").html(pdata.typefields);
+					createEditors();
+					if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
+					$("#pst-es-fields").slideDown();
+					if(data.type !== "redirect") Phroses.displaySaved();
+				}
+			});
+		
+			/**
+			 * Public / Private Switcher
+			 */
+			Phroses.formify({
+				selector: "#pst-vis input",
+				action: "change",
+				collect: function() {
+					return {
+						"id" : $("#pid").val(),
+						"public" : ($(this).is(":checked") === true) ? 1 : 0
+					};
+				},
+				success: function() {}
+			});
 		});
 		
+	} else {
+	
+
 		/**
-		 * Move Screen
+		 * Login Screen
 		 */
 		Phroses.formify({
-			selector: "#pst-ms",
-			collect : function() {
-				var data = $(this).serializeArray();
-				data.push({ name : "id", value : $("#pid").val() });
-				return data;
+			selector: "#phroses-login",
+			success: function() {
+				$("#phroses-login").animate({width:0}, function() {
+					location.reload();
+				});
 			},
-			success: function(data) {
-				history.replaceState({}, document.title, $("#puri").val());
-				$("#pst-ms").fadeOut();
-				Phroses.displaySaved();
-			},
+			failure: function() {
+				$("#phroses-login").shake();
+			}
+		});
 
+
+		/**
+		 * Type switcher on /admin/pages
+		 */
+		Phroses.formify({
+			selector: ".pageman-select",
+			action: "change",
+			collect: function() {
+				return { type : $(this).val(), id : $(this).parent().parent().data("id"), nocontent : true };
+			},
+			success: function() {
+				var parent = $(this).parent().parent();
+				parent.addClass("saved");
+				setTimeout(function() { parent.removeClass("saved"); }, 1000);
+			}
+		});
+		$(".pageman-select").click(function(e) { e.preventDefault(); });
+
+		/**
+		 * Page deletion on /admin/pages
+		 */
+		Phroses.formify({
+			selector: ".pageman-delete",
+			action: "click",
+			collect : function() { return null; },
+			success: function() {
+				$(this).parent().parent().slideUp(function() {
+					$(this).remove();
+				});
+			}
+		});
+
+		/**
+		 * Theme selector on /admin
+		 */
+		Phroses.formify({
+			selector: "#theme-selector",
+			action: "change",
+			collect: function() { return { theme : $(this).val() }; },
+			success: Phroses.displaySaved
+		});
+
+		/**
+		 * Upgrade screen
+		 * uses EventSource to track progress, so formify doesnt work here.
+		 */
+		$("#phr-upgrade-screen").submit(function(e) {
+			e.preventDefault();
+			$(this).fadeIn();
+			
+			var ev = new EventSource("/admin/update/start");
+			ev.addEventListener("progress", function(e) {
+				console.log(e.data);
+				$(".phr-progress-bar").css({width: JSON.parse(e.data).progress+"%" });
+				
+				// completion
+				if(JSON.parse(e.data).progress === 100) {
+					ev.close();
+					
+					$("#phr-upgrade-screen .phr-progress").addClass("done");
+					$("#phr-upgrade-screen h1").fadeOut(function() {
+						$(this).html("Phroses updated to "+JSON.parse(e.data).version);
+						$(this).fadeIn();
+					});
+					
+					setTimeout(function() {
+						location.reload();
+					}, 5000);
+				}
+			});
+
+			ev.addEventListener("error", function(e) {
+				ev.close();
+				console.log(e.data);
+				var data = JSON.parse(e.data);
+
+				var extra = "";
+				if(data.error == "write") extra = "<br>debug: operation " + data.action + " on file " + data.file;
+
+				$(".phr-progress-error").html(Phroses.errors[data.error] + extra);
+				$(".phr-progress").addClass("error");
+			});
+		});
+
+		$(".phr-update-icon").click(function() {
+			$(this).addClass("done");
+			setTimeout(function() {
+				$("#phr-upgrade-screen").submit();
+			}, 1000);
+		});
+			
+		$("#phr-new-page").submit(function(e) {
+			document.location = $("#phr-new-page input").val() + "#new";
+		});
+		
+
+		Phroses.formify({
+			selector : "#phroses_site_creds",
+			success : function() {
+				Phroses.displaySaved();
+				$("#phroses_site_creds input:not([name='username'])").val('');
+			},
 			failure: function(data) {
 				data = data.responseJSON;
-				Phroses.genericError(Phroses.errors["pst-ms"][data.error] || Phroses.errors[data.error] || "An unknown error occurred.");
-			}
-		});
-		
-		/**
-		 * New Page Screen
-		 */
-		Phroses.formify({
-			selector: "#pst-ns",
-			hash: "#new",
-			hashreqclass: {
-				element: "#pst",
-				class : "new"
-			},
-			success: function(pdata) {
-				var title = $("#pst-ns [name=title]").val();
-				$("#pid").val(pdata.id);
-				$("#pst").removeClass("new");
-				$("#pst").addClass("existing");
-				$("#phr-container").html(pdata.content);
-				$("#pst-es-fields").html(pdata.typefields);
-				$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
-				$("#pst-es-type").val($("#pst-ns select").val());
-				Phroses.createEditors();
-				document.title = title;
-	
-				$("#pst-ns").fadeOut(function() {
-					$("#pst-ns")[0].reset();
-				});
-			}
-		});
-	
-		/**
-		 * Type changer on the edit screen
-		 */
-		Phroses.formify({
-			selector:  "#pst-es-type",
-			action: "change",
-			collect: function() {
-				$("#pst-es-fields").slideUp();
-				return { type : $(this).val(), id : $("#pid").val() };
-			},
-			success: function(pdata) {
-				$("#pst-es-fields").html(pdata.typefields);
-				createEditors();
-				if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
-				$("#pst-es-fields").slideDown();
-				if(data.type !== "redirect") Phroses.displaySaved();
-			}
-		});
-	
-		/**
-		 * Public / Private Switcher
-		 */
-		Phroses.formify({
-			selector: "#pst-vis input",
-			action: "change",
-			collect: function() {
-				return {
-					"id" : $("#pid").val(),
-					"public" : ($(this).is(":checked") === true) ? 1 : 0
-				};
-			},
-			success: function() {}
-		});
-	});
-	
 
-	/**
-	 * Login Screen
-	 */
-	Phroses.formify({
-		selector: "#phroses-login",
-		success: function() {
-			$("#phroses-login").animate({width:0}, function() {
-				location.reload();
-			});
-		},
-		failure: function() {
-			$("#phroses-login").shake();
-		}
-	});
+				$("#error").html({ 
+					"username" : "Please enter a value for the username field.",
+					"old" : "The value for the old password was incorrect.",
+					"repeat" : "The two new passwords do not match."
+				}[data.field] || Phroses.errors[data.error]);
 
+				$("#error").addClass("active");
 
-	/**
-	 * Type switcher on /admin/pages
-	 */
-	Phroses.formify({
-		selector: ".pageman-select",
-		action: "change",
-		collect: function() {
-			return { type : $(this).val(), id : $(this).parent().parent().data("id"), nocontent : true };
-		},
-		success: function() {
-			var parent = $(this).parent().parent();
-			parent.addClass("saved");
-			setTimeout(function() { parent.removeClass("saved"); }, 1000);
-		}
-	});
-	$(".pageman-select").click(function(e) { e.preventDefault(); });
-
-	/**
-	 * Page deletion on /admin/pages
-	 */
-	Phroses.formify({
-		selector: ".pageman-delete",
-		action: "click",
-		collect : function() { return null; },
-		success: function() {
-			$(this).parent().parent().slideUp(function() {
-				$(this).remove();
-			});
-		}
-	});
-
-	/**
-	 * Theme selector on /admin
-	 */
-	Phroses.formify({
-		selector: "#theme-selector",
-		action: "change",
-		collect: function() { return { theme : $(this).val() }; },
-		success: Phroses.displaySaved
-	});
-
-	/**
-	 * Upgrade screen
-	 * uses EventSource to track progress, so formify doesnt work here.
-	 */
-	$("#phr-upgrade-screen").submit(function(e) {
-		e.preventDefault();
-		$(this).fadeIn();
-		
-		var ev = new EventSource("/admin/update/start");
-		ev.addEventListener("progress", function(e) {
-            console.log(e.data);
-			$(".phr-progress-bar").css({width: JSON.parse(e.data).progress+"%" });
-			
-			// completion
-			if(JSON.parse(e.data).progress === 100) {
-				ev.close();
-				
-				$("#phr-upgrade-screen .phr-progress").addClass("done");
-				$("#phr-upgrade-screen h1").fadeOut(function() {
-					$(this).html("Phroses updated to "+JSON.parse(e.data).version);
-					$(this).fadeIn();
-				});
-				
 				setTimeout(function() {
-					location.reload();
+					$("#error").removeClass("active");
 				}, 5000);
 			}
 		});
-
-		ev.addEventListener("error", function(e) {
-			ev.close();
-            console.log(e.data);
-			var data = JSON.parse(e.data);
-
-			var extra = "";
-			if(data.error == "write") extra = "<br>debug: operation " + data.action + " on file " + data.file;
-
-			$(".phr-progress-error").html(Phroses.errors[data.error] + extra);
-			$(".phr-progress").addClass("error");
-		});
-	});
-
-	$(".phr-update-icon").click(function() {
-		$(this).addClass("done");
-		setTimeout(function() {
-			$("#phr-upgrade-screen").submit();
-		}, 1000);
-	});
-        
-	$("#phr-new-page").submit(function(e) {
-		document.location = $("#phr-new-page input").val() + "#new";
-	});
-	
-
-	Phroses.formify({
-		selector : "#phroses_site_creds",
-		success : function() {
-			Phroses.displaySaved();
-			$("#phroses_site_creds input:not([name='username'])").val('');
-		},
-		failure: function(data) {
-			data = data.responseJSON;
-
-			$("#error").html({ 
-				"username" : "Please enter a value for the username field.",
-				"old" : "The value for the old password was incorrect.",
-				"repeat" : "The two new passwords do not match."
-			}[data.field] || Phroses.errors[data.error]);
-
-			$("#error").addClass("active");
-
-			setTimeout(function() {
-				$("#error").removeClass("active");
-			}, 5000);
-		}
-	});
+	}
 });

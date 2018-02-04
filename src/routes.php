@@ -77,6 +77,8 @@ self::route("get", self::RESPONSES["SYS"][200], function() {
 			else echo "resource not found";
 		}
 
+		echo '<input type="hidden" id="phr-admin-page" value="true">';
+
 		if($theme->HasType("admin")) $theme->SetType("admin", true);
 		$theme->title = $title ?? "Phroses System Page";
 		$theme->main = trim(ob_get_clean());
