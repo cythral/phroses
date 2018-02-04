@@ -13,7 +13,7 @@ handleMethod("post", function($out) {
     $pst = new Template(INCLUDES["TPL"]."/pst.tpl");
     $pst->uri = $_REQUEST["uri"];
 
-    $info = DB::Query("SELECT `title`, `content`, `public`, `type`, `id` FROM `pages` WHERE `uri`=?", [ $_REQUEST["uri"] ]);
+    $info = DB::Query("SELECT `title`, `content`, `public`, `type`, `id` FROM `pages` WHERE `uri`=? AND `siteID`=?", [ $_REQUEST["uri"], SITE["ID"] ]);
     $page = $info[0] ?? null;
 
     if(count($info) == 0) {

@@ -1,5 +1,5 @@
 <div class="container">
-    <form id="phroses_site_creds" class="sys form" data-method="POST" data-uri="/admin/creds">
+    <form id="phroses_site_creds" class="sys form" data-method="POST" data-url="/admin/creds">
         <h1 class="c">
         Change Site Credentials
         </h1>

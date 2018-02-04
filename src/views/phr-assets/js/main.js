@@ -110,17 +110,7 @@ Phroses.setupButtons = function() {
 	$(".pst_btn").on("dragstart", function() { return false; });	
 };
 
-jQuery.fn.shake = function(interval,distance,times){
-	interval = typeof interval == "undefined" ? 100 : interval;
-	distance = typeof distance == "undefined" ? 10 : distance;
-	times = typeof times == "undefined" ? 3 : times;
-	var jTarget = $(this);
-	jTarget.css('position','relative');
-	for(var iter=0;iter<(times+1);iter++){
-	   jTarget.animate({ left: ((iter%2==0 ? distance : distance*-1))}, interval);
-	}
-	return jTarget.animate({ left: 0},interval);
- };
+
 
 Phroses.displaySaved = function() {
 	$("#saved").addClass("active");
@@ -147,6 +137,18 @@ Phroses.createEditors = function() {
 	});
 }
 
+
+jQuery.fn.shake = function(interval,distance,times){
+	interval = typeof interval == "undefined" ? 100 : interval;
+	distance = typeof distance == "undefined" ? 10 : distance;
+	times = typeof times == "undefined" ? 3 : times;
+	var jTarget = $(this);
+	jTarget.css('position','relative');
+	for(var iter=0;iter<(times+1);iter++){
+	   jTarget.animate({ left: ((iter%2==0 ? distance : distance*-1))}, interval);
+	}
+	return jTarget.animate({ left: 0},interval);
+ };
 
 
 $(function() {
@@ -416,48 +418,31 @@ $(function() {
 	});
 	
 
-	$(".sys.form").submit(function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		
-		var data = $(this).serializeArray(), 
-            content = {}, 
-            method = $(this).data("method"),
-            uri = $("[name='uri']").val() || $(this).data("uri"),
-						id = $(this).attr("id");	
-                    
-		$("#phroses_editor .content").each(function() {
-			if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
-			else content[$(this).attr("id")] = $(this).val();
-		});
-		
-   	 	data.push({ name : "content", value : JSON.stringify(content) });
-		
-		$.ajax({url : uri, data: data, method : method })
-		.done(function(postdata) {
-      		if(id == "phroses_editor" || id == "phroses_site_creds") {
-				$("#saved").addClass("active");
-				setTimeout(function() {
-					$("#saved").removeClass("active");
-				}, 5000);
-			} else if(id == "phroses_creator") {
-				document.location = "/admin/pages/"+postdata.id;
-			}
-		})
-		.fail(function(data) {
+	Phroses.formify({
+		selector : "#phroses_site_creds",
+		collect : function() {
+			return $(this).serializeArray();
+		},
+		success : function() {
+			$("#saved").addClass("active");
+			setTimeout(function() {
+				$("#saved").removeClass("active");
+			}, 5000);
+		},
+		failure: function(data) {
 			data = data.responseJSON;
-			
-			if(id =="phroses_site_creds") {
-				$("#error").html({ 
-					"username" : "Please enter a value for the username field.",
-					"old" : "The value for the old password was incorrect.",
-					"repeat" : "The two new passwords do not match."
-				}[data.field] || Phroses.errors[data.error]);
-				$("#error").addClass("active");
-				setTimeout(function() {
-					$("#error").removeClass("active");
-				}, 5000);
-			}
-		});
+
+			$("#error").html({ 
+				"username" : "Please enter a value for the username field.",
+				"old" : "The value for the old password was incorrect.",
+				"repeat" : "The two new passwords do not match."
+			}[data.field] || Phroses.errors[data.error]);
+
+			$("#error").addClass("active");
+
+			setTimeout(function() {
+				$("#error").removeClass("active");
+			}, 5000);
+		}
 	});
 });
