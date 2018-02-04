@@ -122,7 +122,7 @@ jQuery.fn.shake = function(interval,distance,times){
 	return jTarget.animate({ left: 0},interval);
  };
 
-function displaySaved() {
+Phroses.displaySaved = function() {
 	$("#saved").addClass("active");
 	setTimeout(function() {
 		$("#saved").removeClass("active");
@@ -190,7 +190,7 @@ $(function() {
 				return data;
 			},
 			success: function(pdata) {
-				displaySaved();
+				Phroses.displaySaved();
 				Phroses.updatePage($("#pst-es-title").val(), pdata.content);
 			}
 		});
@@ -221,7 +221,7 @@ $(function() {
 			success: function(data) {
 				history.replaceState({}, document.title, $("#puri").val());
 				$("#pst-ms").fadeOut();
-				displaySaved();
+				Phroses.displaySaved();
 			},
 
 			failure: function(data) {
@@ -276,7 +276,7 @@ $(function() {
 				createEditors();
 				if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
 				$("#pst-es-fields").slideDown();
-				if(data.type !== "redirect") displaySaved();
+				if(data.type !== "redirect") Phroses.displaySaved();
 			}
 		});
 	
@@ -359,7 +359,7 @@ $(function() {
 		selector: "#theme-selector",
 		action: "change",
 		collect: function() { return { theme : $(this).val() }; },
-		success: displaySaved
+		success: Phroses.displaySaved
 	});
 
 	/**
