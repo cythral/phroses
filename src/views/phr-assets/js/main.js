@@ -29,11 +29,12 @@ Phroses.formify = function(options) {
 	$(options.selector)[options.action || "submit"](function(e) {
 		e.preventDefault();
 		e.stopPropagation();
-		var collect = options.collect.bind(this);
+		var data = (options.collect || function() { return $(this).serializeArray(); }).bind(this)();
+		
 
 		$.ajax({
 			url : $(this).data("url"),
-			data : collect(),
+			data : data,
 			method : $(this).data("method")
 		}).then(options.success.bind(this)).catch((options.failure) ? options.failure.bind(this) : Phroses.genericError);
 	});
@@ -202,9 +203,6 @@ $(function() {
 		 */
 		Phroses.formify({
 			selector: "#pst-ds",
-			collect: function() {
-				return $(this).serializeArray();
-			},
 			success: function(data) {
 				location.reload();
 			}
@@ -241,9 +239,6 @@ $(function() {
 			hashreqclass: {
 				element: "#pst",
 				class : "new"
-			},
-			collect: function() {
-				return $(this).serializeArray();
 			},
 			success: function(pdata) {
 				var title = $("#pst-ns [name=title]").val();
@@ -420,15 +415,7 @@ $(function() {
 
 	Phroses.formify({
 		selector : "#phroses_site_creds",
-		collect : function() {
-			return $(this).serializeArray();
-		},
-		success : function() {
-			$("#saved").addClass("active");
-			setTimeout(function() {
-				$("#saved").removeClass("active");
-			}, 5000);
-		},
+		success : Phroses.displaySaved,
 		failure: function(data) {
 			data = data.responseJSON;
 
