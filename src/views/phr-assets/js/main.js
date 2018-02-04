@@ -299,7 +299,6 @@ $(function() {
 	 */
 	Phroses.formify({
 		selector: "#phroses-login",
-		collect: function() { return $(this).serializeArray(); },
 		success: function() {
 			$("#phroses-login").animate({width:0}, function() {
 				location.reload();
