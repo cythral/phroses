@@ -293,13 +293,6 @@ $(function() {
 		});
 	});
 	
-	
-
-	
-
-
-	
-	
 
 	/**
 	 * Login Screen
@@ -415,7 +408,10 @@ $(function() {
 
 	Phroses.formify({
 		selector : "#phroses_site_creds",
-		success : Phroses.displaySaved,
+		success : function() {
+			Phroses.displaySaved();
+			$("#phroses_site_creds input:not([name='username'])").val('');
+		},
 		failure: function(data) {
 			data = data.responseJSON;
 

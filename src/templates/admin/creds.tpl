@@ -1,5 +1,5 @@
 <div class="container">
-    <form id="phroses_site_creds" class="sys form" data-method="POST" data-url="/admin/creds">
+    <form id="phroses_site_creds" data-method="POST" data-url="/admin/creds">
         <h1 class="c">
         Change Site Credentials
         </h1>
@@ -33,6 +33,7 @@
         </section>
         <div class="aln-c">
             <a href="#" class="pst_btn txt" data-target="phroses_site_creds" data-action="submit">Submit</a>
+            <input type="submit" style="display:none">
         </div>
     </form>
 </div>
