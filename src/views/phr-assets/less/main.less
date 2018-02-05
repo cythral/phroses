@@ -236,12 +236,12 @@ body.noscroll { overflow: hidden; }
 
 .dashbar {
     background: @primary;
-    height: 50px;
-    padding: 10px;
+    height: 70px;
+    padding: 15px;
     box-sizing: border-box;
-    line-height: 30px;
     font-family: sans-serif;
     color: white;
+    line-height: 40px;
 	
     div {
         display: inline-block;
@@ -257,13 +257,17 @@ body.noscroll { overflow: hidden; }
         width: 20%;
         overflow: hidden;
         font-weight: bold;
+        font-size: 1.3em;
+        text-transform: uppercase;
     }
     
     .dashbar_actions {
-        width: 20%;
+        width: 40%;
         overflow: hidden;
         text-align: right;
         float: right;
+
+        a:hover { text-decoration: underline; }
     }
 }
   

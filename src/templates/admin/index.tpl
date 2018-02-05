@@ -5,7 +5,7 @@
 <div id="error">Error</div>
 
 <div class="container">
-    <h1 class="c panel-heading aln-c">Phroses Dashboard</h1>
+    <h1 class="c panel-heading aln-c">~ Welcome ~</h1>
     
     <br>
 

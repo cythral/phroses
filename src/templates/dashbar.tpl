@@ -1,6 +1,6 @@
 <div class="dashbar">
     <div class="dashbar_brand">
-        <a href="/admin">Phroses Panel</a>
+        <a href="/admin">Phroses Dashboard</a>
     </div>
     <div class="dashbar_actions">
         <{var::host}> | <a href="/admin/logout">Logout</a>

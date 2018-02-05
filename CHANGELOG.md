@@ -11,7 +11,7 @@
 - Internal stylesheets are now reloaded on page edit saves
 - Sysforms are now gone, Phroses.formify replaced them
 - Password fields are now cleared after a successful change on /admin/creds
-
+- Redesigned the admin dashboard for a more streamlined look
 
 
 
