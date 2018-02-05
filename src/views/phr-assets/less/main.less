@@ -641,3 +641,47 @@ select.c {
         }
     }
 }
+
+.admin-links {
+    text-align: center;
+    margin-top: 30px;
+    
+
+    a {
+        background: @primary;
+        color: white !important;
+        height: 200px;
+        width: 200px;
+        margin: 15px;
+        border-radius: 100px;
+        display:inline-block;
+        text-align: center;
+        padding-top: 50px;
+        text-transform: uppercase;
+        font-weight: bold;
+        transition: padding-top .5s, transform .5s;
+        vertical-align: middle;
+
+        i {
+            display: block;
+            font-size: 100px;
+            margin-bottom: 5px;
+        }
+
+        span {
+            height: 0;
+            display: inline-block;
+            transition: height .5s;
+            overflow: hidden;
+        }
+
+        &:hover {
+            transform: scale(1.2,1.2);
+            padding-top: 30px;
+
+            span {
+                height: auto;
+            }
+        }
+    }
+}
