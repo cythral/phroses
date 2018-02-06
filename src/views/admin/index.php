@@ -15,8 +15,10 @@ handleMethod("POST", function($out) {
 $vars = DB::Query("SELECT SUM(`views`) AS viewcount, COUNT(`id`) AS pagecount FROM `pages` WHERE `siteID`=?", [ SITE["ID"] ])[0];
 
 $index = new Template(INCLUDES["TPL"]."/admin/index.tpl");
-$index->pagecount = $vars->pagecount;
-$index->viewcount = $vars->viewcount ?? 0;
+$index->pagecount = ($vars->pagecount > 999) ? "999+" : $vars->pagecount;
+$index->fullpagecount = $vars->pagecount;
+$index->viewcount = (($views = ($vars->viewcount ?? 0)) > 999) ? "999+" : $views;
+$index->fullviewcount = $vars->viewcount;
 
 foreach(Theme::List() as $thm) {
     $index->push("themes", [ "name" => $thm, "selected" => ($thm == SITE["THEME"]) ? "selected" : "" ]);

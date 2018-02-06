@@ -10,8 +10,8 @@
     <br>
 
     <div class="admin-stats container aln-c">
-        <div class="stats-bubble"><span><{var::pagecount}></span> Pages</div>
-        <div class="stats-bubble"><span><{var::viewcount}></span> Page Views</div>
+        <div class="stats-bubble"><span title="<{var::fullpagecount}>"><{var::pagecount}></span> Pages</div>
+        <div class="stats-bubble"><span title="<{var::fullviewcount}>"><{var::viewcount}></span> Page Views</div>
     </div>
 
     <div class="admin-links">
