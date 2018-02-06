@@ -1,22 +1,25 @@
-<div class="container pages">
-    <div class="pages-top">
-        <a class="phr-btn btn pull-r" href="#" id="new" data-target="phr-new-page" data-action="fadeIn"><i class="fa fa-plus"></i> New Page</a>
-        <h1 class="c">Pages</h1>
-        <div class="clear"></div>
+<div class="container pages admin-page">
+    <div class="admin-page-top">
+        <h2 class="c">Pages</h2>
+        <a class="pst_btn txt" href="#" data-target="phr-new-page" data-action="fadeIn">New</a>
     </div>
 
     <{var::empty}>
 
+    <ul>
     <{array::pages::
-        <a href="@uri" class="page_item" data-id="@id"><strong>@title</strong> @uri 
-            <div class="pull-r">    
+        <li class="page-item jlink" data-href="@uri" data-id="@id">
+            <strong class="title">@title</strong>
+            <span class="uri">@uri</span>
+            <div class="page-item-options">    
                 <select class="pageman-select" data-method="PATCH" data-url="@uri">
                     @types
                 </select>
                 <i class="pageman-delete fa fa-times" data-method="DELETE" data-url="@uri"></i>
             </div>
-        </a>
+        </li>
     }>
+    </ul>
 </div>
 
 <div id="phr-new-page" class="container screen">

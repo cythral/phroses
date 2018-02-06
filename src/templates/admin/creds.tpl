@@ -1,8 +1,7 @@
-<div class="container">
+<div class="container admin-page">
     <form id="phroses_site_creds" data-method="POST" data-url="/admin/creds">
-        <h1 class="c">
-        Change Site Credentials
-        </h1>
+        <h2 class="c">Change Site Credentials</h2>
+
         <div id="saved">Saved Credentials!</div>
         <div id="error"></div>
         

@@ -279,27 +279,6 @@ ul.inline {
 
 
 .page_item {
-    display: block;
-    border-bottom: 1px solid @primary;
-    height: 50px;
-    line-height: 50px;
-    padding-left: 20px;
-    color: @primary !important;
-
-    transition: color .5s, background .5s;
-
-    &:hover {
-        background: @primary;
-        color: white !important;
-        
-        .pull-r { opacity: 1; }
-    }
-
-    &.saved {
-        background: @saved;
-        color: white !important;
-    }
-
     .pull-r {
         margin-right: 30px; 
         opacity: 0;
@@ -307,29 +286,7 @@ ul.inline {
         width: 20%;
         text-align: right;
         
-        select { 
-            padding: 5px; 
-            height: 30px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: white;
-            border: none;
-            color: @primary;
-            position: relative;
-            width: 70%;
-            text-align: center;
-            text-align-last: center;
-            border-radius: 25px;
-            cursor: pointer;
-            &:hover { box-shadow: 0 0 10px #000; }
-        }
         
-        i { 
-            font-size: 120%;
-            margin-left: 5%;
-            cursor: pointer;
-            vertical-align: middle;
-        }
     }
 }
 
@@ -486,69 +443,118 @@ select.c {
     h2 {
         .c;
         font-size: 2em;
-        text-transform: uppercase;
+
+        &:first-of-type {
+            margin-bottom: 30px;
+        }
     }
 
-    &.uploads {
+    ul {
+        list-style-type: none;
+        margin: 30px 0 30px 0;
 
-        .uploads-top {
+        li {
+            border-bottom: 2px solid @primary;
+            padding: 15px;
+            color: @primary;
+            font-weight: bold;
             position: relative;
-            margin-bottom: 60px;
+            cursor: pointer;
+            transition: background .5s, color .5s;
+            height: 60px;
+            line-height: 30px;
+
+            input, > strong, > span {
+                border: none;
+                background: none;
+                font-size: 1.2em;
+                font-weight: bold;
+            }
+
+            &.page-item > span {
+                margin: 0 15px 0 15px;
+                font-weight: normal;
+            }
+
+            .upload-icons {
+                position: absolute;
+                right: 15px;
+                top: 0;
+                line-height: 60px;
+                height: 60px;
+            }
+
+            &:hover {
+                .page-item-options {
+                    opacity: 1;
+                }
+            }
+
+            .page-item-options {
+                opacity: 0;
+                transition: opacity .5s;
+                position: absolute;
+                top: 0;
+                right: 0;
+                white-space: nowrap;
+                padding: 0 30px 0 15px;
+                height: 60px;
+                line-height: 60px;
+
+                select { 
+                    padding: 5px; 
+                    height: 30px;
+                    -webkit-appearance: none;
+                    appearance: none;
+                    background: white;
+                    border: none;
+                    color: @primary;
+                    position: relative;
+                    width: 200px;
+                    text-align: center;
+                    text-align-last: center;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    &:hover { box-shadow: 0 0 10px #000; }
+                }
+                
+                i { 
+                    margin-left: 5%;
+                    font-size: 1.8em;
+                    cursor: pointer;
+                    vertical-align: middle;
+                }
+            }
 
             a {
-                position: absolute;
-                top: -10px;
-                right: 0;
+                color: white;
+                font-size: 1.8em;
+                line-height: 60px;
+                cursor: pointer;
+                margin: 0 10px 0 10px;
+            }
+
+            &:hover, &.saved {
+                background: @primary;
+                color: white;
+                input { color: white; }
+                a { color: white; }
+            }
+
+            &.saved {
+                background: @saved;
             }
         }
+    }
 
-        ul {
-            list-style-type: none;
-            margin: 30px 0 30px 0;
+    .admin-page-top {
+        position: relative;
+        margin-bottom: 60px;
 
-            li {
-                border-bottom: 1px solid @primary;
-                padding: 15px;
-                color: @primary;
-                font-weight: bold;
-                position: relative;
-                cursor: pointer;
-                transition: background .5s, color .5s;
-                height: 60px;
-
-                input {
-                    border: none;
-                    background: none;
-                    font-size: 1.2em;
-                    font-weight: bold;
-                }
-
-                .upload-icons {
-                    position: absolute;
-                    right: 15px;
-                    top: 0;
-                    line-height: 60px;
-                    height: 60px;
-                }
-
-                a {
-                    color: white;
-                    font-size: 1.8em;
-                    line-height: 60px;
-                    cursor: pointer;
-                    margin: 0 10px 0 10px;
-                }
-
-                &:hover, &.saved {
-                    background: @primary;
-                    color: white;
-                    input { color: white; }
-                }
-
-                &.saved {
-                    background: @saved;
-                }
-            }
+        a {
+            position: absolute;
+            top: -10px;
+            right: 0;
         }
     }
 }

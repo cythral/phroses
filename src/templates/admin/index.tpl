@@ -4,7 +4,7 @@
 <div id="saved">Saved</div>
 <div id="error">Error</div>
 
-<div class="container">
+<div class="container admin-page">
     <div class="admin-stats container aln-c">
         <div class="stats-bubble"><span title="<{var::fullpagecount}>"><{var::pagecount}></span> Pages</div>
         <div class="stats-bubble"><span title="<{var::fullviewcount}>"><{var::viewcount}></span> Page Views</div>

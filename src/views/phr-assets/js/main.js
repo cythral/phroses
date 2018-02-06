@@ -28,7 +28,7 @@ Phroses.formify = function(options) {
 
 	$(document).on(options.action || "submit", options.selector, function(e) {
 		e.preventDefault();
-		e.stopPropagation();
+		e.stopImmediatePropagation();
 		var data = (options.collect || function() { return $(this).serializeArray(); }).bind(this)();
 		
 
@@ -155,6 +155,10 @@ jQuery.fn.shake = function(interval,distance,times){
 $(function() {
 	console.log("-== Phroses Initialized ==-");
 	
+
+	$(document).on("click", ".jlink", function() {
+		document.location = $(this).data("href");
+	});
 	
 	if(!$("#phr-admin-page").val()) {
 		var content = $("body").html();
@@ -329,7 +333,7 @@ $(function() {
 				setTimeout(function() { parent.removeClass("saved"); }, 1000);
 			}
 		});
-		$(".pageman-select").click(function(e) { e.preventDefault(); });
+		$(".pageman-select").click(function(e) { e.preventDefault(); e.stopImmediatePropagation(); });
 
 		/**
 		 * Page deletion on /admin/pages
