@@ -1,7 +1,7 @@
 <div class="admin-page uploads">
     <div class="admin-page-top">
         <h2>Uploads</h2>
-        <a class="pst_btn txt" data-target="upload" data-action="fadeIn">New</a>
+        <a class="pst_btn lefttooltip" id="pst-new" data-target="upload" data-action="fadeIn">New</a>
     </div>
 
     <ul>

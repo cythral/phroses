@@ -1,7 +1,7 @@
 <div class="container pages admin-page">
     <div class="admin-page-top">
         <h2 class="c">Pages</h2>
-        <a class="pst_btn txt" href="#" data-target="phr-new-page" data-action="fadeIn">New</a>
+        <a class="pst_btn lefttooltip" id="pst-new" href="#" data-target="phr-new-page" data-action="fadeIn">New</a>
     </div>
 
     <{var::empty}>
