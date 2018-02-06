@@ -105,3 +105,60 @@
         }
     }
 }
+
+.dashbar {
+    background: @primary;
+    height: 70px;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    color: white;
+    line-height: 70px;
+	
+    div {
+        display: inline-block;
+        float: left;
+    }
+    
+    a {
+        text-decoration: none;
+        color: white;
+    }
+    
+    .dashbar_brand {
+        width: 40%;
+        overflow: hidden;
+        font-weight: bold;
+        padding: 0 15px 0 15px;
+        font-size: 1.3em;
+        text-transform: uppercase;
+    }
+    
+    .dashbar_actions {
+        width: 40%;
+        overflow: hidden;
+        text-align: right;
+        float: right;
+        vertical-align: top;
+
+        li {
+            height: 100%;
+            line-height: 70px;
+            vertical-align: top;
+            text-transform: uppercase;
+
+
+            a {
+                height: 100%;
+                width: 100%;
+                padding: 0 15px 0 15px;
+                display: inline-block;
+                background: @primary;
+                transition: background .5s;
+
+                &:hover {
+                    background: lighten(@primary, 10%);
+                }
+            }
+        }
+    }
+}

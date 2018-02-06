@@ -5,10 +5,6 @@
 <div id="error">Error</div>
 
 <div class="container">
-    <h1 class="c panel-heading aln-c">~ Welcome ~</h1>
-    
-    <br>
-
     <div class="admin-stats container aln-c">
         <div class="stats-bubble"><span title="<{var::fullpagecount}>"><{var::pagecount}></span> Pages</div>
         <div class="stats-bubble"><span title="<{var::fullviewcount}>"><{var::viewcount}></span> Page Views</div>
