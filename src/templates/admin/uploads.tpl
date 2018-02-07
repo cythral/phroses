@@ -1,7 +1,7 @@
 <div class="admin-page uploads">
     <div class="admin-page-top">
         <h2>Uploads</h2>
-        <a class="pst_btn lefttooltip" id="pst-new" data-target="upload" data-action="fadeIn">New</a>
+        <a class="pst_btn lefttooltip ci ci-new" data-target="upload" data-action="fadeIn">New</a>
     </div>
 
     <ul>
@@ -22,7 +22,7 @@
     <a id="seefull" class="c" href="https://www.adcosales.com/files/products/no-preview-available.jpg">Go to file <i class="fa fa-chevron-right"></i></a>
     
     <div class="actions">
-        <a class="pst_btn txt" data-target="preview" data-action="fadeOut">Close</a>
+        <a class="pst_btn ci ci-close" data-target="preview" data-action="fadeOut">Close</a>
     </div>
 </div>
 
