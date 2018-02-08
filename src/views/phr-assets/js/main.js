@@ -10,6 +10,13 @@ Phroses.errors = {
 
 	"pst-ms" : {
 		"resource_exists" : "The URI you are trying to move this page to already exists."
+	},
+
+	"uploads" : {
+		"resource_exists" : "That filename already exists.",
+		"failed_upl" : "There was an error uploading that file, it may be too large.",
+		"topupldir_notfound" : "The /uploads directory does not exist, please create it and give Phroses write access.",
+		"siteupldir_notfound" : "The uploads sub directory for this website does not exist.  Please give phroses write access to the /uploads folder."
 	}
 };
 
@@ -501,6 +508,18 @@ $(function() {
 			file = (typeof byclick === 'undefined') ? e.originalEvent.dataTransfer.files[0] : $("#file").prop("files")[0];
 			$(this).find("label").fadeOut(400, function() { $("#upload-namer").fadeIn(); });
 			
+			var resetUplForm = function() {
+				$("#upload").fadeOut(400, function() {
+					$("#upload").off("submit");
+					$("#upload-namer").fadeOut();
+					$("#upload-namer input").val('');
+					$("#upload label").fadeIn();
+					$("#upload").removeClass("active");
+					$(".phr-progress-bar").css({width:"0"});
+					$(".phr-progress").removeClass("done");
+					$(".phr-progress").fadeOut();
+				});
+			};
 
 			var submit = function(e) {
 				e.preventDefault();
@@ -534,20 +553,8 @@ $(function() {
 						$(".phr-progress-bar").css({width:"100%"});
 						$(".phr-progress").addClass("done");
 
-						setTimeout(function() {
-							$("#upload").fadeOut();
-							$("#upload").off("submit");
-							$("#upload-namer").fadeOut();
-							$("#upload-namer").val('');
-							$("#upload label").fadeIn();
-							$("#upload").removeClass("active");
-							$(".phr-progress-bar").css({width:"0"});
-							$(".phr-progress").removeClass("done");
-							$(".phr-progress").fadeOut();
-						}, 2000);
+						setTimeout(resetUplForm, 2000);
 
-						
-	
 						$(".admin-page.uploads ul").append('<li class="upload" data-filename="'+filename+'"><input value="'+filename+'" data-method="post"><div class="upload-icons"><a href="/uploads/'+filename+'" class="fa fa-link"></a><a href="#" class="fa fa-search-plus"></a><a href="#" class="fa fa-times upload-delete" data-method="post"></a></div></li>');
 
 					},
@@ -558,9 +565,11 @@ $(function() {
 							$(".phr-progress-bar").css({width:0});
 							$(".phr-progress").removeClass("error");
 							$(".phr-progress").fadeOut();
-						});
 
-						Phroses.genericError(data.responseJSON);
+							resetUplForm();
+						}, 2000);
+
+						Phroses.genericError(Phroses.errors.uploads[data.responseJSON.error] || data.responseJSON);
 						$("#upload").one("submit", submit);
 					}
 				});
