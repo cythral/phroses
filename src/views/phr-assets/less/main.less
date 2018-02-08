@@ -585,10 +585,17 @@ select.c {
     transition: background .5s;
     padding-top: 20vh;
 
-    label {
+    label, h2 {
         .c;
         font-size: 2.3em;
+    }
+
+    label {
         cursor: pointer;
+    }
+
+    h2 {
+        margin-bottom: 30px;
     }
 
     input[type="file"] { 
@@ -613,5 +620,10 @@ select.c {
         a {
             margin-top: 30px;
         }
+    }
+
+    .phr-progress {
+        display: none;
+        margin-top: 30px;
     }
 }

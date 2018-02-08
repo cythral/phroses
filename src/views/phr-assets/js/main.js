@@ -487,25 +487,31 @@ $(function() {
 			}
 		});
 
-		$("#upload").on("drag dragstart dragend dragover dragenter dragleave drop submit", function(e) {
+		$("#upload").on("drag dragstart dragend dragover dragenter dragleave drop", function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 		});
 
-		$("#upload").on("dragenter", function() { $(this).addClass("dragover"); });
-		$("#upload").on("dragleave", function() { $(this).removeClass("dragover"); });
-		$("#upload").on("drop", function(e, byclick) {
+		$("#upload:not(.active)").on("dragenter", function() { $(this).addClass("dragover"); });
+		$("#upload:not(.active)").on("dragleave", function() { $(this).removeClass("dragover"); });
+		$("#upload:not(.active)").on("drop", function(e, byclick) {
+			$(this).addClass("active");
 			$(this).removeClass("dragover");
 			
 			file = (typeof byclick === 'undefined') ? e.originalEvent.dataTransfer.files[0] : $("#file").prop("files")[0];
-			$(this).find("#upload-namer").fadeIn();
+			$(this).find("label").fadeOut(400, function() { $("#upload-namer").fadeIn(); });
+			
 
-			$("#upload").on("submit", function() {
+			var submit = function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				$("#upload .phr-progress").fadeIn();
+
 				var data = new FormData(), filename = $("[name='filename']").val();
 				data.append("filename", filename);
 				data.append("file", file);
 				data.append("action", "new");
-	
+				
 				$.ajax({
 					url : "",
 					data : data,
@@ -513,20 +519,55 @@ $(function() {
 					processData : false,
 					dataType : 'json',
 					contentType : false,
+					xhr: function() {
+						var xhr = new window.XMLHttpRequest();
+						xhr.upload.addEventListener("progress", function(evt){
+							if (evt.lengthComputable) {  
+								var percentComplete = evt.loaded / evt.total;
+								$(".phr-progress-bar").css({width:percentComplete+"%"});
+							}
+						}, false); 
+
+						return xhr;
+					},
 					success : function() {
+						$(".phr-progress-bar").css({width:"100%"});
+						$(".phr-progress").addClass("done");
+
+						setTimeout(function() {
+							$("#upload").fadeOut();
+							$("#upload").off("submit");
+							$("#upload-namer").fadeOut();
+							$("#upload-namer").val('');
+							$("#upload label").fadeIn();
+							$("#upload").removeClass("active");
+							$(".phr-progress-bar").css({width:"0"});
+							$(".phr-progress").removeClass("done");
+							$(".phr-progress").fadeOut();
+						}, 2000);
+
 						
-						$("#upload").fadeOut();
-						$("#upload").off("submit");
-						$("#upload-namer").fadeOut();
-						$("#upload-namer").val('');
 	
 						$(".admin-page.uploads ul").append('<li class="upload" data-filename="'+filename+'"><input value="'+filename+'" data-method="post"><div class="upload-icons"><a href="/uploads/'+filename+'" class="fa fa-link"></a><a href="#" class="fa fa-search-plus"></a><a href="#" class="fa fa-times upload-delete" data-method="post"></a></div></li>');
+
+					},
+					error: function(data) {
+						$(".phr-progress").addClass("error");
+
+						setTimeout(function() {
+							$(".phr-progress-bar").css({width:0});
+							$(".phr-progress").removeClass("error");
+							$(".phr-progress").fadeOut();
+						});
+
+						Phroses.genericError(data.responseJSON);
+						$("#upload").one("submit", submit);
 					}
 				});
-			});
-		});
+			};
 
-		
+			$("#upload").one("submit", submit);
+		});
 
 		$("#upload #file").change(function() {
 			$("#upload").trigger('drop', true);
