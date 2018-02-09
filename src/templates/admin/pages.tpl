@@ -1,7 +1,7 @@
 <div class="container pages admin-page">
     <div class="admin-page-top">
         <h2 class="c">Pages</h2>
-        <a class="pst_btn lefttooltip ci ci-new" href="#" data-target="phr-new-page" data-action="fadeIn">New</a>
+        <a class="pst_btn lefttooltip" href="#" data-target="phr-new-page" data-action="fadeIn"><i class="ci ci-new"></i></a>
     </div>
 
     <{var::empty}>
@@ -15,7 +15,7 @@
                 <select class="pageman-select" data-method="PATCH" data-url="@uri">
                     @types
                 </select>
-                <i class="pageman-delete fa fa-times" data-method="DELETE" data-url="@uri"></i>
+                <i class="pageman-delete ci ci-delete" data-method="DELETE" data-url="@uri"></i>
             </div>
         </li>
     }>

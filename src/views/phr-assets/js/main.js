@@ -566,7 +566,12 @@ $(function() {
 							$(".phr-progress").removeClass("error");
 							$(".phr-progress").fadeOut();
 
-							resetUplForm();
+							if(data.responseJSON.error === "resource_exists") {
+								$("#upload-namer input").val('');
+							} else {
+								resetUplForm();
+							}
+							
 						}, 2000);
 
 						Phroses.genericError(Phroses.errors.uploads[data.responseJSON.error] || data.responseJSON);

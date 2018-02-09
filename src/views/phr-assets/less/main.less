@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Oxygen');
-@import url('http://cdn.jsdelivr.net/gh/cythral/icons@0.1.0/src/css/style.css');
+@import url('http://cdn.jsdelivr.net/gh/cythral/icons@0.2.1/dist/ci.css');
 
 @primary: #673AB7; 
 @saved: #009688;
@@ -21,7 +21,7 @@ ul.inline {
         margin: 0; 
 
         &:not(:last-of-type) {
-            margin-right: -4px;
+            margin-right: -4px; 
         }
     }
 }
@@ -521,9 +521,14 @@ select.c {
                 
                 i { 
                     margin-left: 5%;
-                    font-size: 1.8em;
+                    font-size: 3em;
                     cursor: pointer;
                     vertical-align: middle;
+                    font-weight: normal;
+
+                    &:hover:before {
+                        text-shadow: 0 0 10px #000;
+                    }
                 }
             }
 
