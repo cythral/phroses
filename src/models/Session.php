@@ -39,8 +39,7 @@ class Session extends \SessionHandler {
   }
   
   static public function _gc($max) {
-    $max = time() - $max;
-    \Phroses\DB::Query("DELETE FROM `sessions` WHERE `date` > $max");
+    \Phroses\DB::Query("DELETE FROM `sessions` WHERE TIMESTAMPDIFF(second, `date`, NOW()) > $max");
     return true;
   }
   
