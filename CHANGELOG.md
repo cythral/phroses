@@ -6,6 +6,9 @@
 ### Bug Fixes & Minor Changes
 - Fixes an overflow issue on PST icons (issue #7)
 - Fixes an issue where iOS still had a border and radius on inputs (issue #6)
+- JavaScript for the uploads feature is now in its own file
+- Upload progress is now more accurate
+
 
 <br />
 
