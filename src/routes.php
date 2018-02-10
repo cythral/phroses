@@ -76,6 +76,9 @@ self::route("get", self::RESPONSES["SYS"][200], function() {
 
 	} else {
 		ob_start();
+
+		echo '<div class="phroses-container">';
+
 		if(!$_SESSION) {
 			$theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
@@ -100,7 +103,8 @@ self::route("get", self::RESPONSES["SYS"][200], function() {
 		}
 
 		echo '<input type="hidden" id="phr-admin-page" value="true">';
-
+		echo '</div>';
+		
 		if($theme->HasType("admin")) $theme->SetType("admin", true);
 		$theme->title = $title ?? "Phroses System Page";
 		$theme->main = trim(ob_get_clean());

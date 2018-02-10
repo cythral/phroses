@@ -4,6 +4,19 @@
 @primary: #673AB7; 
 @saved: #009688;
 
+.phroses-container {
+    * {
+        border-radius: 0;
+        border: none;
+        outline: none;
+        box-sizing: border-box;
+
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+}
+
 @import "animations"; 
 @import "pst";  
 @import "panel";
@@ -221,7 +234,9 @@ ul.inline {
 
     input {
         background: none;
-        border: none;
+        border-right: none !important;
+        border-left: none !important;
+        border-top: none !important;
         outline: none !important;
         border-bottom: 3px solid @primary;
         display: inline-block;
@@ -233,6 +248,8 @@ ul.inline {
         font-size: 1.3em;
         color: @primary;
         margin-bottom: 30px;
+        border-radius: 0 !important;
+        box-shadow: none !important;
 
         &[type="submit"] {
             background: @primary;
