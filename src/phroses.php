@@ -165,7 +165,7 @@ abstract class Phroses {
 			"RESPONSE" => $response,
 			"NAME" => $info->name,
 			"THEME" => $info->theme,
-			"USERNAME" => $info->adminUsername, // todo: remove username and password from constant cause security
+			"USERNAME" => $info->adminUsername,
 			"PASSWORD" => $info->adminPassword,
 			"PAGE" => [
 				"ID" => $info->pageID,
@@ -181,7 +181,7 @@ abstract class Phroses {
 	}
 
 	static public function urlFix() {
-		if(substr(reqc\PATH, -1) == "/" && $_SERVER["REQUEST_URI"] != "/") {
+		if(substr(reqc\PATH, -1) == "/" && reqc\PATH != "/") {
 			self::$out->redirect(substr(reqc\PATH, 0, -1));
 		}
 	}
