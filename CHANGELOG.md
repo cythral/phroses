@@ -1,5 +1,8 @@
 # CHANGE LOG
 
+## v0.6.1
+- fixes an issue where css dependencies (cythral/icons, oxygen font) could be loaded over http when on https.  
+
 ## v0.6.0
 ### New Features
 - **Uploads**: you can now upload images and other files from the admin panel at /admin/uploads
