@@ -22,7 +22,7 @@
     <a id="seefull" class="c" href="https://www.adcosales.com/files/products/no-preview-available.jpg">Go to file <i class="fa fa-chevron-right"></i></a>
     
     <div class="actions">
-        <a class="pst_btn ci ci-close" data-target="preview" data-action="fadeOut">Close</a>
+        <a class="pst_btn" data-target="preview" data-action="fadeOut"><i class="ci ci-close"></i></a>
     </div>
 </div>
 
