@@ -558,7 +558,7 @@ select.c {
                 margin: 0 10px 0 10px;
             }
 
-            &:hover, &.saved {
+            &:hover, &.saved, &.error {
                 background: @primary;
                 color: white;
                 input { color: white; }
@@ -567,6 +567,10 @@ select.c {
 
             &.saved {
                 background: @saved;
+            }
+
+            &.error {
+                background: red;
             }
         }
     }

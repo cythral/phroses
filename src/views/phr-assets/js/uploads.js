@@ -25,13 +25,21 @@ $(function() {
             return { action : "rename", filename : $(this).parent().data("filename"), to : $(this).val() };
         },
         success: function() {
-            console.log($(this).parent().selector);
             var upel = $(this).parent();
             upel.data("filename", $(this).val());
 
             upel.addClass("saved");
             setTimeout(function() {
                 upel.removeClass("saved");
+            }.bind(this), 1000);
+        },
+        failure: function(data) {
+            var upel = $(this).parent();
+            $(this).val(upel.data("filename"));
+
+            upel.addClass("error");
+            setTimeout(function() {
+                upel.removeClass("error");
             }.bind(this), 1000);
         }
     });

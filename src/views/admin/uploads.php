@@ -13,8 +13,8 @@ function parseSize($size) {
 
 handleMethod("post", function($out) use ($uploaddir) {
 
-    $error = function (string $error, bool $check) use ($out) {
-        if($check) $out->send(["type" => "error", "error" => $error], 400);
+    $error = function (string $error, bool $check, array $extra = []) use ($out) {
+        if($check) $out->send(array_merge(["type" => "error", "error" => $error], $extra), 400);
     };
 
     
