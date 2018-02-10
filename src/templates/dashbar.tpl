@@ -3,7 +3,7 @@
         <a href="/admin">Phroses Dashboard</a>
     </div>
     <ul class="dashbar_actions inline">
-        <li><a href="<{var::host}>"><{var::host}></a></li>
+        <li><a href="//<{var::host}>"><{var::host}></a></li>
         <li><a href="/admin/logout">logout</a></li>
     </ul>
     <div class="clear"></div>

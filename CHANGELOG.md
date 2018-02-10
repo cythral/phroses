@@ -12,7 +12,8 @@
 - Sysforms are now gone, Phroses.formify replaced them
 - Password fields are now cleared after a successful change on /admin/creds
 - Redesigned the admin dashboard and pages for a more streamlined look
-- Removed icons, uses a combination of fontawesome and cythral/icons instead
+- Removed most icons, uses a combination of fontawesome and cythral/icons instead.  Please note that the automatic inclusion of the font awesome stylesheet will be removed in future versions.
+
 
 
 
