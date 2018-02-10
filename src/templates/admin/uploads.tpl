@@ -36,7 +36,7 @@
             <h2>Name the file:</h2>
             <div class="form_icfix c aln-l">
                 <div>Filename:</div>
-                <input name="filename" class="form_input form_field" placeholder="filename.jpg" autocomplete="off">     
+                <input required name="filename" class="form_input form_field" placeholder="filename.jpg" autocomplete="off">     
             </div>
 
             <a class="pst_btn txt" data-target="upload" data-action="submit">Upload</a>

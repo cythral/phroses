@@ -77,6 +77,7 @@ $(function() {
         var submit = function(e) {
             e.preventDefault();
             e.stopPropagation();
+
             $("#upload .phr-progress").fadeIn();
 
             var data = new FormData(), filename = $("[name='filename']").val();
