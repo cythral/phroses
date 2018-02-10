@@ -57,10 +57,7 @@ $(function() {
     $("#upload:not(.active)").on("drop", function(e, byclick) {
         $(this).addClass("active");
         $(this).removeClass("dragover");
-        
-        file = (typeof byclick === 'undefined') ? e.originalEvent.dataTransfer.files[0] : $("#file").prop("files")[0];
-        $(this).find("label").fadeOut(400, function() { $("#upload-namer").fadeIn(); });
-        
+
         var resetUplForm = function() {
             $("#upload").fadeOut(400, function() {
                 $("#upload").off("submit");
@@ -73,6 +70,24 @@ $(function() {
                 $(".phr-progress").fadeOut();
             });
         };
+        
+        file = (typeof byclick === 'undefined') ? e.originalEvent.dataTransfer.files[0] : $("#file").prop("files")[0];
+
+        if(file.size > $("#maxuplsize").val()) {
+            Phroses.genericError("That file is too large.  Please select a file less than " + ($("#maxuplsize").val() / 1048576) + "MB or increase php's max_upload_filesize");
+            resetUplForm();
+            return;
+        }
+
+        if(file.size > $("#maxformsize").val()) {
+            Phroses.genericError("That file is too large.  Please select a file less than " + ($("#maxformsize").val() / 1048576) + "MB or increase php's post_max_size");
+            resetUplForm();
+            return;
+        }
+
+        $(this).find("label").fadeOut(400, function() { $("#upload-namer").fadeIn(); });
+        
+        
 
         var submit = function(e) {
             e.preventDefault();

@@ -9,6 +9,7 @@
 - JavaScript for the uploads feature is now in its own file
 - Upload progress is now more accurate
 - Naming upload files is now required
+- Upload file sizes are checked before uploading
 
 
 <br />

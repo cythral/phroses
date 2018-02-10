@@ -45,3 +45,7 @@
         </div>
     </div>
 </form>
+
+
+<input type="hidden" id="maxuplsize" value="<{var::maxuplsize}>">
+<input type="hidden" id="maxformsize" value="<{var::maxformsize}>">
