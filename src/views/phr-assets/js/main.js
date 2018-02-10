@@ -363,7 +363,13 @@ $(function() {
 			selector: "#theme-selector",
 			action: "change",
 			collect: function() { return { theme : $(this).val() }; },
-			success: Phroses.displaySaved
+			success: function() {
+				Phroses.displaySaved();
+				
+				setTimeout(function() {
+					location.reload();
+				}, 2000);
+			}
 		});
 
 		/**
@@ -571,7 +577,7 @@ $(function() {
 							} else {
 								resetUplForm();
 							}
-							
+
 						}, 2000);
 
 						Phroses.genericError(Phroses.errors.uploads[data.responseJSON.error] || data.responseJSON);

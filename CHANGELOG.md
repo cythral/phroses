@@ -14,6 +14,8 @@
 - Redesigned the admin dashboard and pages for a more streamlined look
 - Removed most icons, uses a combination of fontawesome and cythral/icons instead.  Please note that the automatic inclusion of the font awesome stylesheet will be removed in future versions.
 - URL in the dashbar links back to the homepage now.
+- The dashboard now reloads after a theme change.
+
 
 
 
