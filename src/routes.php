@@ -8,6 +8,7 @@
 namespace Phroses;
 
 use \reqc;
+use \Phroses\DB;
 use \reqc\Output;
 use \listen\Events;
 use \inix\Config as inix;
@@ -16,6 +17,22 @@ use const \reqc\{ VARS, MIME_TYPES };
 
 self::route("get", self::RESPONSES["PAGE"][200], function() {
 	ob_start("ob_gzhandler");
+
+	if(isset($_GET["mode"]) && $_GET["mode"] == "json") {
+		DB::Query("UPDATE `pages` SET `views` = `views` - 1 WHERE `id`=?", [ SITE["PAGE"]["ID"] ]);
+
+		self::$out = new \reqc\JSON\Server();
+		self::$out->send([
+			"id" => SITE["PAGE"]["ID"],
+			"title" => SITE["PAGE"]["TITLE"],
+			"type" => SITE["PAGE"]["TYPE"],
+			"views" => SITE["PAGE"]["VIEWS"] - 1,
+			"dateCreated" => SITE["PAGE"]["DATECREATED"],
+			"dateModified" => SITE["PAGE"]["DATEMODIFIED"],
+			"content" => SITE["PAGE"]["CONTENT"]
+		], 200);
+	}
+
 
 	// pages with an extension may have their content type autoset by reqc
 	// since this is a page make sure its set to html
