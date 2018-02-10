@@ -1,5 +1,17 @@
 # CHANGE LOG
 
+## v0.7.0
+### New Features
+- placeholder
+### Bug Fixes & Minor Changes
+- Fixes an overflow issue on PST icons (issue #7)
+
+<br />
+
+---
+
+<br />
+
 ## v0.6.1
 - fixes an issue where css dependencies (cythral/icons, oxygen font) could be loaded over http when on https.  
 
