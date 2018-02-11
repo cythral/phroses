@@ -159,6 +159,18 @@ final class Theme extends Template {
 	public function setContent($content) {
 		$this->content = $content;
 	}
+
+	public function getEditorFields($type = null) {
+		if(!$type) $type = $this->type;
+		
+		ob_start();
+		foreach($this->GetContentFields($type) as $key => $field) {
+			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type ?>-main" data-id="<?= $key; ?>"></div><? }
+			else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value=""><? }
+		}
+
+		return trim(ob_get_clean());
+	}
     
     /*public function __toString() : string {
         $content = parent::__toString();

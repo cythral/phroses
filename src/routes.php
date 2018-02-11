@@ -13,6 +13,7 @@ use \reqc\Output;
 use \listen\Events;
 use \inix\Config as inix;
 use \phyrex\Template;
+use \reqc\JSON\Server as JSONServer;
 use const \reqc\{ VARS, MIME_TYPES };
 
 self::route("get", self::RESPONSES["PAGE"][200], function(&$page) {
@@ -20,7 +21,7 @@ self::route("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
 	if(isset($_GET["mode"]) && $_GET["mode"] == "json") {
 
-		self::$out = new \reqc\JSON\Server();
+		self::$out = new JSONServer();
 		self::$out->send([
 			"id" => $page->id,
 			"title" => $page->title,
@@ -132,7 +133,7 @@ self::route("patch", self::RESPONSES["API"], $api);
 
 
 self::route("post", self::RESPONSES["DEFAULT"], function(&$page) {
-	self::$out = new reqc\JSON\Server();
+	self::$out = new JSONServer();
 
 	if(reqc\URI == "/api" && $page->theme->HasAPI()) {
 		$page->theme->RunAPI();
@@ -165,7 +166,7 @@ self::route("post", self::RESPONSES["DEFAULT"], function(&$page) {
 });
 
 self::route("patch", self::RESPONSES["DEFAULT"], function(&$page) {
-	self::$out = new reqc\JSON\Server();
+	self::$out = new JSONServer();
 
 	// Validation
 	self::error("access_denied", !$_SESSION, null, 401);
@@ -197,15 +198,7 @@ self::route("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 
 	$output = [ "type" => "success" ];
 	if(!isset($_REQUEST["nocontent"])) $output["content"] = $page->theme->GetBody();
-	if(isset($_REQUEST["type"])) {
-
-		ob_start();
-		foreach($page->theme->GetContentFields($_REQUEST["type"]) as $key => $field) {
-			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $_REQUEST["type"] ?>-main" data-id="<?= $key; ?>"></div><? }
-			else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value=""><? }
-		}
-		$output["typefields"] = trim(ob_get_clean());
-	}
+	if(isset($_REQUEST["type"])) $output["typefields"] = $page->theme->getEditorFields($_REQUEST["type"]);
 
 	// if we are changing to type redirect or the page is a redirect, there is no content
 	if(SITE["PAGE"]["TYPE"] == "redirect" || (isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect")) unset($output["content"]);
@@ -214,7 +207,7 @@ self::route("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 
 
 self::route("delete", self::RESPONSES["DEFAULT"], function(&$page) {
-	self::$out = new reqc\JSON\Server();
+	self::$out = new JSONServer();
 	
 	self::error("access_denied", !$_SESSION, null, 401);
 	self::error("resource_missing", SITE["RESPONSE"] != self::RESPONSES["PAGE"][200] && SITE["RESPONSE"] != self::RESPONSES["PAGE"][301]);
