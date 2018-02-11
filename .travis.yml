@@ -5,7 +5,7 @@ php:
   
 before_script: 
   - phpenv config-add php.ini
-  - npm install -g less
+  - npm install -g less@2.7.2
   - npm install -g less-plugin-clean-css
   - composer install
   
