@@ -203,7 +203,7 @@ self::route("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 	if(isset($_REQUEST["type"])) {
 
 		ob_start();
-		foreach($theme->GetContentFields($_REQUEST["type"]) as $key => $field) {
+		foreach($page->theme->GetContentFields($_REQUEST["type"]) as $key => $field) {
 			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $_REQUEST["type"] ?>-main" data-id="<?= $key; ?>"></div><? }
 			else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value=""><? }
 		}
