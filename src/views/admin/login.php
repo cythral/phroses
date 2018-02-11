@@ -23,7 +23,6 @@ handleMethod("POST", function($out) {
   } else if(password_verify(inix::get("pepper").$_POST["password"], SITE["PASSWORD"]) && $_POST["username"] == SITE["USERNAME"]) {
     $_SESSION["live"] = "true";
     $out->send(["type" => "success"], 200);
-
   }
 
   $out->send(["type" => "error"], 401);

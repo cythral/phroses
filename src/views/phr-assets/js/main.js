@@ -282,7 +282,7 @@ $(function() {
 				},
 				success: function(pdata) {
 					$("#pst-es-fields").html(pdata.typefields);
-					createEditors();
+					Phroses.createEditors();
 					if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
 					$("#pst-es-fields").slideDown();
 					if(data.type !== "redirect") Phroses.displaySaved();

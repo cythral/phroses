@@ -11,7 +11,7 @@
 - Naming upload files is now required
 - Upload file sizes are checked before uploading
 - Fixes an issue where you could rename an upload to an existing filename (issue #8)
-
+- New page object replaces the SITE["PAGE"] constant
 
 <br />
 

@@ -17,8 +17,6 @@ handleMethod("post", function($out) use ($uploaddir) {
         if($check) $out->send(array_merge(["type" => "error", "error" => $error], $extra), 400);
     };
 
-    
-
     if($_POST['action'] == "rename") {
         $error("resource_exists", file_exists($uploaddir.$_POST["to"]));
         $error("failed_rename", !@rename($uploaddir.$_POST["filename"], $uploaddir.$_POST["to"]));

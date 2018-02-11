@@ -14,7 +14,8 @@ final class Theme extends Template {
     public $name;
 	private $types = ["redirect"];
 	private $useconst = true;
-    private $type;
+	private $type;
+	private $content;
 	
 	/**
 	* Theme constructor.  Sets up the theme root, loads stylesheets,
@@ -26,7 +27,8 @@ final class Theme extends Template {
 	public function __construct(string $name, string $type) {
 		$this->root = INCLUDES["THEMES"]."/".strtolower($name);
 		$this->SetType($type);
-        $this->name = $name;
+		$this->name = $name;
+		$this->content = SITE["PAGE"]["CONTENT"];
         
 		// make sure theme directory and page type exists
 		if(!file_exists($this->root)) throw new \Exception("Theme doesn't exist");
@@ -153,6 +155,10 @@ final class Theme extends Template {
 		}
 		return $list;
 	}
+
+	public function setContent($content) {
+		$this->content = $content;
+	}
     
     /*public function __toString() : string {
         $content = parent::__toString();
@@ -169,7 +175,7 @@ final class Theme extends Template {
 
 
 Theme::$filters["content"] = function($key, $fieldtype) {
-	$content = SITE["PAGE"]["CONTENT"];
+	$content = $this->content;
 	if(!$this->useconst) $content = json_decode($_REQUEST["content"] ?? "{}", true);
 	
 	if(array_key_exists($key, $content ?? [])) echo $content[$key];

@@ -124,3 +124,11 @@ function mapValue($value, $map) {
 
     return false;
 }
+
+function keysExist(array $keys, array $array) {
+    return count(array_diff($keys, array_keys(array_intersect_key(array_flip($keys), $array)))) == 0;
+}
+
+function keysDontExist(array $keys, array $array) {
+    return count(array_diff(array_intersect_key(array_flip($keys), $array), $keys)) == 0;
+}

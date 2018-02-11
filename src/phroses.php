@@ -17,6 +17,7 @@ abstract class Phroses {
 	static private $handlers = [];
 	static private $cmds = [];
 	static private $ran = false;
+	static private $page;
 	static private $modes = [
 		"development" => [
 			"display_errors" => 1,
@@ -157,6 +158,17 @@ abstract class Phroses {
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
         if($response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) $response = self::RESPONSES["PAGE"][404];
 
+		$pageData = [
+			"ID" => $info->pageID,
+			"TYPE" => $info->type ?? "page",
+			"VIEWS" => $info->views + 1,
+			"DATECREATED" => $info->dateCreated,
+			"DATEMODIFIED" => $info->dateModified,
+			"TITLE" => $info->title,
+			"CONTENT" => json_decode($info->content, true),
+			"VISIBILITY" => $info->public
+		];
+
 		// Setup the site constant
 		// maybe should have this as an object instead?
 		// todo: thinkabout that
@@ -167,17 +179,10 @@ abstract class Phroses {
 			"THEME" => $info->theme,
 			"USERNAME" => $info->adminUsername,
 			"PASSWORD" => $info->adminPassword,
-			"PAGE" => [
-				"ID" => $info->pageID,
-				"TYPE" => $info->type ?? "page",
-				"VIEWS" => $info->views,
-                "DATECREATED" => $info->dateCreated,
-                "DATEMODIFIED" => $info->dateModified,
-				"TITLE" => $info->title,
-				"CONTENT" => json_decode($info->content, true),
-                "VISIBILITY" => $info->public
-			]
+			"PAGE" => $pageData
 		]);
+
+		self::$page = new Page($pageData, self::$out);
 	}
 
 	static public function urlFix() {
@@ -213,8 +218,8 @@ abstract class Phroses {
 	
 	static public function traceRoutes($method, $route) {
 		if($route != self::RESPONSES["SYS"][200]) {
-			(isset(self::$handlers[$method][$route])) ? self::$handlers[$method][$route]() : self::$handlers[$method][self::RESPONSES["DEFAULT"]]();
-		} else self::$handlers["GET"][$route]();
+			(isset(self::$handlers[$method][$route])) ? self::$handlers[$method][$route](self::$page) : self::$handlers[$method][self::RESPONSES["DEFAULT"]](self::$page);
+		} else self::$handlers["GET"][$route](self::$page);
 	}
 
 	static public function traceCommands($cliArgs) {
@@ -239,6 +244,11 @@ abstract class Phroses {
 		
 		if(isset(self::$cmds[$cmd])) self::$cmds[$cmd]($args, $flags);
 	}
+
+	static public function error(string $error, bool $check, ?array $extra = [], int $code = 400) {
+		if(!(self::$out instanceof \reqc\JSON\Server)) self::$out = new \reqc\JSON\Server;
+        if($check) self::$out->send(array_merge(["type" => "error", "error" => $error], $extra), $code);
+    }
 }
 
 
