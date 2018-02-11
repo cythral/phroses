@@ -26,7 +26,7 @@ class Page {
         foreach(self::REQUIRED_OPTIONS as $option) {
             if(!array_key_exists($option, $options)) throw new \Exception("Missing required option $option");
         }
-        
+
         $this->data = $options;
         $this->oh = $oh;
         $this->theme = new Theme(SITE["THEME"], $this->type);
@@ -42,8 +42,14 @@ class Page {
         return true;
     }
 
+    public function getAll() {
+        return $this->data;
+    }
+
     public function display() {
+        ob_start("ob_gzhandler");
         $this->oh->setContentType(\reqc\MIME_TYPES["HTML"]); 
+
         $this->theme->title = $this->title;
         $this->theme->setContent($this->content);
         echo $this->theme;
