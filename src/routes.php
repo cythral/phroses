@@ -57,32 +57,29 @@ self::route("get", self::RESPONSES["SYS"][200], function(&$page) {
 	} else {
 		ob_start();
 
+		$page->theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+		$page->theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
+		$page->theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
+
 		if(!$_SESSION) {
-			$page->theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-			$page->theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
 			self::$out->setCode(401);
 			include INCLUDES["VIEWS"]."/admin/login.php";
 		
 		} else {
-			if(reqc\METHOD == "GET") {
-				$page->theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-				$page->theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
-				
+			if(reqc\METHOD == "GET") {				
 				$dashbar = new Template(INCLUDES["TPL"]."/dashbar.tpl");
 				$dashbar->host = reqc\HOST;
 				echo $dashbar;
 			}
+
 			if(file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php")) include INCLUDES["VIEWS"].reqc\PATH."/index.php";
 			else if(file_exists(INCLUDES["VIEWS"].reqc\PATH.'.php')) include INCLUDES["VIEWS"].reqc\PATH.".php";
 			else echo "resource not found";
 		}
 
-		echo '<input type="hidden" id="phr-admin-page" value="true">';
-
 		if($page->theme->HasType("admin")) $page->theme->SetType("admin", true);
 		$page->theme->title = $title ?? "Phroses System Page";
-		$page->theme->main = '<div class="phroses-container">'.trim(ob_get_clean()).'</div>';
-		$page->theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
+		$page->theme->main = '<div class="phroses-container">'.trim(ob_get_clean()).'<input type="hidden" id="phr-admin-page" value="true"></div>';
 	}
 
 	$page->display();

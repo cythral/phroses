@@ -26,6 +26,7 @@ class Page {
         foreach(self::REQUIRED_OPTIONS as $option) {
             if(!array_key_exists($option, $options)) throw new \Exception("Missing required option $option");
         }
+        
         $this->data = $options;
         $this->oh = $oh;
         $this->theme = new Theme(SITE["THEME"], $this->type);

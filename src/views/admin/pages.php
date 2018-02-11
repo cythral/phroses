@@ -11,16 +11,17 @@ $pages = new Template(INCLUDES["TPL"]."/admin/pages.tpl");
 
 if(count($q) == 0) $pages->empty = "<em>No pages for ".BASEURL."</em>";
 
-foreach($q as $page) {
+foreach($q as $p) {
     ob_start();
-    foreach($theme->GetTypes() as $type) {
-        ?><option <?= ($type == "redirect") ? "disabled" : ""; ?> <?= ($type == $page->type) ? "selected" : ""; ?>><?= $type; ?></option><?
+    
+    foreach($page->theme->GetTypes() as $type) {
+        ?><option <?= ($type == "redirect") ? "disabled" : ""; ?> <?= ($type == $p->type) ? "selected" : ""; ?>><?= $type; ?></option><?
     } 
     
     $pages->push("pages", [ 
-        "uri" => $page->uri, 
-        "id" => $page->id, 
-        "title" => $page->title,
+        "uri" => $p->uri, 
+        "id" => $p->id, 
+        "title" => $p->title,
         "types" => ob_get_clean()
     ]);
 }
