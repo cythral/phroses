@@ -28,7 +28,7 @@ self::route("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
 self::route("get", self::RESPONSES["PAGE"][301], function(&$page) {
 
-	if(array_key_exists("destination", $page->content)) {
+	if(array_key_exists("destination", $page->content) && !empty($page->content["destination"]) && $page->content["destination"] != PATH) {
         self::$out->redirect($page->content["destination"]);
 	} 
 	
