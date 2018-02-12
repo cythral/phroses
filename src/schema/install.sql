@@ -17,7 +17,8 @@ CREATE TABLE `sites` (
   `theme` varchar(300) NOT NULL,
   `name` varchar(100) NOT NULL,
   `adminUsername` varchar(50) NOT NULL,
-  `adminPassword` char(60) NOT NULL
+  `adminPassword` char(60) NOT NULL,
+  `adminURI` varchar(800) DEFAULT '/admin' NOT NULL
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 /******************************************

@@ -3,6 +3,7 @@
 ## v0.7.0
 ### New Features
 - **Fix Incomplete Redirects**: you can now fix incomplete redirects on-page.  A more detailed error is displayed as well.
+- **Configurable Admin URI**: you can now configure /admin and subpages to have a different base uri
 ### Bug Fixes & Minor Changes
 - Fixes an overflow issue on PST icons (issue #7)
 - Fixes an issue where iOS still had a border and radius on inputs (issue #6)
@@ -12,6 +13,7 @@
 - Upload file sizes are checked before uploading instead of waiting for the server to give the error
 - Fixes an issue where you could rename an upload to an existing filename (issue #8)
 - New page object replaces the SITE["PAGE"] constant
+- The error that displays if no site was detected and the **expose** config in phroses.conf equals false was redone.
 
 <br />
 

@@ -6,7 +6,7 @@ use \reqc;
 define("Phroses", true);
 define("Phroses\VERSION", "v0.7.0");
 define("Phroses\SRC", __DIR__);
-define("Phroses\SCHEMAVER", 2);
+define("Phroses\SCHEMAVER", 3);
 define("Phroses\DEPS", $deps);
 define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC));
 define("Phroses\INCLUDES", [

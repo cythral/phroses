@@ -20,7 +20,9 @@ self::route("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
 	if(arrayValEquals($_GET, "mode", "json")) {
 		self::$out = new JSONServer();
-		self::$out->send($page->getAll(), 200);
+		$json = $page->getAll();
+		if($_SESSION) $json["adminuri"] = SITE["ADMINURI"];
+		self::$out->send($json, 200);
 	}
 
 	$page->display();
@@ -37,16 +39,16 @@ self::route("get", self::RESPONSES["PAGE"][301], function(&$page) {
 });
 
 self::route("get", self::RESPONSES["SYS"][200], function(&$page) {
+	$path = substr(PATH, strlen(SITE["ADMINURI"]));
 
-	if(!is_dir($file = INCLUDES["VIEWS"].PATH) && file_exists($file) && strtolower(EXTENSION) != "php") {
+	if(!is_dir($file = INCLUDES["VIEWS"].$path) && file_exists($file) && strtolower(EXTENSION) != "php") {
 		readfileCached($file);
 	}
 
 	ob_start();
-
-	$page->theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
+	$page->theme->push("stylesheets", [ "src" => SITE["ADMINURI"]."/assets/css/main.css" ]);
 	$page->theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-	$page->theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
+	$page->theme->push("scripts", [ "src" => SITE["ADMINURI"]."/assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
 
 	if(!$_SESSION) {
 		self::$out->setCode(401);
@@ -56,11 +58,12 @@ self::route("get", self::RESPONSES["SYS"][200], function(&$page) {
 		if(METHOD == "GET") {				
 			$dashbar = new Template(INCLUDES["TPL"]."/dashbar.tpl");
 			$dashbar->host = HOST;
+			$dashbar->adminuri = SITE["ADMINURI"];
 			echo $dashbar;
 		}
 
-		if(file_exists($file = INCLUDES["VIEWS"].PATH."/index.php")) include $file;
-		else if(file_exists($file = INCLUDES["VIEWS"].PATH.'.php')) include $file;
+		if(file_exists($file = INCLUDES["VIEWS"].$path."/index.php")) include $file;
+		else if(file_exists($file = INCLUDES["VIEWS"].$path.'.php')) include $file;
 		else echo new Template(INCLUDES["TPL"]."/errors/404.tpl");
 	}
 

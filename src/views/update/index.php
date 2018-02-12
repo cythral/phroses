@@ -2,7 +2,7 @@
 use Phroses\Phroses;
 use Phroses\Exceptions\WriteException;
 use function Phroses\{sendEvent, rrmdir};
-use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES};
+use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES, SITE};
 
 $version = json_decode(@file_get_contents("http://api.phroses.com/version"))->latest_version ?? null;
 
@@ -19,8 +19,8 @@ if($version == null) { ?>
       An update is available
     </h1>
     <div class="phr-update-icon">
-      <img src="/phr-assets/img/update-ring.png">
-      <img src="/phr-assets/img/update-arrow.png">
+      <img src="<?= SITE["ADMINURI"]; ?>/assets/img/update-ring.png">
+      <img src="<?= SITE["ADMINURI"]; ?>/assets/img/update-arrow.png">
     </div>
     <p class="c">
       click the above icon to start updating
@@ -40,7 +40,7 @@ if($version == null) { ?>
     <h1>
       Phroses is up-to-date
       <div>
-        <img src="/phr-assets/img/checkmark.png" style="width:250px;height:250px;">
+        <img src="<?= SITE["ADMINURI"]; ?>/assets/img/checkmark.png" style="width:250px;height:250px;">
       </div>
     </h1>
   </div>

@@ -2,7 +2,7 @@
 
 use phyrex\Template;
 use function Phroses\{ handleMethod };
-use const Phroses\{ INCLUDES };
+use const Phroses\{ INCLUDES, SITE };
 
 $uploaddir = INCLUDES["UPLOADS"]."/".reqc\BASEURL."/";
 
@@ -37,7 +37,7 @@ handleMethod("post", function($out) use ($uploaddir) {
     $out->send(["type" => "success"], 200);
 });
 
-$page->theme->push("scripts", ["src" => "/phr-assets/js/uploads.js", "attrs" => "defer"]);
+$page->theme->push("scripts", ["src" => SITE["ADMINURI"]."/assets/js/uploads.js", "attrs" => "defer"]);
 
 $uploads = new Template(INCLUDES["TPL"]."/admin/uploads.tpl");
 $uploads->maxuplsize = parseSize(ini_get("upload_max_filesize"));

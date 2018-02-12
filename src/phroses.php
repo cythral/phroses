@@ -59,6 +59,8 @@ abstract class Phroses {
 		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
 		Events::attach("modeset", [ (bool)(inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
 		
+		DB::Update();
+
 		// page or asset
 		if(reqc\TYPE != reqc\TYPES["CLI"]) {
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
@@ -125,7 +127,7 @@ abstract class Phroses {
 	static public function loadSiteInfo(bool $showNewSite) {
 		if(self::$ran) return;
 
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			PATH,
 			BASEURL
 		]);
@@ -138,14 +140,15 @@ abstract class Phroses {
 				die(new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
 			}
 		}
+		
 
 		// Determine Response Type
 		$response = self::RESPONSES["PAGE"][200];
 		if(!isset(($info = $info[0])->pageID)) $response = self::RESPONSES["PAGE"][404];
-		if(PATH != "/" &&
-			(file_exists(INCLUDES["VIEWS"].PATH.".php") ||
-		   	file_exists(INCLUDES["VIEWS"].PATH) ||
-		   	file_exists(INCLUDES["VIEWS"].PATH."/index.php"))) $response = self::RESPONSES["SYS"][200];
+		if(PATH != "/" && substr(PATH, 0, strlen($info->adminURI)) == $info->adminURI &&
+			(file_exists(INCLUDES["VIEWS"].($adminpath = substr(PATH, strlen($info->adminURI))).".php") ||
+		   	file_exists(INCLUDES["VIEWS"].$adminpath) ||
+		   	file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) $response = self::RESPONSES["SYS"][200];
 
 		if(substr(PATH, 0, 8) == "/uploads" &&
 			file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8))) $response = self::RESPONSES["UPLOAD"];
@@ -172,6 +175,7 @@ abstract class Phroses {
 			"RESPONSE" => $response,
 			"NAME" => $info->name,
 			"THEME" => $info->theme,
+			"ADMINURI" => $info->adminURI ?? "/admin",
 			"USERNAME" => $info->adminUsername,
 			"PASSWORD" => $info->adminPassword,
 			"PAGE" => $pageData

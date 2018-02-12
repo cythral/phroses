@@ -1,6 +1,13 @@
 var editors = {};
 
-function Phroses() {}
+function Phroses() {
+	var $this = this;
+
+	$.getJSON("?mode=json", function(data) { $this.pageData = data; });
+}
+
+var controller = new Phroses();
+
 Phroses.errors = {
 	"write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
     "api" : "There was a problem accessing the api.  Please try again later",
@@ -17,6 +24,11 @@ Phroses.errors = {
 		"failed_upl" : "There was an error uploading that file, it may be too large.",
 		"topupldir_notfound" : "The /uploads directory does not exist, please create it and give Phroses write access.",
 		"siteupldir_notfound" : "The uploads sub directory for this website does not exist.  Please give phroses write access to the /uploads folder."
+	},
+
+	"admin" : {
+		"resource_exists" : "That page already exists",
+		"bad_uri" : "Please use a valid uri that is not '/'"
 	}
 };
 
@@ -64,8 +76,7 @@ Phroses.reloadStyles = function() {
 		if(href.substring(0, 1) === "/" && href.substring(1, 2) !== "/") pass = true; // relative
 		if(href.replace(/http(s)?\:/g, "").substring(0, origin.length) === origin) pass = true; // on the same domain
 
-
-		if(href !== "/phr-assets/css/main.css" && pass) {
+		if(href !== controller.pageData.adminuri+"/assets/css/main.css" && pass) {
 			
 			$.get(href, function(body) {
 				$("head").append('<style class="phr-reloaded" data-href="'+href+'">'+body+'</style>');
@@ -446,6 +457,31 @@ $(function() {
 				setTimeout(function() {
 					$("#error").removeClass("active");
 				}, 5000);
+			}
+		});
+
+		Phroses.formify({
+			selector: ".admin-uri input",
+			action: "change",
+			collect: function() {
+				return { uri : $(this).val() };
+			},
+			success: function() {
+				Phroses.displaySaved();
+				let olduri = $(this).data("initial-value"), newuri = $(this).val();
+
+				$(".adminlink").each(function() {
+					$(this).attr("href", $(this).attr("href").replace(new RegExp("^"+olduri, 'g'), newuri));
+				});
+
+				history.replaceState({}, document.title, $(this).val());
+				$(this).data("initial-value", $(this).val());
+			},
+			failure: function(data) {
+				$(this).val($(this).data("initial-value"));
+				data = data.responseJSON;
+
+				Phroses.genericError(Phroses.errors.admin[data.error] || Phroses.errors[data.error]);
 			}
 		});
 	}
