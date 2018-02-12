@@ -54,6 +54,6 @@ handleMethod("post", function($out) {
   
 
 $installer = new Template(INCLUDES["TPL"]."/installer.tpl");
-$installer->styles = file_get_contents(SRC."/views/phr-assets/css/main.css");
-$installer->script = file_get_contents(SRC."/views/phr-assets/js/install.js");
+$installer->styles = file_get_contents(SRC."/views/assets/css/main.css");
+$installer->script = file_get_contents(SRC."/views/assets/js/install.js");
 echo $installer;

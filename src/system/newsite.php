@@ -25,6 +25,6 @@ handleMethod("post", function($out) {
 self::$out->setCode(404);
 $newsite = new Template(INCLUDES["TPL"]."/newsite.tpl");
 $newsite->url = BASEURL;
-$newsite->styles = file_get_contents(SRC."/views/phr-assets/css/main.css");
-$newsite->script = file_get_contents(SRC."/views/phr-assets/js/install.js");
+$newsite->styles = file_get_contents(SRC."/views/assets/css/main.css");
+$newsite->script = file_get_contents(SRC."/views/assets/js/install.js");
 die($newsite);
