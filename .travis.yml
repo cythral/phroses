@@ -10,8 +10,8 @@ before_script:
   - composer install
   
 script:
-  - lessc --clean-css src/views/phr-assets/less/main.less src/views/phr-assets/css/main.css
-  - rm -rf src/views/phr-assets/less
+  - lessc --clean-css src/views/assets/less/main.less src/views/assets/css/main.css
+  - rm -rf src/views/assets/less
   - php build.php
   - php phroses.phar
   - php tests/bootstrap.php
