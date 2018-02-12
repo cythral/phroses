@@ -52,7 +52,7 @@ final class Theme extends Template {
 	* @param string $type the current page type
 	*/
 	private function SetupSessionTools() {
-		if($_SESSION && reqc\METHOD == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404]])) {
+		if($_SESSION && reqc\METHOD == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
@@ -66,8 +66,8 @@ final class Theme extends Template {
 	* @param $asset Filename of the asset to check for
 	* @return bool whether or not the specified asset exists
 	*/
-	public function AssetExists(string $asset) : bool {
-		return (file_exists("{$this->root}/assets{$asset}"));
+	public function assetExists(string $asset) : bool {
+		return $asset == "/" ? false : file_exists("{$this->root}/assets{$asset}");
 	}
 	
 	/**
@@ -75,8 +75,8 @@ final class Theme extends Template {
 	*
 	* @param $asset Filename of the asset
 	*/
-	public function AssetRead(string $asset) {
-		if($this->AssetExists($asset)) ReadfileCached("{$this->root}/assets{$asset}");
+	public function assetRead(string $asset) {
+		if($this->assetExists($asset)) readfileCached("{$this->root}/assets{$asset}");
 	}
 	
 	public function ErrorExists(string $error) : bool {
@@ -102,8 +102,8 @@ final class Theme extends Template {
 		if($this->HasAPI()) include "{$this->root}/api.php";
 	}
 	
-    public function HasType($type) {
-        return file_exists("{$this->root}/{$type}.tpl");
+    public function hasType($type) {
+        return file_exists("{$this->root}/{$type}.tpl") || $type == "redirect";
     }
 	public function GetContentFields(string $tpl) {
 		if($tpl == "redirect") return ["destination" => "text"];
@@ -162,7 +162,7 @@ final class Theme extends Template {
 
 	public function getEditorFields($type = null) {
 		if(!$type) $type = $this->type;
-		
+
 		ob_start();
 		foreach($this->GetContentFields($type) as $key => $field) {
 			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type ?>-main" data-id="<?= $key; ?>"></div><? }

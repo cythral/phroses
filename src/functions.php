@@ -94,7 +94,7 @@ function sendEvent(string $event, array $data) {
   flush();
 }
 
-function ReadfileCached($file) {
+function readfileCached($file) {
     if(!file_exists($file)) return false;
     
     
@@ -131,4 +131,8 @@ function keysExist(array $keys, array $array) {
 
 function keysDontExist(array $keys, array $array) {
     return count(array_diff(array_intersect_key(array_flip($keys), $array), $keys)) == 0;
+}
+
+function arrayValEquals(array $haystack, string $needle, string $equal) {
+    return array_key_exists($needle, $haystack) && $haystack[$needle] == $equal;
 }

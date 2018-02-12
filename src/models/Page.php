@@ -46,12 +46,12 @@ class Page {
         return $this->data;
     }
 
-    public function display() {
+    public function display(?array $content = null) {
         ob_start("ob_gzhandler");
         $this->oh->setContentType(\reqc\MIME_TYPES["HTML"]); 
 
         $this->theme->title = $this->title;
-        $this->theme->setContent($this->content);
+        $this->theme->setContent($content ?? $this->content);
         echo $this->theme;
 
         if(inix::get("mode") == "production") {
@@ -64,13 +64,15 @@ class Page {
         DB::Query("DELETE FROM `pages` WHERE `id`=?", [ $this->id ]);
     }
 
-    static public function create($path, $title, $type, $content = "{}", $siteId = SITE["ID"]) {
+    static public function create($path, $title, $type, $content = "{}", $siteId = null) {
+        if(!$siteId && !defined("SITE")) throw new \Exception("No siteID Present");
+
         DB::Query("INSERT INTO `pages` (`uri`,`title`,`type`,`content`, `siteID`,`dateCreated`) VALUES (?, ?, ?, ?, ?, NOW())", [
             $path,
             $title,
             $type,
             $content,
-            $siteId
+            $siteId ?? SITE["ID"]
         ]);
 
         return DB::LastID();

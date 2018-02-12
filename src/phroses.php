@@ -10,7 +10,7 @@ use \reqc\Output;
 use \listen\Events;
 use \phyrex\Template;
 use \inix\Config as inix;
-use const \reqc\{ VARS, MIME_TYPES };
+use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL };
 
 abstract class Phroses {
 	static private $out;
@@ -61,7 +61,7 @@ abstract class Phroses {
 		
 		// page or asset
 		if(reqc\TYPE != reqc\TYPES["CLI"]) {
-			Events::trigger("routesmapped", [include SRC."/routes.php"]);
+			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [self::setupSession()]);
             Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
 			if(((bool)(inix::get("notrailingslashes") ?? true))) self::urlFix();
@@ -69,7 +69,7 @@ abstract class Phroses {
 
 		// command line
 		} else {
-			Events::trigger("commandsmapped", [include SRC."/commands.php"]);
+			Events::trigger("commandsmapped", [ include SRC."/commands.php" ]);
             Events::attach("commandstrace", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::traceCommands");
 			exit(0);
 		}
@@ -111,7 +111,7 @@ abstract class Phroses {
 		return true;
 	}
 
-	static public function route(string $method, int $response, callable $handler) {
+	static public function route(string $method, int $response, callable $handler, bool $json = false) {
 		$method = strtoupper($method);
 		if(!isset(self::$handlers[$method])) self::$handlers[$method] = [];
 		self::$handlers[$method][$response] = $handler;
@@ -125,14 +125,9 @@ abstract class Phroses {
 	static public function loadSiteInfo(bool $showNewSite) {
 		if(self::$ran) return;
 
-		if(reqc\TYPE == "cli") { // functionality tbd
-			define("Phroses\SITE", ["RESPONSE" => "CLI"]);
-			return;
-		}
-
 		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
-			reqc\PATH,
-			reqc\BASEURL
+			PATH,
+			BASEURL
 		]);
 
 		// if site doesn't exist, create a new one (script ends here)
@@ -147,17 +142,17 @@ abstract class Phroses {
 		// Determine Response Type
 		$response = self::RESPONSES["PAGE"][200];
 		if(!isset(($info = $info[0])->pageID)) $response = self::RESPONSES["PAGE"][404];
-		if(reqc\PATH != "/" &&
-			(file_exists(INCLUDES["VIEWS"].reqc\PATH.".php") ||
-		   	file_exists(INCLUDES["VIEWS"].reqc\PATH) ||
-		   	file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php"))) $response = self::RESPONSES["SYS"][200];
+		if(PATH != "/" &&
+			(file_exists(INCLUDES["VIEWS"].PATH.".php") ||
+		   	file_exists(INCLUDES["VIEWS"].PATH) ||
+		   	file_exists(INCLUDES["VIEWS"].PATH."/index.php"))) $response = self::RESPONSES["SYS"][200];
 
-		if(substr(reqc\PATH, 0, 8) == "/uploads" &&
-			file_exists(INCLUDES["UPLOADS"]."/".reqc\BASEURL."/".substr(reqc\PATH, 8))) $response = self::RESPONSES["UPLOAD"];
-		if(substr(reqc\PATH, 0, 4) == "/api") $response = self::RESPONSES["API"];
+		if(substr(PATH, 0, 8) == "/uploads" &&
+			file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8))) $response = self::RESPONSES["UPLOAD"];
+		if(substr(PATH, 0, 4) == "/api") $response = self::RESPONSES["API"];
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
         if($response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) $response = self::RESPONSES["PAGE"][404];
-
+		
 		$pageData = [
 			"ID" => $info->pageID,
 			"TYPE" => $info->type ?? "page",
@@ -186,8 +181,8 @@ abstract class Phroses {
 	}
 
 	static public function urlFix() {
-		if(substr(reqc\PATH, -1) == "/" && reqc\PATH != "/") {
-			self::$out->redirect(substr(reqc\PATH, 0, -1));
+		if(substr(PATH, -1) == "/" && PATH != "/") {
+			self::$out->redirect(substr(PATH, 0, -1));
 		}
 	}
 

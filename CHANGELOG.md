@@ -2,7 +2,7 @@
 
 ## v0.7.0
 ### New Features
-- placeholder
+- **Fix Incomplete Redirects**: you can now fix incomplete redirects on-page.  A more detailed error is displayed as well.
 ### Bug Fixes & Minor Changes
 - Fixes an overflow issue on PST icons (issue #7)
 - Fixes an issue where iOS still had a border and radius on inputs (issue #6)
