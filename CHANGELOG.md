@@ -9,7 +9,7 @@
 - JavaScript for the uploads feature is now in its own file
 - Upload progress is now more accurate
 - Naming upload files is now required
-- Upload file sizes are checked before uploading
+- Upload file sizes are checked before uploading instead of waiting for the server to give the error
 - Fixes an issue where you could rename an upload to an existing filename (issue #8)
 - New page object replaces the SITE["PAGE"] constant
 

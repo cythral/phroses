@@ -135,7 +135,7 @@ abstract class Phroses {
 			if($showNewSite) include "system/newsite.php";
 			else {
 				self::$out->setCode(404);
-				die("Resource not found (404)"); // todo: make this more interesting
+				die(new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
 			}
 		}
 
