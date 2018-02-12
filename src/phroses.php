@@ -100,8 +100,9 @@ abstract class Phroses {
 	static public function checkReqs(string $defaultTheme, string $configFile) {
 		if(!file_exists($defaultTheme)) {
 			self::$out->setCode(500);
-			self::$out->setContentType(MIME_TYPES["TXT"]);
-			die("Default theme ".basename($defaultTheme)." was not detected.  Please re-add the default bloom theme to its proper directory.");
+			$themeError = new Template(INCLUDES["TPL"]."/errors/notheme.tpl");
+			$themeError->themename = basename($defaultTheme);
+			die($themeError);
 		}
 		
 		// if no configuration file found, run installer
