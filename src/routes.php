@@ -123,7 +123,7 @@ self::route("post", self::RESPONSES["DEFAULT"], function(&$page) {
 
 	self::error("bad_value", !$page->theme->hasType($_REQUEST["type"]), [ "field" => "type" ]);
 
-	$id = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], SITE["ID"], $_REQUEST["content"] ?? "{}");
+	$id = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", SITE["ID"]);
 	$theme = new Theme(SITE["THEME"], $_REQUEST["type"]);
 
 	self::$out->send([ 
