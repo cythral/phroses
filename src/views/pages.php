@@ -22,7 +22,7 @@ foreach($q as $p) {
         "uri" => $p->uri, 
         "id" => $p->id, 
         "title" => $p->title,
-        "types" => ob_get_clean()
+        "types" => trim(ob_get_clean())
     ]);
 }
 

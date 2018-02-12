@@ -4,6 +4,7 @@
 ### New Features
 - **Fix Incomplete Redirects**: you can now fix incomplete redirects on-page.  A more detailed error is displayed as well.
 - **Configurable Admin URI**: you can now configure /admin and subpages to have a different base uri
+- **Site Maintenance Mode**: you can now turn on maintenance mode for specific sites rather than all of them
 ### Bug Fixes & Minor Changes
 - Fixes an overflow issue on PST icons (issue #7)
 - Fixes an issue where iOS still had a border and radius on inputs (issue #6)
@@ -14,6 +15,7 @@
 - Fixes an issue where you could rename an upload to an existing filename (issue #8)
 - New page object replaces the SITE["PAGE"] constant
 - The error that displays if no site was detected and the **expose** config in phroses.conf equals false was redone.
+- The error that dislays if the default theme was not detected was redone
 
 <br />
 

@@ -52,7 +52,7 @@ self::route("get", self::RESPONSES["SYS"][200], function(&$page) {
 
 	if(!$_SESSION) {
 		self::$out->setCode(401);
-		include INCLUDES["VIEWS"]."/admin/login.php";
+		include INCLUDES["VIEWS"]."/login.php";
 	
 	} else {
 		if(METHOD == "GET") {				
@@ -106,12 +106,9 @@ $api = function(&$page) {
 	$page->display();
 };
 
-self::route("get", self::RESPONSES["API"], $api);
-self::route("post", self::RESPONSES["API"], $api);
-self::route("put", self::RESPONSES["API"], $api);
-self::route("delete", self::RESPONSES["API"], $api);
-self::route("patch", self::RESPONSES["API"], $api);
-
+foreach(["get", "put", "post", "patch", "delete"] as $method) {
+	self::route($method, self::RESPONSES["API"], $api);
+}
 
 self::route("post", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
@@ -142,7 +139,7 @@ self::route("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 
 	// Validation
 	self::error("access_denied", !$_SESSION, null, 401);
-	self::error("resource_missing", SITE["RESPONSE"] != self::RESPONSES["PAGE"][200] && SITE["RESPONSE"] != self::RESPONSES["PAGE"][301]);
+	self::error("resource_missing", !in_array(SITE["RESPONSE"], [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
 	self::error("no_change", keysDontExist(["type", "uri", "title", "content", "public"], $_REQUEST));
 	self::error("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
 
@@ -191,5 +188,14 @@ self::route("delete", self::RESPONSES["DEFAULT"], function(&$page) {
 self::route("get", self::RESPONSES["UPLOAD"], function() {
 	readfileCached(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8));
 });
+
+$maintenance = function(&$page) {
+	self::$out->setCode(503);
+	die(new Template(INCLUDES["TPL"]."/maintenance.tpl"));
+};
+
+foreach(["get", "put", "post", "patch", "delete"] as $method) {
+	self::route($method, self::RESPONSES["MAINTENANCE"], $maintenance);
+}
 
 return self::$handlers;

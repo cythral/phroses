@@ -21,6 +21,9 @@ handleMethod("POST", function($out) {
         DB::Query("UPDATE `sites` SET `adminURI`=? WHERE `id`=?", [ $_POST["uri"], SITE["ID"] ]);
     }
 
+    if(isset($_POST["maintenance"])) {
+        DB::Query("UPDATE `sites` SET `maintenance`=? WHERE `id`=?", [ (bool)$_POST["maintenance"], SITE["ID"] ]);
+    }
     $out->send(["type" => "success"], 200);
 });
 
@@ -36,6 +39,10 @@ $index->adminuri = SITE["ADMINURI"];
 
 foreach(Theme::List() as $thm) {
     $index->push("themes", [ "name" => $thm, "selected" => ($thm == SITE["THEME"]) ? "selected" : "" ]);
+}
+
+foreach([[1,"on"], [0, "off"]] as list($value, $name)) {
+    $index->push("moption", [ "value" => $value, "name" => $name, "selected" => (bool)$value == SITE["MAINTENANCE"] ? "selected" : "" ]);
 }
 
 echo $index;

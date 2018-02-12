@@ -48,7 +48,8 @@ abstract class Phroses {
 
 		"THEME" => 5,
 		"API" => 6,
-		"UPLOAD" => 7
+		"UPLOAD" => 7,
+		"MAINTENANCE" => 8
 	];
 
 	static public function start() {
@@ -128,7 +129,7 @@ abstract class Phroses {
 	static public function loadSiteInfo(bool $showNewSite) {
 		if(self::$ran) return;
 
-		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
+		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `sites`.`maintenance`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			PATH,
 			BASEURL
 		]);
@@ -151,12 +152,12 @@ abstract class Phroses {
 		   	file_exists(INCLUDES["VIEWS"].$adminpath) ||
 		   	file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) $response = self::RESPONSES["SYS"][200];
 
-		if(substr(PATH, 0, 8) == "/uploads" &&
-			file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8))) $response = self::RESPONSES["UPLOAD"];
+		if(substr(PATH, 0, 8) == "/uploads" && file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8))) $response = self::RESPONSES["UPLOAD"];
 		if(substr(PATH, 0, 4) == "/api") $response = self::RESPONSES["API"];
 		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
         if($response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) $response = self::RESPONSES["PAGE"][404];
-		
+		if($info->maintenance && !$_SESSION && $response != self::RESPONSES["SYS"][200]) $response = self::RESPONSES["MAINTENANCE"];
+
 		$pageData = [
 			"ID" => $info->pageID,
 			"TYPE" => $info->type ?? "page",
@@ -179,7 +180,8 @@ abstract class Phroses {
 			"ADMINURI" => $info->adminURI ?? "/admin",
 			"USERNAME" => $info->adminUsername,
 			"PASSWORD" => $info->adminPassword,
-			"PAGE" => $pageData
+			"PAGE" => $pageData,
+			"MAINTENANCE" => $info->maintenance
 		]);
 
 		self::$page = new Page($pageData, self::$out);

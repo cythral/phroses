@@ -32,5 +32,12 @@
             <div>Admin URI:</div>
             <input class="c form_field form_input" type="text" value="<{var::adminuri}>" data-method="POST" data-url="" data-initial-value="<{var::adminuri}>">
         </div>
+
+        <div class="form_icfix aln-l c maintenance-select">
+            <div>Maintenance:</div>
+            <select class="c form_field form_select" data-method="POST" data-url="">
+                <{array::moption::<option value="@value" @selected>@name</option>}>
+            </select>
+        </div>
     </div>
 </div>
