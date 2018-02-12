@@ -160,7 +160,7 @@ abstract class Phroses {
 			"DATECREATED" => $info->dateCreated,
 			"DATEMODIFIED" => $info->dateModified,
 			"TITLE" => $info->title,
-			"CONTENT" => json_decode($info->content, true),
+			"CONTENT" => json_decode($info->content, true) ?? [],
 			"VISIBILITY" => $info->public
 		];
 
