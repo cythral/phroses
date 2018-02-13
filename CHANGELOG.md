@@ -16,6 +16,8 @@
 - New page object replaces the SITE["PAGE"] constant
 - The error that displays if no site was detected and the **expose** config in phroses.conf equals false was redone.
 - The error that dislays if the default theme was not detected was redone
+- THEME response was removed
+- ASSET response was added, switches handling from PAGE[404].  Theme assets are also accessible when maintenance mode is turned on.
 
 <br />
 

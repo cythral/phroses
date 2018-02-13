@@ -30,6 +30,8 @@ abstract class Phroses {
 		]
 	];
 
+	static public $response = self::RESPONSES["PAGE"][200];
+
 
 	const ON = true;
     const OFF = false;
@@ -46,7 +48,7 @@ abstract class Phroses {
 			200 => 4
 		],
 
-		"THEME" => 5,
+		"ASSET" => 5,
 		"API" => 6,
 		"UPLOAD" => 7,
 		"MAINTENANCE" => 8
@@ -68,7 +70,7 @@ abstract class Phroses {
 			Events::trigger("sessionstarted", [self::setupSession()]);
             Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
 			if(((bool)(inix::get("notrailingslashes") ?? true))) self::urlFix();
-			Events::attach("routestrace", [ reqc\METHOD, SITE["RESPONSE"] ], "\Phroses\Phroses::traceRoutes");
+			Events::attach("routestrace", [ reqc\METHOD, self::$response ], "\Phroses\Phroses::traceRoutes");
 
 		// command line
 		} else {
@@ -145,18 +147,17 @@ abstract class Phroses {
 		
 
 		// Determine Response Type
-		$response = self::RESPONSES["PAGE"][200];
-		if(!isset(($info = $info[0])->pageID)) $response = self::RESPONSES["PAGE"][404];
+		if(!isset(($info = $info[0])->pageID)) self::$response = self::RESPONSES["PAGE"][404];
 		if(PATH != "/" && substr(PATH, 0, strlen($info->adminURI)) == $info->adminURI &&
 			(file_exists(INCLUDES["VIEWS"].($adminpath = substr(PATH, strlen($info->adminURI))).".php") ||
 		   	file_exists(INCLUDES["VIEWS"].$adminpath) ||
-		   	file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) $response = self::RESPONSES["SYS"][200];
+		   	file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) self::$response = self::RESPONSES["SYS"][200];
 
-		if(substr(PATH, 0, 8) == "/uploads" && file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8))) $response = self::RESPONSES["UPLOAD"];
-		if(substr(PATH, 0, 4) == "/api") $response = self::RESPONSES["API"];
-		if($info->type == "redirect") $response = self::RESPONSES["PAGE"][301];
-        if($response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) $response = self::RESPONSES["PAGE"][404];
-		if($info->maintenance && !$_SESSION && $response != self::RESPONSES["SYS"][200]) $response = self::RESPONSES["MAINTENANCE"];
+		if(substr(PATH, 0, 8) == "/uploads" && file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8))) self::$response = self::RESPONSES["UPLOAD"];
+		if(substr(PATH, 0, 4) == "/api") self::$response = self::RESPONSES["API"];
+		if($info->type == "redirect") self::$response = self::RESPONSES["PAGE"][301];
+        if(self::$response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) self::$response = self::RESPONSES["PAGE"][404];
+		if($info->maintenance && !$_SESSION && self::$response != self::RESPONSES["SYS"][200]) self::$response = self::RESPONSES["MAINTENANCE"];
 
 		$pageData = [
 			"ID" => $info->pageID,
@@ -174,7 +175,7 @@ abstract class Phroses {
 		// todo: thinkabout that
 		define("Phroses\SITE", [
 			"ID" => $info->id,
-			"RESPONSE" => $response,
+			"RESPONSE" => self::$response,
 			"NAME" => $info->name,
 			"THEME" => $info->theme,
 			"ADMINURI" => $info->adminURI ?? "/admin",
@@ -185,6 +186,7 @@ abstract class Phroses {
 		]);
 
 		self::$page = new Page($pageData, self::$out);
+		if(in_array(self::$response, [ self::RESPONSES["MAINTENANCE"], self::RESPONSES["PAGE"][404] ]) && self::$page->theme->assetExists(PATH)) self::$response = self::RESPONSES["ASSET"];
 	}
 
 	static public function urlFix() {

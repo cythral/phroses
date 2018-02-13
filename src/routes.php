@@ -77,12 +77,7 @@ self::route("get", self::RESPONSES["SYS"][200], function(&$page) {
 	$page->display();
 });
 
-self::route("get", self::RESPONSES["PAGE"][404], function(&$page) {
-
-	if($page->theme->assetExists(PATH)) {
-		$page->theme->assetRead(PATH);
-	}
-		
+self::route("get", self::RESPONSES["PAGE"][404], function(&$page) {		
 	self::$out->setCode(404);
 	self::$out->setContentType(MIME_TYPES["HTML"]);
 	
@@ -95,6 +90,10 @@ self::route("get", self::RESPONSES["PAGE"][404], function(&$page) {
 	$page->display();
 });
 
+$assets = function(&$page) { $page->theme->assetRead(PATH); };
+foreach(["get", "put", "post", "patch", "delete"] as $method) {
+	self::route($method, self::RESPONSES["ASSET"], $assets);
+}
 
 $api = function(&$page) {
 	if($page->theme->hasAPI()) die($page->theme->runAPI());
@@ -115,7 +114,7 @@ self::route("post", self::RESPONSES["DEFAULT"], function(&$page) {
 
 	// Validation
 	self::error("access_denied", !$_SESSION, null, 401);
-	self::error("resource_exists", SITE["RESPONSE"] != self::RESPONSES["PAGE"][404]);
+	self::error("resource_exists", self::$response != self::RESPONSES["PAGE"][404]);
 
 	foreach(["title","type"] as $type) {
 		self::error("missing_value", !array_key_exists($type, $_REQUEST), [ "field" => $type ]);

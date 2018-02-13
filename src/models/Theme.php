@@ -52,7 +52,7 @@ final class Theme extends Template {
 	* @param string $type the current page type
 	*/
 	private function SetupSessionTools() {
-		if($_SESSION && reqc\METHOD == "GET" && in_array(SITE["RESPONSE"], [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
+		if($_SESSION && reqc\METHOD == "GET" && in_array(Phroses::$response, [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->push("stylesheets", [ "src" => SITE["ADMINURI"]."/assets/css/main.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
