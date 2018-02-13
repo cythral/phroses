@@ -1,23 +1,17 @@
 <?php
+
 namespace Phroses;
 
-class Session extends \SessionHandler {
+class Session implements \SessionHandlerInterface {
   static private $run = false;
   
   static public function start() {
     if(self::$run) return;
 
-    session_set_save_handler(
-      "\Phroses\Session::_open",
-      "\Phroses\Session::_close",
-      "\Phroses\Session::_read",
-      "\Phroses\Session::_write",
-      "\Phroses\Session::_destroy",
-      "\Phroses\Session::_gc"
-    );
-    
+    session_set_save_handler(new Session, true);
     session_start();
     self::$run = true;
+    return session_id();
   }
   
   static public function end() {
@@ -25,26 +19,26 @@ class Session extends \SessionHandler {
     session_write_close();
   }
   
-  static public function _open($a, $b) { return true; }
-  static public function _close() { return true; }
+  public function open($a, $b) { return true; }
+  public function close() { return true; }
   
-  static public function _read($id) {
-    $data = \Phroses\DB::Query("SELECT `data` FROM `sessions` WHERE `id`=?", [ $id ]);
+  public function read($id) {
+    $data = DB::Query("SELECT `data` FROM `sessions` WHERE `id`=?", [ $id ]);
     return ($data) ? $data[0]->data : '';
   }
   
-  static public function _write($id, $data) {
-    \Phroses\DB::Query("REPLACE INTO `sessions` (`id`, `data`) VALUES (?, ?)", [ $id, $data ]);
+  public function write($id, $data) {
+    DB::Query("REPLACE INTO `sessions` (`id`, `data`) VALUES (?, ?)", [ $id, $data ]);
     return true;
   }
   
-  static public function _gc($max) {
-    \Phroses\DB::Query("DELETE FROM `sessions` WHERE TIMESTAMPDIFF(second, `date`, NOW()) > $max");
+  public function gc($max) {
+    DB::Query("DELETE FROM `sessions` WHERE TIMESTAMPDIFF(second, `date`, NOW()) > $max");
     return true;
   }
   
-  static public function _destroy($id) {
-    \Phroses\DB::Query("DELETE FROM `sessions` WHERE `id`=?", [ $id ]);
+  public function destroy($id) {
+    DB::Query("DELETE FROM `sessions` WHERE `id`=?", [ $id ]);
     return true;
   }
 }

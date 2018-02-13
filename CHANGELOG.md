@@ -18,6 +18,7 @@
 - The error that dislays if the default theme was not detected was redone
 - THEME response was removed
 - ASSET response was added, switches handling from PAGE[404].  Theme assets are also accessible when maintenance mode is turned on.
+- Improvements to session handling
 
 <br />
 

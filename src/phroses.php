@@ -196,9 +196,7 @@ abstract class Phroses {
 	}
 
 	static public function setupSession(): string {
-		Session::start();
-		register_shutdown_function("session_write_close");
-		return session_id();
+		return Session::start();
 	}
 
     
