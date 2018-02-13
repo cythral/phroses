@@ -1,15 +1,10 @@
-var editors = {};
+var editors = {}, controller;
 
 function Phroses() {
 	var $this = this;
-
-	$.getJSON("?mode=json", function(data) { 
-		$this.pageData = data; 
-		$(window).trigger("pagedata");
-	});
+	$this.adminuri = $("#phroses-script").data("adminuri");
 }
 
-var controller = new Phroses();
 
 Phroses.errors = {
 	"write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
@@ -79,7 +74,7 @@ Phroses.reloadStyles = function() {
 		if(href.substring(0, 1) === "/" && href.substring(1, 2) !== "/") pass = true; // relative
 		if(href.replace(/http(s)?\:/g, "").substring(0, origin.length) === origin) pass = true; // on the same domain
 
-		if(href !== controller.pageData.adminuri+"/assets/css/main.css" && pass) {
+		if(href !== controller.adminuri+"/assets/css/main.css" && pass) {
 			
 			$.get(href, function(body) {
 				$("head").append('<style class="phr-reloaded" data-href="'+href+'">'+body+'</style>');
@@ -175,7 +170,7 @@ jQuery.fn.shake = function(interval,distance,times){
 
 $(function() {
 	console.log("-== Phroses Initialized ==-");
-	
+	controller = new Phroses();
 
 	$(document).on("click", ".jlink", function() {
 		document.location = $(this).data("href");
@@ -185,143 +180,138 @@ $(function() {
 		var content = $("body").html();
 		$("body").html('<div id="phr-container">'+content+"</div>");
 
-
-		$(window).on("pagedata", function() {
-			console.log("Page Data Loaded");
-
-			$.post(controller.pageData.adminuri+"/api/pst", { uri : window.location.pathname }, function(data) {
-				$("body").append(data.content);
-				
-				Phroses.setupButtons();
-				Phroses.createEditors();
-	
-				$("#pst-es").bind("keydown", function(e) {
-					if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
-						e.preventDefault();
-						e.stopImmediatePropagation();
-						$("#pst-es").submit();
-					}
-				});
+		$.post(controller.adminuri+"/api/pst", { uri : window.location.pathname }, function(data) {
+			$("body").append(data.content);
 			
-				$("#pst-es-title").change(function() { $("#pst-es").submit() });
-	
-				/**
-				 * Editor Screen
-				 */
-				Phroses.formify({
-					selector : "#pst-es",
-					collect: function() {
-						var data = $(this).serializeArray(), content = {};
+			Phroses.setupButtons();
+			Phroses.createEditors();
+
+			$("#pst-es").bind("keydown", function(e) {
+				if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					$("#pst-es").submit();
+				}
+			});
+		
+			$("#pst-es-title").change(function() { $("#pst-es").submit() });
+
+			/**
+			 * Editor Screen
+			 */
+			Phroses.formify({
+				selector : "#pst-es",
+				collect: function() {
+					var data = $(this).serializeArray(), content = {};
+				
+					$("#pst-es .content").each(function() {
+						if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
+						else content[$(this).attr("id")] = $(this).val();
+					});
 					
-						$("#pst-es .content").each(function() {
-							if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
-							else content[$(this).attr("id")] = $(this).val();
-						});
-						
-						data.push({name : "id", value : $("#pid").val() });
-						data.push({name : "content", value : JSON.stringify(content) });
-						if($("#pst-es-type").val() === "redirect") data.push({name : "type", value : "redirect" });
-						return data;
-					},
-					success: function(pdata) {
-						Phroses.displaySaved();
-						Phroses.updatePage($("#pst-es-title").val(), pdata.content);
-					}
-				});
+					data.push({name : "id", value : $("#pid").val() });
+					data.push({name : "content", value : JSON.stringify(content) });
+					if($("#pst-es-type").val() === "redirect") data.push({name : "type", value : "redirect" });
+					return data;
+				},
+				success: function(pdata) {
+					Phroses.displaySaved();
+					Phroses.updatePage($("#pst-es-title").val(), pdata.content);
+				}
+			});
+		
+			/**
+			 * Deletion Screen
+			 */
+			Phroses.formify({
+				selector: "#pst-ds",
+				success: function(data) {
+					location.reload();
+				}
+			});
 			
-				/**
-				 * Deletion Screen
-				 */
-				Phroses.formify({
-					selector: "#pst-ds",
-					success: function(data) {
-						location.reload();
-					}
-				});
-				
-				/**
-				 * Move Screen
-				 */
-				Phroses.formify({
-					selector: "#pst-ms",
-					collect : function() {
-						var data = $(this).serializeArray();
-						data.push({ name : "id", value : $("#pid").val() });
-						return data;
-					},
-					success: function(data) {
-						history.replaceState({}, document.title, $("#puri").val());
-						$("#pst-ms").fadeOut();
-						Phroses.displaySaved();
-					},
-	
-					failure: function(data) {
-						data = data.responseJSON;
-						Phroses.genericError(Phroses.errors["pst-ms"][data.error] || Phroses.errors[data.error] || "An unknown error occurred.");
-					}
-				});
-				
-				/**
-				 * New Page Screen
-				 */
-				Phroses.formify({
-					selector: "#pst-ns",
-					hash: "#new",
-					hashreqclass: {
-						element: "#pst",
-						class : "new"
-					},
-					success: function(pdata) {
-						var title = $("#pst-ns [name=title]").val();
-						$("#pid").val(pdata.id);
-						$("#pst").removeClass("new");
-						$("#pst").addClass("existing");
-						$("#phr-container").html(pdata.content);
-						$("#pst-es-fields").html(pdata.typefields);
-						$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
-						$("#pst-es-type").val($("#pst-ns select").val());
-						Phroses.createEditors();
-						document.title = title;
+			/**
+			 * Move Screen
+			 */
+			Phroses.formify({
+				selector: "#pst-ms",
+				collect : function() {
+					var data = $(this).serializeArray();
+					data.push({ name : "id", value : $("#pid").val() });
+					return data;
+				},
+				success: function(data) {
+					history.replaceState({}, document.title, $("#puri").val());
+					$("#pst-ms").fadeOut();
+					Phroses.displaySaved();
+				},
+
+				failure: function(data) {
+					data = data.responseJSON;
+					Phroses.genericError(Phroses.errors["pst-ms"][data.error] || Phroses.errors[data.error] || "An unknown error occurred.");
+				}
+			});
 			
-						$("#pst-ns").fadeOut(function() {
-							$("#pst-ns")[0].reset();
-						});
-					}
-				});
-			
-				/**
-				 * Type changer on the edit screen
-				 */
-				Phroses.formify({
-					selector:  "#pst-es-type",
-					action: "change",
-					collect: function() {
-						$("#pst-es-fields").slideUp();
-						return { type : $(this).val(), id : $("#pid").val() };
-					},
-					success: function(pdata) {
-						$("#pst-es-fields").html(pdata.typefields);
-						Phroses.createEditors();
-						if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
-						$("#pst-es-fields").slideDown();
-						if(data.type !== "redirect") Phroses.displaySaved();
-					}
-				});
-			
-				/**
-				 * Public / Private Switcher
-				 */
-				Phroses.formify({
-					selector: "#pst-vis input",
-					action: "change",
-					collect: function() {
-						return {
-							"id" : $("#pid").val(),
-							"public" : ($(this).is(":checked") === true) ? 1 : 0
-						};
-					},
-					success: function() {}
-				});
+			/**
+			 * New Page Screen
+			 */
+			Phroses.formify({
+				selector: "#pst-ns",
+				hash: "#new",
+				hashreqclass: {
+					element: "#pst",
+					class : "new"
+				},
+				success: function(pdata) {
+					var title = $("#pst-ns [name=title]").val();
+					$("#pid").val(pdata.id);
+					$("#pst").removeClass("new");
+					$("#pst").addClass("existing");
+					$("#phr-container").html(pdata.content);
+					$("#pst-es-fields").html(pdata.typefields);
+					$("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
+					$("#pst-es-type").val($("#pst-ns select").val());
+					Phroses.createEditors();
+					document.title = title;
+		
+					$("#pst-ns").fadeOut(function() {
+						$("#pst-ns")[0].reset();
+					});
+				}
+			});
+		
+			/**
+			 * Type changer on the edit screen
+			 */
+			Phroses.formify({
+				selector:  "#pst-es-type",
+				action: "change",
+				collect: function() {
+					$("#pst-es-fields").slideUp();
+					return { type : $(this).val(), id : $("#pid").val() };
+				},
+				success: function(pdata) {
+					$("#pst-es-fields").html(pdata.typefields);
+					Phroses.createEditors();
+					if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
+					$("#pst-es-fields").slideDown();
+					if(data.type !== "redirect") Phroses.displaySaved();
+				}
+			});
+		
+			/**
+			 * Public / Private Switcher
+			 */
+			Phroses.formify({
+				selector: "#pst-vis input",
+				action: "change",
+				collect: function() {
+					return {
+						"id" : $("#pid").val(),
+						"public" : ($(this).is(":checked") === true) ? 1 : 0
+					};
+				},
+				success: function() {}
 			});
 		});
 		

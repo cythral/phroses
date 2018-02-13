@@ -20,9 +20,7 @@ self::route("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
 	if(arrayValEquals($_GET, "mode", "json")) {
 		self::$out = new JSONServer();
-		$json = $page->getAll();
-		if($_SESSION) $json["adminuri"] = SITE["ADMINURI"];
-		self::$out->send($json, 200);
+		self::$out->send($page->getAll(), 200);
 	}
 
 	$page->display();
@@ -175,9 +173,9 @@ self::route("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 
 self::route("delete", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
-	
+	 
 	self::error("access_denied", !$_SESSION, null, 401);
-	self::error("resource_missing", SITE["RESPONSE"] != self::RESPONSES["PAGE"][200] && SITE["RESPONSE"] != self::RESPONSES["PAGE"][301]);
+	self::error("resource_missing", !in_array(Phroses::$response, [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
 
 	$page->delete();
 	self::$out->send(["type" => "success"], 200);
