@@ -93,16 +93,7 @@ foreach(["get", "put", "post", "patch", "delete"] as $method) {
 	self::route($method, self::RESPONSES["ASSET"], $assets);
 }
 
-$api = function(&$page) {
-	if($page->theme->hasAPI()) die($page->theme->runAPI());
-
-	self::$out->setCode(404);
-	$page->theme->title = "404 Not Found";
-	$page->theme->main = (string) new Template(INCLUDES["TPL"]."/errors/404.tpl");
-
-	$page->display();
-};
-
+$api = function(&$page) { $page->theme->runAPI(); };
 foreach(["get", "put", "post", "patch", "delete"] as $method) {
 	self::route($method, self::RESPONSES["API"], $api);
 }

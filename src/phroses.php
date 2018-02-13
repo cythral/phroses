@@ -187,6 +187,7 @@ abstract class Phroses {
 
 		self::$page = new Page($pageData, self::$out);
 		if(in_array(self::$response, [ self::RESPONSES["MAINTENANCE"], self::RESPONSES["PAGE"][404] ]) && self::$page->theme->assetExists(PATH)) self::$response = self::RESPONSES["ASSET"];
+		if(self::$response == self::RESPONSES["API"] && !self::$page->theme->hasApi()) self::$response = self::RESPONSES["PAGE"][404];
 	}
 
 	static public function urlFix() {
