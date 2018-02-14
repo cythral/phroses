@@ -67,7 +67,7 @@ abstract class Phroses {
 		// page or asset
 		if(reqc\TYPE != reqc\TYPES["CLI"]) {
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
-			Events::trigger("sessionstarted", [self::setupSession()]);
+			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
 			if(((bool)(inix::get("notrailingslashes") ?? true))) self::urlFix();
 			Events::attach("routestrace", [ reqc\METHOD, self::$response ], "\Phroses\Phroses::traceRoutes");
@@ -196,11 +196,6 @@ abstract class Phroses {
 		}
 	}
 
-	static public function setupSession(): string {
-		return Session::start();
-	}
-
-
 	static public function setMaintenance(bool $mode = self::ON) {
 		if($mode == self::ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
 		if($mode == self::OFF) unlink(ROOT."/.maintenance");
@@ -212,10 +207,10 @@ abstract class Phroses {
 		$m = new Parser((string)$data);
 
 		Events::trigger("email", [
-		(string)$m->headers['from'],
-		(string)$m->headers['to'],
-		(string)$m->headers['subject'],
-		(string)$m->bodies['text/plain']
+			(string)$m->headers['from'],
+			(string)$m->headers['to'],
+			(string)$m->headers['subject'],
+			(string)$m->bodies['text/plain']
 		]);
 	}
 
