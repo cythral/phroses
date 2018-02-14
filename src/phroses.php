@@ -4,8 +4,8 @@ namespace Phroses;
 
 include __DIR__."/constants.php";
 
-$loader = include ((INPHAR) ? __DIR__ : dirname(__DIR__)) . "/vendor/autoload.php";
-$loader->addPsr4("Phroses\\", __DIR__."/models");
+$loader = include ((INPHAR) ? SRC : ROOT) . "/vendor/autoload.php";
+$loader->addPsr4("Phroses\\", SRC."/models");
 include SRC."/functions.php";
 
 use \reqc;
@@ -22,7 +22,6 @@ abstract class Phroses {
 	static private $out;
 	static private $handlers = [];
 	static private $cmds = [];
-	static private $ran = false;
 	static private $page;
 	static private $modes = [
 		"development" => [
@@ -70,7 +69,6 @@ abstract class Phroses {
 	
 
 	static public function start() {
-		if(self::$ran) return; // only run once
 		self::$out = new Output();
 
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
@@ -94,7 +92,6 @@ abstract class Phroses {
 	}
 
 	static public function setupMode(bool $noindex) {
-		if(self::$ran) return; // only run once
 		if(!array_key_exists(inix::get("mode"), self::$modes)) return false;
 		foreach(self::$modes[inix::get("mode")] as $key => $val) { ini_set($key, $val); }
 
@@ -143,10 +140,7 @@ abstract class Phroses {
 		self::$cmds[$cmd] = $handler;
 	}
 
-
 	static public function loadSiteInfo(bool $showNewSite) {
-		if(self::$ran) return;
-
 		$info = DB::Query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `sites`.`maintenance`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			PATH,
 			BASEURL
@@ -165,9 +159,9 @@ abstract class Phroses {
 		// Determine Response Type
 		if(!isset(($info = $info[0])->pageID)) self::$response = self::RESPONSES["PAGE"][404];
 		if(PATH != "/" && substr(PATH, 0, strlen($info->adminURI)) == $info->adminURI &&
-		(file_exists(INCLUDES["VIEWS"].($adminpath = substr(PATH, strlen($info->adminURI))).".php") ||
-		file_exists(INCLUDES["VIEWS"].$adminpath) ||
-		file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) self::$response = self::RESPONSES["SYS"][200];
+			(file_exists(INCLUDES["VIEWS"].($adminpath = substr(PATH, strlen($info->adminURI))).".php") ||
+			file_exists(INCLUDES["VIEWS"].$adminpath) ||
+			file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) self::$response = self::RESPONSES["SYS"][200];
 
 		if(substr(PATH, 0, 8) == "/uploads" && file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8)) && trim(PATH, "/") != "uploads") self::$response = self::RESPONSES["UPLOAD"];
 		if(substr(PATH, 0, 4) == "/api") self::$response = self::RESPONSES["API"];
