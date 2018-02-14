@@ -3,6 +3,9 @@
 namespace Phroses;
 
 include __DIR__."/constants.php";
+
+$loader = include ((INPHAR) ? __DIR__ : dirname(__DIR__)) . "/vendor/autoload.php";
+$loader->addPsr4("Phroses\\", __DIR__."/models");
 include SRC."/functions.php";
 
 use \reqc;
@@ -73,8 +76,6 @@ abstract class Phroses {
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
 		Events::attach("modeset", [ (bool)(inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
-
-		DB::Update();
 
 		// page or asset
 		if(TYPE != TYPES["CLI"]) {
@@ -174,7 +175,6 @@ abstract class Phroses {
 		if(self::$response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) self::$response = self::RESPONSES["PAGE"][404];
 		if($info->maintenance && !$_SESSION && self::$response != self::RESPONSES["SYS"][200]) self::$response = self::RESPONSES["MAINTENANCE"];
 		
-
 		$pageData = [
 			"ID" => $info->pageID,
 			"TYPE" => $info->type ?? "page",

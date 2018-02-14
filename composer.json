@@ -10,6 +10,11 @@
     "require" : {
         "php" : ">=7.2",
         "ext-curl" : "*",
+        "ext-pdo_mysql" : "*",
+        "ext-json" : "*",
+        "ext-dom" : "*",
+        "ext-session" : "*",
+        "ext-date" : "*",
         "cythral/reqc" : "^1.4.1",
         "cythral/phyrex": "^0.1.0",
         "cythral/inix": "^0.1.1",
