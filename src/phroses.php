@@ -56,6 +56,14 @@ abstract class Phroses {
 		"UPLOAD" => 7,
 		"MAINTENANCE" => 8
 	];
+
+	const METHODS = [
+		"GET",
+		"POST",
+		"PATCH",
+		"PUT",
+		"DELETE"
+	];
 	
 
 	static public function start() {
@@ -74,12 +82,12 @@ abstract class Phroses {
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
 			if((bool) (inix::get("notrailingslashes") ?? true)) self::urlFix();
-			Events::attach("routestrace", [ METHOD, self::$response ], "\Phroses\Phroses::traceRoutes");
+			Events::attach("routesfollow", [ METHOD, self::$response ], "\Phroses\Phroses::followRoute");
 
 		// command line
 		} else {
 			Events::trigger("commandsmapped", [ include SRC."/commands.php" ]);
-			Events::attach("commandstrace", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::traceCommands");
+			Events::attach("commandsfollow", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::followCommand");
 			exit(0);
 		}
 	}
@@ -122,7 +130,7 @@ abstract class Phroses {
 	}
 
 	static public function route(?string $method, int $response, callable $handler, bool $json = false) {
-		$methods = ($method) ? [ strtoupper($method) ] : [ "GET", "POST", "PUT", "PATCH", "DELETE" ];
+		$methods = ($method) ? [ strtoupper($method) ] : [ "GET", "POST", "PUT", "PATCH", "DELETE" ]; // if method was null, create a route for all methods
 
 		foreach($methods as $method) {
 			if(!isset(self::$handlers[$method])) self::$handlers[$method] = [];
@@ -222,12 +230,13 @@ abstract class Phroses {
 		]);
 	}
 
-	static public function traceRoutes($method, $route) {
+	static public function followRoute($method, $route) {
 		if($route == self::RESPONSES["SYS"][200]) $method = "GET";
-		(isset(self::$handlers[$method][$route])) ? self::$handlers[$method][$route](self::$page) : self::$handlers[$method][self::RESPONSES["DEFAULT"]](self::$page);
+		if(!isset(self::$handlers[$method][$route])) $route = self::RESPONSES["DEFAULT"];
+		return self::$handlers[$method][$route](self::$page);
 	}
 
-	static public function traceCommands($cliArgs) {
+	static public function followCommand($cliArgs) {
 		array_shift($cliArgs); // remove filename
 		if(count($cliArgs) == 0) {
 			echo "no command given";
