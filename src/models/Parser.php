@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * email parser
  * i put this together in 5 minutes
  * don't judge me
  * @todo conform to rfc2822

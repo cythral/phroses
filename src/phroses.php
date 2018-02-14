@@ -34,7 +34,7 @@ abstract class Phroses {
 
 
 	const ON = true;
-    const OFF = false;
+	const OFF = false;
 	const RESPONSES = [
 		"DEFAULT" => 0,
 
@@ -57,25 +57,25 @@ abstract class Phroses {
 	static public function start() {
 		if(self::$ran) return; // only run once
 		self::$out = new Output();
-		
+
 		Events::trigger("pluginsloaded", [self::loadPlugins()]);
 		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
 		Events::attach("modeset", [ (bool)(inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
-		
+
 		DB::Update();
 
 		// page or asset
 		if(reqc\TYPE != reqc\TYPES["CLI"]) {
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [self::setupSession()]);
-            Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
+			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
 			if(((bool)(inix::get("notrailingslashes") ?? true))) self::urlFix();
 			Events::attach("routestrace", [ reqc\METHOD, self::$response ], "\Phroses\Phroses::traceRoutes");
 
 		// command line
 		} else {
 			Events::trigger("commandsmapped", [ include SRC."/commands.php" ]);
-            Events::attach("commandstrace", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::traceCommands");
+			Events::attach("commandstrace", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::traceCommands");
 			exit(0);
 		}
 	}
@@ -83,15 +83,15 @@ abstract class Phroses {
 	static public function setupMode(bool $noindex) {
 		if(self::$ran) return; // only run once
 		if(!array_key_exists(inix::get("mode"), self::$modes)) return false;
-        foreach(self::$modes[inix::get("mode")] as $key => $val) { ini_set($key, $val); }
+		foreach(self::$modes[inix::get("mode")] as $key => $val) { ini_set($key, $val); }
 
-        if($noindex && inix::get("mode") == "development") {
-            self::$out->setHeader("X-Robots-Tag", "none");
-        }
+		if($noindex && inix::get("mode") == "development") {
+			self::$out->setHeader("X-Robots-Tag", "none");
+		}
 	}
 
-    static public function loadPlugins(): array {
-        foreach(glob(INCLUDES["PLUGINS"]."/*", GLOB_ONLYDIR) as $dir) {
+	static public function loadPlugins(): array {
+		foreach(glob(INCLUDES["PLUGINS"]."/*", GLOB_ONLYDIR) as $dir) {
 			static $list = [];
 			if(file_exists($dir."/bootstrap.php")) include $dir."/bootstrap.php";
 			$list[] = basename($dir);
@@ -107,7 +107,7 @@ abstract class Phroses {
 			$themeError->themename = basename($defaultTheme);
 			die($themeError);
 		}
-		
+
 		// if no configuration file found, run installer
 		if(!inix::load($configFile)) {
 			include SRC."/system/install.php";
@@ -144,19 +144,19 @@ abstract class Phroses {
 				die(new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
 			}
 		}
-		
+
 
 		// Determine Response Type
 		if(!isset(($info = $info[0])->pageID)) self::$response = self::RESPONSES["PAGE"][404];
 		if(PATH != "/" && substr(PATH, 0, strlen($info->adminURI)) == $info->adminURI &&
-			(file_exists(INCLUDES["VIEWS"].($adminpath = substr(PATH, strlen($info->adminURI))).".php") ||
-		   	file_exists(INCLUDES["VIEWS"].$adminpath) ||
-		   	file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) self::$response = self::RESPONSES["SYS"][200];
+		(file_exists(INCLUDES["VIEWS"].($adminpath = substr(PATH, strlen($info->adminURI))).".php") ||
+		file_exists(INCLUDES["VIEWS"].$adminpath) ||
+		file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) self::$response = self::RESPONSES["SYS"][200];
 
 		if(substr(PATH, 0, 8) == "/uploads" && file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8))) self::$response = self::RESPONSES["UPLOAD"];
 		if(substr(PATH, 0, 4) == "/api") self::$response = self::RESPONSES["API"];
 		if($info->type == "redirect") self::$response = self::RESPONSES["PAGE"][301];
-        if(self::$response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) self::$response = self::RESPONSES["PAGE"][404];
+		if(self::$response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) self::$response = self::RESPONSES["PAGE"][404];
 		if($info->maintenance && !$_SESSION && self::$response != self::RESPONSES["SYS"][200]) self::$response = self::RESPONSES["MAINTENANCE"];
 
 		$pageData = [
@@ -200,25 +200,25 @@ abstract class Phroses {
 		return Session::start();
 	}
 
-    
-    static public function setMaintenance(bool $mode = self::ON) {
-        if($mode == self::ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
-        if($mode == self::OFF) unlink(ROOT."/.maintenance");
-    }
 
-
-    static public function handleEmail() {
-        $data = file_get_contents("php://stdin");
-        $m = new Parser((string)$data);
-
-        Events::trigger("email", [
-            (string)$m->headers['from'],
-            (string)$m->headers['to'],
-            (string)$m->headers['subject'],
-            (string)$m->bodies['text/plain']
-        ]);
+	static public function setMaintenance(bool $mode = self::ON) {
+		if($mode == self::ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
+		if($mode == self::OFF) unlink(ROOT."/.maintenance");
 	}
-	
+
+
+	static public function handleEmail() {
+		$data = file_get_contents("php://stdin");
+		$m = new Parser((string)$data);
+
+		Events::trigger("email", [
+		(string)$m->headers['from'],
+		(string)$m->headers['to'],
+		(string)$m->headers['subject'],
+		(string)$m->bodies['text/plain']
+		]);
+	}
+
 	static public function traceRoutes($method, $route) {
 		if($route != self::RESPONSES["SYS"][200]) {
 			(isset(self::$handlers[$method][$route])) ? self::$handlers[$method][$route](self::$page) : self::$handlers[$method][self::RESPONSES["DEFAULT"]](self::$page);
@@ -244,14 +244,14 @@ abstract class Phroses {
 				else $args[$subparts[0]] = true;
 			}
 		}
-		
+
 		if(isset(self::$cmds[$cmd])) self::$cmds[$cmd]($args, $flags);
 	}
 
 	static public function error(string $error, bool $check, ?array $extra = [], int $code = 400) {
 		if(!(self::$out instanceof \reqc\JSON\Server)) self::$out = new \reqc\JSON\Server;
-        if($check) self::$out->send(array_merge(["type" => "error", "error" => $error], $extra), $code);
-    }
+		if($check) self::$out->send(array_merge(["type" => "error", "error" => $error], $extra), $code);
+	}
 }
 
 
