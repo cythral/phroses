@@ -7,12 +7,16 @@ header unset x-powered-by
 
 RewriteEngine on
 RewriteBase /
+DirectorySlash off   # needed for uris like /uploads to work when notrailingslashes = true
+
 # Maintenance Mode -- 
 RewriteCond %{DOCUMENT_ROOT}/.maintenance -f  
 RewriteRule ^(.*)$ .maintenance [L]
+
 # Developers Mode --
 RewriteCond %{DOCUMENT_ROOT}/.developer -f
 RewriteCond %{DOCUMENT_ROOT}/src/startup.php -f
 RewriteRule ^(.*)$ src/startup.php [L] 
+
 # Production --
 RewriteRule ^(.*)$ phroses.phar [L]

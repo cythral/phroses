@@ -88,15 +88,8 @@ self::route("get", self::RESPONSES["PAGE"][404], function(&$page) {
 	$page->display();
 });
 
-$assets = function(&$page) { $page->theme->assetRead(PATH); };
-foreach(["get", "put", "post", "patch", "delete"] as $method) {
-	self::route($method, self::RESPONSES["ASSET"], $assets);
-}
-
-$api = function(&$page) { $page->theme->runAPI(); };
-foreach(["get", "put", "post", "patch", "delete"] as $method) {
-	self::route($method, self::RESPONSES["API"], $api);
-}
+self::route(null, self::RESPONSES["ASSET"], function(&$page) { $page->theme->assetRead(PATH); });
+self::route(null, self::RESPONSES["API"], function(&$page) { $page->theme->runAPI(); });
 
 self::route("post", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
@@ -177,13 +170,9 @@ self::route("get", self::RESPONSES["UPLOAD"], function() {
 	readfileCached(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8));
 });
 
-$maintenance = function(&$page) {
+self::route(null, self::RESPONSES["MAINTENANCE"], function(&$page) {
 	self::$out->setCode(503);
 	die(new Template(INCLUDES["TPL"]."/maintenance.tpl"));
-};
-
-foreach(["get", "put", "post", "patch", "delete"] as $method) {
-	self::route($method, self::RESPONSES["MAINTENANCE"], $maintenance);
-}
+});
 
 return self::$handlers;

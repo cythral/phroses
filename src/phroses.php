@@ -56,12 +56,13 @@ abstract class Phroses {
 		"UPLOAD" => 7,
 		"MAINTENANCE" => 8
 	];
+	
 
 	static public function start() {
 		if(self::$ran) return; // only run once
 		self::$out = new Output();
 
-		Events::trigger("pluginsloaded", [self::loadPlugins()]);
+		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
 		Events::attach("modeset", [ (bool)(inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
 
@@ -72,7 +73,7 @@ abstract class Phroses {
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
-			if(((bool)(inix::get("notrailingslashes") ?? true))) self::urlFix();
+			if((bool) (inix::get("notrailingslashes") ?? true)) self::urlFix();
 			Events::attach("routestrace", [ METHOD, self::$response ], "\Phroses\Phroses::traceRoutes");
 
 		// command line
@@ -120,10 +121,13 @@ abstract class Phroses {
 		return true;
 	}
 
-	static public function route(string $method, int $response, callable $handler, bool $json = false) {
-		$method = strtoupper($method);
-		if(!isset(self::$handlers[$method])) self::$handlers[$method] = [];
-		self::$handlers[$method][$response] = $handler;
+	static public function route(?string $method, int $response, callable $handler, bool $json = false) {
+		$methods = ($method) ? [ strtoupper($method) ] : [ "GET", "POST", "PUT", "PATCH", "DELETE" ];
+
+		foreach($methods as $method) {
+			if(!isset(self::$handlers[$method])) self::$handlers[$method] = [];
+			self::$handlers[$method][$response] = $handler;
+		}
 	}
 
 	static public function addCmd(string $cmd, callable $handler) {
@@ -156,11 +160,12 @@ abstract class Phroses {
 		file_exists(INCLUDES["VIEWS"].$adminpath) ||
 		file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) self::$response = self::RESPONSES["SYS"][200];
 
-		if(substr(PATH, 0, 8) == "/uploads" && file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8))) self::$response = self::RESPONSES["UPLOAD"];
+		if(substr(PATH, 0, 8) == "/uploads" && file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8)) && trim(PATH, "/") != "uploads") self::$response = self::RESPONSES["UPLOAD"];
 		if(substr(PATH, 0, 4) == "/api") self::$response = self::RESPONSES["API"];
 		if($info->type == "redirect") self::$response = self::RESPONSES["PAGE"][301];
 		if(self::$response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) self::$response = self::RESPONSES["PAGE"][404];
 		if($info->maintenance && !$_SESSION && self::$response != self::RESPONSES["SYS"][200]) self::$response = self::RESPONSES["MAINTENANCE"];
+		
 
 		$pageData = [
 			"ID" => $info->pageID,
@@ -218,9 +223,8 @@ abstract class Phroses {
 	}
 
 	static public function traceRoutes($method, $route) {
-		if($route != self::RESPONSES["SYS"][200]) {
-			(isset(self::$handlers[$method][$route])) ? self::$handlers[$method][$route](self::$page) : self::$handlers[$method][self::RESPONSES["DEFAULT"]](self::$page);
-		} else self::$handlers["GET"][$route](self::$page);
+		if($route == self::RESPONSES["SYS"][200]) $method = "GET";
+		(isset(self::$handlers[$method][$route])) ? self::$handlers[$method][$route](self::$page) : self::$handlers[$method][self::RESPONSES["DEFAULT"]](self::$page);
 	}
 
 	static public function traceCommands($cliArgs) {

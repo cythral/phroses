@@ -1,4 +1,4 @@
-<?
+<?php
 
 use phyrex\Template;
 use \Phroses\{ DB, Theme };
