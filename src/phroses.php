@@ -10,6 +10,8 @@ use \reqc\Output;
 use \listen\Events;
 use \phyrex\Template;
 use \inix\Config as inix;
+use \ZBateson\MailMimeParser\MailMimeParser;
+
 use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL, TYPE, TYPES, METHOD };
 
 abstract class Phroses {
@@ -205,13 +207,13 @@ abstract class Phroses {
 
 	static public function handleEmail() {
 		$data = file_get_contents("php://stdin");
-		$m = new Parser((string)$data);
+		$m = (new MailMimeParser())->parse((string) $data);
 
 		Events::trigger("email", [
-			(string)$m->headers['from'],
-			(string)$m->headers['to'],
-			(string)$m->headers['subject'],
-			(string)$m->bodies['text/plain']
+			$m->getHeaderValue('from'),
+			$m->getHeaderValue('to'),
+			$m->getHeaderValue('subject'),
+			$m->getTextContent() || $m->getHtmlContent()
 		]);
 	}
 

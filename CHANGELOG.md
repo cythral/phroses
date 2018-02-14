@@ -19,6 +19,7 @@
 - THEME response was removed
 - ASSET response was added, switches handling from PAGE[404].  Theme assets are also accessible when maintenance mode is turned on.
 - Improvements to session handling
+- Parser class was removed in favor of zbateson/MailMimeParser
 
 <br />
 
