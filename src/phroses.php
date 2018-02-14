@@ -10,9 +10,10 @@ use \reqc\Output;
 use \listen\Events;
 use \phyrex\Template;
 use \inix\Config as inix;
-use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL };
+use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL, TYPE, TYPES, METHOD };
 
 abstract class Phroses {
+	
 	static private $out;
 	static private $handlers = [];
 	static private $cmds = [];
@@ -65,12 +66,12 @@ abstract class Phroses {
 		DB::Update();
 
 		// page or asset
-		if(reqc\TYPE != reqc\TYPES["CLI"]) {
+		if(TYPE != TYPES["CLI"]) {
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
 			if(((bool)(inix::get("notrailingslashes") ?? true))) self::urlFix();
-			Events::attach("routestrace", [ reqc\METHOD, self::$response ], "\Phroses\Phroses::traceRoutes");
+			Events::attach("routestrace", [ METHOD, self::$response ], "\Phroses\Phroses::traceRoutes");
 
 		// command line
 		} else {
