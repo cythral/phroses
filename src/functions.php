@@ -17,23 +17,6 @@ function FileList($dir) : array {
     return [];
 }
 
-/**
- * @deprecated use reqc's json server instead
- */
-function JsonOutput($array, $code = 400) {
-    http_response_code($code);
-    header("content-type: application/json; charset=utf8");
-    die(json_encode($array));
-}
-
-/**
- * @deprecated use reqc's json server instead.
- */
-function JsonOutputSuccess($array = [ "type" => "success" ], $code = 200) {
-  JsonOutput($array, $code);
-}
-
-
 function handleMethod(string $method, callable $handler, array $filters = []) {
     if(reqc\TYPE == "cli") return;
     
@@ -63,6 +46,12 @@ function handleMethod(string $method, callable $handler, array $filters = []) {
         $out->setCode(200);
         $handler($out);
         die;
+    }
+}
+
+function mapError(string $error, bool $check, ?array $extra = [], int $code = 400) {
+	if($check) {
+        (new reqc\JSON\Server())->send(array_merge(["type" => "error", "error" => $error], $extra), $code);
     }
 }
 
@@ -96,7 +85,6 @@ function sendEvent(string $event, array $data) {
 
 function readfileCached($file) {
     if(!file_exists($file)) return false;
-    
     
     $lastmodified = filemtime($file);
     $gmt_mtime = gmdate('r', $lastmodified);

@@ -16,7 +16,7 @@ use \phyrex\Template;
 
 use const \reqc\{ VARS, MIME_TYPES, PATH, EXTENSION, METHOD, HOST, BASEURL };
 
-self::route("get", self::RESPONSES["PAGE"][200], function(&$page) {
+self::addRoute("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
 	if(arrayValEquals($_GET, "mode", "json")) {
 		self::$out = new JSONServer();
@@ -26,7 +26,7 @@ self::route("get", self::RESPONSES["PAGE"][200], function(&$page) {
 	$page->display();
 });
 
-self::route("get", self::RESPONSES["PAGE"][301], function(&$page) {
+self::addRoute("get", self::RESPONSES["PAGE"][301], function(&$page) {
 
 	if(array_key_exists("destination", $page->content) && !empty($page->content["destination"]) && $page->content["destination"] != PATH) {
         self::$out->redirect($page->content["destination"]);
@@ -36,7 +36,7 @@ self::route("get", self::RESPONSES["PAGE"][301], function(&$page) {
 	$page->display([ "main" => (string) new Template(INCLUDES["TPL"]."/errors/redirect.tpl") ]);
 });
 
-self::route("get", self::RESPONSES["SYS"][200], function(&$page) {
+self::addRoute("get", self::RESPONSES["SYS"][200], function(&$page) {
 	$path = substr(PATH, strlen(SITE["ADMINURI"]));
 
 	if(!is_dir($file = INCLUDES["VIEWS"].$path) && file_exists($file) && strtolower(EXTENSION) != "php") {
@@ -75,7 +75,7 @@ self::route("get", self::RESPONSES["SYS"][200], function(&$page) {
 	$page->display();
 });
 
-self::route("get", self::RESPONSES["PAGE"][404], function(&$page) {		
+self::addRoute("get", self::RESPONSES["PAGE"][404], function(&$page) {		
 	self::$out->setCode(404);
 	self::$out->setContentType(MIME_TYPES["HTML"]);
 	
@@ -88,21 +88,21 @@ self::route("get", self::RESPONSES["PAGE"][404], function(&$page) {
 	$page->display();
 });
 
-self::route(null, self::RESPONSES["ASSET"], function(&$page) { $page->theme->assetRead(PATH); });
-self::route(null, self::RESPONSES["API"], function(&$page) { $page->theme->runAPI(); });
+self::addRoute(null, self::RESPONSES["ASSET"], function(&$page) { $page->theme->assetRead(PATH); });
+self::addRoute(null, self::RESPONSES["API"], function(&$page) { $page->theme->runAPI(); });
 
-self::route("post", self::RESPONSES["DEFAULT"], function(&$page) {
+self::addRoute("post", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
 
 	// Validation
-	self::error("access_denied", !$_SESSION, null, 401);
-	self::error("resource_exists", self::$response != self::RESPONSES["PAGE"][404]);
+	mapError("access_denied", !$_SESSION, null, 401);
+	mapError("resource_exists", self::$response != self::RESPONSES["PAGE"][404]);
 
 	foreach(["title","type"] as $type) {
-		self::error("missing_value", !array_key_exists($type, $_REQUEST), [ "field" => $type ]);
+		mapError("missing_value", !array_key_exists($type, $_REQUEST), [ "field" => $type ]);
 	}
 
-	self::error("bad_value", !$page->theme->hasType($_REQUEST["type"]), [ "field" => "type" ]);
+	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"]), [ "field" => "type" ]);
 
 	$id = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", SITE["ID"]);
 	$theme = new Theme(SITE["THEME"], $_REQUEST["type"]);
@@ -115,18 +115,18 @@ self::route("post", self::RESPONSES["DEFAULT"], function(&$page) {
 	], 200);
 });
 
-self::route("patch", self::RESPONSES["DEFAULT"], function(&$page) {
+self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
 
 	// Validation
-	self::error("access_denied", !$_SESSION, null, 401);
-	self::error("resource_missing", !in_array(SITE["RESPONSE"], [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
-	self::error("no_change", keysDontExist(["type", "uri", "title", "content", "public"], $_REQUEST));
-	self::error("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
+	mapError("access_denied", !$_SESSION, null, 401);
+	mapError("resource_missing", !in_array(SITE["RESPONSE"], [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
+	mapError("no_change", keysDontExist(["type", "uri", "title", "content", "public"], $_REQUEST));
+	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
 
 	if(isset($_REQUEST["uri"])) {
 		$count = DB::Query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ SITE["ID"], $_REQUEST["uri"]])[0]->count ?? 0;
-		self::error("resource_exists", $count > 0);
+		mapError("resource_exists", $count > 0);
 	}
 
 	// do NOT update the database if the request is to change the page to a redirect and there is no content specifying the destination.
@@ -155,24 +155,24 @@ self::route("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 });
 
 
-self::route("delete", self::RESPONSES["DEFAULT"], function(&$page) {
+self::addRoute("delete", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
 	 
-	self::error("access_denied", !$_SESSION, null, 401);
-	self::error("resource_missing", !in_array(Phroses::$response, [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
+	mapError("access_denied", !$_SESSION, null, 401);
+	mapError("resource_missing", !in_array(Phroses::$response, [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
 
 	$page->delete();
 	self::$out->send(["type" => "success"], 200);
 });
 
 
-self::route("get", self::RESPONSES["UPLOAD"], function() {
+self::addRoute("get", self::RESPONSES["UPLOAD"], function() {
 	readfileCached(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8));
 });
 
-self::route(null, self::RESPONSES["MAINTENANCE"], function(&$page) {
+self::addRoute(null, self::RESPONSES["MAINTENANCE"], function(&$page) {
 	self::$out->setCode(503);
 	die(new Template(INCLUDES["TPL"]."/maintenance.tpl"));
 });
 
-return self::$handlers;
+return self::$routes;
