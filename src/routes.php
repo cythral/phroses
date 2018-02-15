@@ -120,7 +120,7 @@ self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 
 	// Validation
 	mapError("access_denied", !$_SESSION, null, 401);
-	mapError("resource_missing", !in_array(SITE["RESPONSE"], [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
+	mapError("resource_missing", !in_array(self::$response, [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
 	mapError("no_change", keysDontExist(["type", "uri", "title", "content", "public"], $_REQUEST));
 	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
 
