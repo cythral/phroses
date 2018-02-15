@@ -14,8 +14,13 @@ use \listen\Events;
 use \inix\Config as inix;
 use \phyrex\Template;
 
+// request variables
 use const \reqc\{ VARS, MIME_TYPES, PATH, EXTENSION, METHOD, HOST, BASEURL };
 
+/**
+ * GET PAGE/200
+ * This route gets page information and either displays it as html or json
+ */
 self::addRoute("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
 	if(arrayValEquals($_GET, "mode", "json")) {
@@ -26,6 +31,10 @@ self::addRoute("get", self::RESPONSES["PAGE"][200], function(&$page) {
 	$page->display();
 });
 
+/**
+ * GET PAGE/301
+ * This route redirects to a different page.  If the destination is not specified, an error is displayed instead
+ */
 self::addRoute("get", self::RESPONSES["PAGE"][301], function(&$page) {
 
 	if(array_key_exists("destination", $page->content) && !empty($page->content["destination"]) && $page->content["destination"] != PATH) {
@@ -36,6 +45,10 @@ self::addRoute("get", self::RESPONSES["PAGE"][301], function(&$page) {
 	$page->display([ "main" => (string) new Template(INCLUDES["TPL"]."/errors/redirect.tpl") ]);
 });
 
+/**
+ * GET SYS/200
+ * Displays an internal phroses "view" (can be a dashboard page or asset file)
+ */
 self::addRoute("get", self::RESPONSES["SYS"][200], function(&$page) {
 	$path = substr(PATH, strlen(SITE["ADMINURI"]));
 
@@ -75,6 +88,10 @@ self::addRoute("get", self::RESPONSES["SYS"][200], function(&$page) {
 	$page->display();
 });
 
+/**
+ * GET PAGE/404
+ * Displays a a 404 not found error when a page or asset is not found.
+ */
 self::addRoute("get", self::RESPONSES["PAGE"][404], function(&$page) {		
 	self::$out->setCode(404);
 	self::$out->setContentType(MIME_TYPES["HTML"]);
@@ -88,9 +105,26 @@ self::addRoute("get", self::RESPONSES["PAGE"][404], function(&$page) {
 	$page->display();
 });
 
-self::addRoute(null, self::RESPONSES["ASSET"], function(&$page) { $page->theme->assetRead(PATH); });
-self::addRoute(null, self::RESPONSES["API"], function(&$page) { $page->theme->runAPI(); });
+/**
+ * (All) ASSET
+ * Serves theme asset files
+ */
+self::addRoute(null, self::RESPONSES["ASSET"], function(&$page) { 
+	$page->theme->assetRead(PATH); 
+});
 
+/**
+ * (All) API
+ * Runs the theme API, if it has one
+ */
+self::addRoute(null, self::RESPONSES["API"], function(&$page) { 
+	$page->theme->runAPI(); 
+});
+
+/**
+ * POST (Default handler)
+ * This handles all post requests.  If a page does not exist, this route creates one based on request parameters.
+ */
 self::addRoute("post", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
 
@@ -115,6 +149,10 @@ self::addRoute("post", self::RESPONSES["DEFAULT"], function(&$page) {
 	], 200);
 });
 
+/**
+ * PATCH (Default handler)
+ * This handles all put requests.  If a page exists, this route edits it based on request parameters.
+ */
 self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
 
@@ -154,7 +192,10 @@ self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out->send($output, 200);
 });
 
-
+/**
+ * DELETE (Default Handler)
+ * This handles all delete requests. If a page exists, this route deletes it.
+ */
 self::addRoute("delete", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out = new JSONServer();
 	 
@@ -165,14 +206,21 @@ self::addRoute("delete", self::RESPONSES["DEFAULT"], function(&$page) {
 	self::$out->send(["type" => "success"], 200);
 });
 
-
+/**
+ * GET UPLOAD
+ * This route serves upload files.
+ */
 self::addRoute("get", self::RESPONSES["UPLOAD"], function() {
 	readfileCached(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8));
 });
 
+/**
+ * (All) MAINTENANCE
+ * This route displays maintenance mode if a site is in one.
+ */
 self::addRoute(null, self::RESPONSES["MAINTENANCE"], function(&$page) {
 	self::$out->setCode(503);
 	die(new Template(INCLUDES["TPL"]."/maintenance.tpl"));
 });
 
-return self::$routes;
+return self::$routes;  // return a list of routes for the listen event
