@@ -2,8 +2,11 @@
 
 namespace Phroses;
 
+use \Exception;
 use \reqc\Output;
 use \inix\Config as inix;
+
+use const \reqc\{ MIME_TYPES };
 
 class Page {
     private $data;
@@ -24,7 +27,7 @@ class Page {
     public function __construct(array $options, Output $oh) {
         $options = array_change_key_case($options);
         foreach(self::REQUIRED_OPTIONS as $option) {
-            if(!array_key_exists($option, $options)) throw new \Exception("Missing required option $option");
+            if(!array_key_exists($option, $options)) throw new Exception("Missing required option $option");
         }
 
         $this->data = $options;
@@ -37,7 +40,7 @@ class Page {
     }
 
     public function __set($key, $val) {
-        if($this->id) DB::Query("UPDATE `pages` SET `$key`=? WHERE `id`=?", [$val, $this->id]);
+        if($this->id) DB::query("UPDATE `pages` SET `$key`=? WHERE `id`=?", [$val, $this->id]);
         $this->data[$key] = $val;
         return true;
     }
@@ -48,7 +51,7 @@ class Page {
 
     public function display(?array $content = null) {
         ob_start("ob_gzhandler");
-        $this->oh->setContentType(\reqc\MIME_TYPES["HTML"]); 
+        $this->oh->setContentType(MIME_TYPES["HTML"]); 
 
         $this->theme->title = $this->title;
         $this->theme->setContent($content ?? $this->content);
@@ -61,13 +64,13 @@ class Page {
     }
 
     public function delete() {
-        DB::Query("DELETE FROM `pages` WHERE `id`=?", [ $this->id ]);
+        DB::query("DELETE FROM `pages` WHERE `id`=?", [ $this->id ]);
     }
 
     static public function create($path, $title, $type, $content = "{}", $siteId = null) {
-        if(!$siteId && !defined("SITE")) throw new \Exception("No siteID Present");
+        if(!$siteId && !defined("SITE")) throw new Exception("No siteID Present");
 
-        DB::Query("INSERT INTO `pages` (`uri`,`title`,`type`,`content`, `siteID`,`dateCreated`) VALUES (?, ?, ?, ?, ?, NOW())", [
+        DB::query("INSERT INTO `pages` (`uri`,`title`,`type`,`content`, `siteID`,`dateCreated`) VALUES (?, ?, ?, ?, ?, NOW())", [
             $path,
             $title,
             $type,
@@ -75,6 +78,6 @@ class Page {
             $siteId ?? SITE["ID"]
         ]);
 
-        return DB::LastID();
+        return DB::lastID();
     }
 }
