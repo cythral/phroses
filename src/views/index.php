@@ -2,13 +2,13 @@
 
 use phyrex\Template;
 use \Phroses\{ DB, Theme };
-use function Phroses\{ HandleMethod };
+use function Phroses\{ HandleMethod, mapError };
 use const \Phroses\{ SITE, INCLUDES };
 
 handleMethod("POST", function($out) {
     if(!empty($_POST["theme"])) {
         mapError("bad_theme", !file_exists(INCLUDES["THEMES"]."/".$_POST["theme"]));
-        DB::Query("UPDATE `sites` SET `theme`=? WHERE `id`=?", [ $_POST["theme"], SITE["ID"] ]);
+        DB::query("UPDATE `sites` SET `theme`=? WHERE `id`=?", [ $_POST["theme"], SITE["ID"] ]);
     }
 
     if(!empty($_POST["uri"])) {
@@ -18,11 +18,15 @@ handleMethod("POST", function($out) {
         mapError("resource_exists", $count != 0);
         mapError("bad_uri", $_POST['uri'] == "/");
 
-        DB::Query("UPDATE `sites` SET `adminURI`=? WHERE `id`=?", [ $_POST["uri"], SITE["ID"] ]);
+        DB::query("UPDATE `sites` SET `adminURI`=? WHERE `id`=?", [ $_POST["uri"], SITE["ID"] ]);
     }
 
     if(isset($_POST["maintenance"])) {
-        DB::Query("UPDATE `sites` SET `maintenance`=? WHERE `id`=?", [ (bool)$_POST["maintenance"], SITE["ID"] ]);
+        DB::query("UPDATE `sites` SET `maintenance`=? WHERE `id`=?", [ (bool)$_POST["maintenance"], SITE["ID"] ]);
+    }
+    
+    if(!empty($_POST["name"])) {
+        DB::query("UPDATE `sites` SET `name`=? WHERE `id`=?", [ $_POST["name"], SITE["ID"] ]);
     }
 
     $out->send(["type" => "success"], 200);
@@ -38,7 +42,7 @@ $index->viewcount = (($views = ($vars->viewcount ?? 0)) > 999) ? "999+" : $views
 $index->fullviewcount = $vars->viewcount;
 $index->adminuri = SITE["ADMINURI"];
 
-foreach(Theme::List() as $thm) {
+foreach(Theme::list() as $thm) {
     $index->push("themes", [ "name" => $thm, "selected" => ($thm == SITE["THEME"]) ? "selected" : "" ]);
 }
 

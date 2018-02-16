@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file defines a number of utility functions
+ */
 
 namespace Phroses;
 

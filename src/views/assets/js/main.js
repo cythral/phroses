@@ -491,5 +491,12 @@ $(function() {
 			collect: function() { return { "maintenance" : $(this).val() } },
 			success: Phroses.displaySaved
 		});
+		
+		Phroses.formify({
+			selector: ".site-namer input",
+			action: "change",
+			collect: function() { return { "name" : $(this).val() } },
+			success: Phroses.displaySaved
+		});
 	}
 });

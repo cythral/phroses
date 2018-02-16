@@ -20,6 +20,11 @@
     <br>
 
     <div class="aln-c">
+        <div class="form_icfix aln-l c site-namer">
+            <div>Site Name:</div>
+            <input class="c form_field form_input" type="text" value="<{site::name}>" data-method="POST" data-url="">
+        </div>
+        
         <div class="form_icfix aln-l c theme-select">
             <div>Theme:</div>
             <select class="c form_field form_select" id="theme-selector" data-method="POST" data-url="">
