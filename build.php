@@ -50,4 +50,4 @@ rrmdir("src/vendor");
 unlink("src/composer.json"); 
 unlink("phroses.tar"); 
 
-echo "build complete".PHP_EOL;
+echo "BUILD COMPLETE".PHP_EOL;
