@@ -20,8 +20,9 @@
 - ASSET response was added, switches handling from PAGE[404].  Theme assets are also accessible when maintenance mode is turned on.
 - Improvements to session handling
 - Parser class was removed in favor of zbateson/MailMimeParser
-- Phroses\JsonOutput, Phroses\JsonOutputError and Phroses\sendEvent have been removed
+- Phroses\JsonOutput, Phroses\JsonOutputError, Phroses\sendEvent and Phroses\mapValue have been removed
 - Phroses\mapError added (shorthand for outputting a json error if an expression evaluates to true)
+- Phroses\allKeysExist, Phroses\allKeysDontExist, Phroses\safeArrayValEquals array utilities added
 
 <br />
 

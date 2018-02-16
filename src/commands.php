@@ -12,7 +12,7 @@ use \ZBateson\MailMimeParser\MailMimeParser;
  */
 self::addCmd("maintenance", function($args, $flags) {
 	if(isset($args["mode"])) {
-		self::setMaintenance(mapValue(strtolower($args["mode"]), [ "on" => self::MM_ON, "off" => self::MM_OFF ]));
+		self::setMaintenance([ "on" => self::MM_ON, "off" => self::MM_OFF ][strtolower($args["mode"])]);
 	}
 });
 

@@ -23,7 +23,7 @@ use const \reqc\{ VARS, MIME_TYPES, PATH, EXTENSION, METHOD, HOST, BASEURL };
  */
 self::addRoute("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
-	if(arrayValEquals($_GET, "mode", "json")) {
+	if(safeArrayValEquals($_GET, "mode", "json")) {
 		self::$out = new JSONServer();
 		self::$out->send($page->getAll(), 200);
 	}
@@ -159,7 +159,7 @@ self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 	// Validation
 	mapError("access_denied", !$_SESSION, null, 401);
 	mapError("resource_missing", !in_array(self::$response, [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
-	mapError("no_change", keysDontExist(["type", "uri", "title", "content", "public"], $_REQUEST));
+	mapError("no_change", allKeysDontExist(["type", "uri", "title", "content", "public"], $_REQUEST));
 	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
 
 	if(isset($_REQUEST["uri"])) {
@@ -169,7 +169,7 @@ self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 
 	// do NOT update the database if the request is to change the page to a redirect and there is no content specifying the destination.
 	// if the page is a type redirect and there is no destination, an error will be displayed which we should be trying to avoid
-	if(!(arrayValEquals($_REQUEST, "type", "redirect") && (!isset($_REQUEST["content"]) || 
+	if(!(safeArrayValEquals($_REQUEST, "type", "redirect") && (!isset($_REQUEST["content"]) || 
 		(isset($_REQUEST["content"]) && !isset(json_decode($_REQUEST["content"])->destination))))) {
 			
 		if(isset($_REQUEST["title"])) $page->title = $_REQUEST["title"];
