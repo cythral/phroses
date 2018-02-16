@@ -4,6 +4,7 @@ namespace Phroses;
 
 use \reqc;
 use \RecursiveIteratorIterator as FileIterator;
+use \RecursiveDirectoryIterator as DirectoryIterator;
 
 /**
  * Return a list of files
@@ -11,7 +12,7 @@ use \RecursiveIteratorIterator as FileIterator;
 function fileList($dir) : array {
     if(file_exists($dir)) {
         $files = [];
-        $iterator = new FileIterator(new FileIterator($dir), FileIterator::CHILD_FIRST);
+        $iterator = new FileIterator(new DirectoryIterator($dir), FileIterator::CHILD_FIRST);
         foreach($iterator as $file) {
             if(!substr($file, strrpos($file, ".")+1)) continue;
             $files[] = $file;
