@@ -6,7 +6,8 @@ use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES};
 
 ob_end_clean();
 ob_end_clean();
-ob_end_clean();
+ob_end_clean(); // third times the charm
+
 ini_set("memory_limit", "50M");
 self::$out = new reqc\EventStream\Server();
 
@@ -44,7 +45,7 @@ try {
     if(!rrmdir(INCLUDES["THEMES"])) throw new WriteException("delete", INCLUDES["THEMES"]);
     if(!rrmdir(INCLUDES["PLUGINS"])) throw new WriteException("delete", INCLUDES["PLUGINS"]);
     self::$out->send("progress", [ "progress" => 40 ]);
-    
+
     if(!rename("tmp/themes", INCLUDES["THEMES"])) throw new WriteException("restore", INCLUDES["THEMES"]);
     if(!rename("tmp/plugins", INCLUDES["PLUGINS"])) throw new WriteException("restore", INCLUDES["PLUGINS"]);
     if(!rename("tmp/phroses.conf", "phroses.conf")) throw new WriteException("restore", ROOT."/tmp/phroses.conf");
