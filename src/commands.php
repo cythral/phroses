@@ -20,7 +20,7 @@ self::addCmd("maintenance", function($args, $flags) {
  * Updates phroses' database schema
  */
 self::addCmd("update", function($args, $flags) {
-	DB::Update();
+	DB::update();
 });
 
 /**
