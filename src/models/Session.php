@@ -10,7 +10,7 @@ class Session implements \SessionHandlerInterface {
 
         session_set_save_handler(new Session, true);
         session_start();
-        
+
         self::$run = true;
         return session_id();
     }
@@ -21,7 +21,7 @@ class Session implements \SessionHandlerInterface {
     }
 
     public function open($a, $b) { 
-        return true; 
+        return class_exists("DB"); 
     }
 
     public function close() { 
