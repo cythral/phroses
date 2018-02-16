@@ -163,7 +163,7 @@ self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
 
 	if(isset($_REQUEST["uri"])) {
-		$count = DB::Query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ SITE["ID"], $_REQUEST["uri"]])[0]->count ?? 0;
+		$count = DB::query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ SITE["ID"], $_REQUEST["uri"]])[0]->count ?? 0;
 		mapError("resource_exists", $count > 0);
 	}
 
