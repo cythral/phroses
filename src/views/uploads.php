@@ -6,11 +6,6 @@ use const Phroses\{ INCLUDES, SITE };
 
 $uploaddir = INCLUDES["UPLOADS"]."/".reqc\BASEURL."/";
 
-function parseSize($size) {
-    $unit = strtolower(substr($size, -1, 1));
-    return (int)$size * pow(1024, stripos('bkmgtpezy', $unit));
-}
-
 handleMethod("post", function($out) use ($uploaddir) {
 
     $error = function (string $error, bool $check, array $extra = []) use ($out) {

@@ -128,3 +128,11 @@ function allKeysDontExist(array $keys, array $array) {
 function safeArrayValEquals(array $haystack, string $needle, string $equal) {
     return array_key_exists($needle, $haystack) && $haystack[$needle] == $equal;
 }
+
+/**
+ * Parse a filesize string like 12M to bytes
+ */
+function parseSize($size) {
+    $unit = strtolower(substr($size, -1, 1));
+    return (int) $size * pow(1024, stripos('bkmgtpezy', $unit));
+}
