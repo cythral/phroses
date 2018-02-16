@@ -25,7 +25,7 @@ self::addRoute("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
 	if(safeArrayValEquals($_GET, "mode", "json")) {
 		self::$out = new JSONServer();
-		self::$out->send($page->getAll(), 200);
+		self::$out->send($page->getData(), 200);
 	}
 
 	$page->display();
