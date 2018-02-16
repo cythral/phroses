@@ -7,6 +7,7 @@ use function Phroses\{ handleMethod };
 use const Phroses\{ SITE, INCLUDES };
 
 handleMethod("post", function($out) {
+    
     mapError("bad_value", empty($_POST["username"]), [ "field" => "username" ]);
 
     if($_POST["old"] != "" || $_POST["new"] != "" || $_POST["repeat"] != "") {
