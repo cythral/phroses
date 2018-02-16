@@ -21,7 +21,7 @@ class Session implements \SessionHandlerInterface {
     }
 
     public function open($a, $b) { 
-        return class_exists("DB"); 
+        return class_exists("\Phroses\DB"); 
     }
 
     public function close() { 
