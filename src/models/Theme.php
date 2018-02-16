@@ -1,10 +1,12 @@
 <?php 
+
 namespace Phroses; 
 
 use \Exception;
 use \reqc; 
 use \inix\Config as inix;
 use \phyrex\Template as Template;
+
 /**
  * This class is a custom implementation of templates that provides
  * an easy way to display a consistent look across a website.  This reads
