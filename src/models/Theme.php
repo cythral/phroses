@@ -2,6 +2,7 @@
 
 namespace Phroses; 
 
+use \DOMDocument;
 use \Exception;
 use \reqc; 
 use \inix\Config as inix;
@@ -113,15 +114,16 @@ final class Theme extends Template {
 	}
     
     public function setType(string $type, bool $reload = false) {
-        if(!file_exists("{$this->root}/{$type}.tpl") && $type != "redirect") throw new \Exception("Theme template doesn't exist");
+        if(!file_exists("{$this->root}/{$type}.tpl") && $type != "redirect") throw new Exception("Theme template doesn't exist");
         $this->type = $type;
         if($reload) $this->tpl = file_get_contents("{$this->root}/{$this->type}.tpl");
     }
 	
 	public function getBody() {
         $this->useconst = false;
-        $src = new \DOMDocument;
-        $dest = new \DOMDocument;
+        $src = new DOMDocument;
+		$dest = new DOMDocument;
+		
         @$src->loadHTML((string) $this);
         $body = $src->getElementsByTagName('body')->item(0);
         if(!$body) return;
@@ -190,8 +192,9 @@ Theme::$filters["content"] = function($key, $fieldtype) {
 };
 
 Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertype = "ASC") {
-    if(!in_array(strtoupper($ordertype), ["ASC", "DESC"])) return;
-    $tlist = DB::Query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=? ORDER BY `{$orderby}` {$ordertype}", [ SITE["ID"], $type ]);
+	if(!in_array(strtoupper($ordertype), ["ASC", "DESC"])) return;
+	
+    $tlist = DB::query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=? ORDER BY `{$orderby}` {$ordertype}", [ SITE["ID"], $type ]);
     foreach($tlist as $page) {
         $out = $field;
         
