@@ -7,7 +7,7 @@ use const \Phroses\{ SITE, INCLUDES };
 
 handleMethod("POST", function($out) {
     if(!empty($_POST["theme"])) {
-        if(!file_exists(INCLUDES["THEMES"]."/".$_POST["theme"])) $out->send(["type" => "error", "error" => "bad_theme"], 400);
+        mapError("bad_theme", !file_exists(INCLUDES["THEMES"]."/".$_POST["theme"]));
         DB::Query("UPDATE `sites` SET `theme`=? WHERE `id`=?", [ $_POST["theme"], SITE["ID"] ]);
     }
 
@@ -15,8 +15,8 @@ handleMethod("POST", function($out) {
         $_POST["uri"] = "/".trim($_POST["uri"], "/");
 
         $count = DB::Query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `uri`=? AND `siteID`=?", [ $_POST["uri"], SITE["ID"] ])[0]->count ?? 0;
-        if($count != 0) $out->send(["type" => "error", "error" => "resource_exists" ], 400);
-        if($_POST["uri"] == "/") $out->send(["type" => "error", "error" => "bad_uri" ], 400);
+        mapError("resource_exists", $count != 0);
+        mapError("bad_uri", $_POST['uri'] == "/");
 
         DB::Query("UPDATE `sites` SET `adminURI`=? WHERE `id`=?", [ $_POST["uri"], SITE["ID"] ]);
     }
@@ -24,6 +24,7 @@ handleMethod("POST", function($out) {
     if(isset($_POST["maintenance"])) {
         DB::Query("UPDATE `sites` SET `maintenance`=? WHERE `id`=?", [ (bool)$_POST["maintenance"], SITE["ID"] ]);
     }
+
     $out->send(["type" => "success"], 200);
 });
 
