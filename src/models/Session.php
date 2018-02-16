@@ -2,7 +2,9 @@
 
 namespace Phroses;
 
-class Session implements \SessionHandlerInterface {
+use \SessionHandlerInterface;
+
+class Session implements SessionHandlerInterface {
     static private $run = false;
 
     static public function start() {
@@ -29,22 +31,22 @@ class Session implements \SessionHandlerInterface {
     }
 
     public function read($id) {
-        $data = DB::Query("SELECT `data` FROM `sessions` WHERE `id`=?", [ $id ]);
+        $data = DB::query("SELECT `data` FROM `sessions` WHERE `id`=?", [ $id ]);
         return ($data) ? $data[0]->data : '';
     }
 
     public function write($id, $data) {
-        DB::Query("REPLACE INTO `sessions` (`id`, `data`) VALUES (?, ?)", [ $id, $data ]);
+        DB::query("REPLACE INTO `sessions` (`id`, `data`) VALUES (?, ?)", [ $id, $data ]);
         return true;
     }
 
     public function gc($max) {
-        DB::Query("DELETE FROM `sessions` WHERE TIMESTAMPDIFF(second, `date`, NOW()) > $max");
+        DB::query("DELETE FROM `sessions` WHERE TIMESTAMPDIFF(second, `date`, NOW()) > $max");
         return true;
     }
 
     public function destroy($id) {
-        DB::Query("DELETE FROM `sessions` WHERE `id`=?", [ $id ]);
+        DB::query("DELETE FROM `sessions` WHERE `id`=?", [ $id ]);
         return true;
     }
 }
