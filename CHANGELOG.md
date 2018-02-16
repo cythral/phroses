@@ -5,6 +5,7 @@
 - **Fix Incomplete Redirects**: you can now fix incomplete redirects on-page.  A more detailed error is displayed as well.
 - **Configurable Admin URI**: you can now configure /admin and subpages to have a different base uri
 - **Site Maintenance Mode**: you can now turn on maintenance mode for specific sites rather than all of them
+- **Site Renaming**: you can now rename the site from the dashboard
 ### Bug Fixes & Minor Changes
 - Fixes an overflow issue on PST icons (issue #7)
 - Fixes an issue where iOS still had a border and radius on inputs (issue #6)

@@ -28,6 +28,7 @@
 
 
 <form id="upload" class="container screen aln-c">
+    <a class="pst_btn upload-cancel" data-target="upload" data-action="fadeOut"><i class="ci ci-close"></i></a>
     <input id="file" name="file" type="file">
     <label for="file"><strong>Choose a file</strong> or drag it here</label>
 
