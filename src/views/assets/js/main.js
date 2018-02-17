@@ -498,5 +498,19 @@ $(function() {
 			collect: function() { return { "name" : $(this).val() } },
 			success: Phroses.displaySaved
 		});
+		
+		Phroses.formify({
+			selector: ".siteurl-changer input",
+			action: "change",
+			collect: function() { return { "url" : $(this).val() } },
+			success: function() {
+				Phroses.displaySaved();
+				var url = $(this).val();
+				
+				setTimeout(function() {
+					window.location.href = "http://" + url + window.location.pathname;
+				}, 2000);
+			}
+		});
 	}
 });

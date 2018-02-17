@@ -4,6 +4,7 @@ use phyrex\Template;
 use \Phroses\{ DB, Theme };
 use function Phroses\{ HandleMethod, mapError };
 use const \Phroses\{ SITE, INCLUDES };
+use const \reqc\{ HOST };
 
 handleMethod("POST", function($out) {
     if(!empty($_POST["theme"])) {
@@ -28,6 +29,10 @@ handleMethod("POST", function($out) {
     if(!empty($_POST["name"])) {
         DB::query("UPDATE `sites` SET `name`=? WHERE `id`=?", [ $_POST["name"], SITE["ID"] ]);
     }
+    
+    if(!empty($_POST["url"])) {
+        DB::query("UPDATE `sites` SET `url`=? WHERE `id`=?", [ $_POST["url"], SITE["ID"] ]);
+    }
 
     $out->send(["type" => "success"], 200);
 });
@@ -41,6 +46,7 @@ $index->fullpagecount = $vars->pagecount;
 $index->viewcount = (($views = ($vars->viewcount ?? 0)) > 999) ? "999+" : $views;
 $index->fullviewcount = $vars->viewcount;
 $index->adminuri = SITE["ADMINURI"];
+$index->host = HOST;
 
 foreach(Theme::list() as $thm) {
     $index->push("themes", [ "name" => $thm, "selected" => ($thm == SITE["THEME"]) ? "selected" : "" ]);
