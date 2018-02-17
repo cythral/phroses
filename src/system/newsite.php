@@ -3,7 +3,7 @@
 use \Phroses\DB;
 use \phyrex\Template;
 use \inix\Config as inix;
-use function \Phroses\handleMethod;
+use function \Phroses\{ handleMethod, mapError };
 use const \Phroses\{ SRC, INCLUDES };
 use const \reqc\{ BASEURL };
 

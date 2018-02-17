@@ -29,7 +29,9 @@ after_success:
   - wget https://raw.githubusercontent.com/snkrsnkampa/travis-ci-discord-webhook/master/send.sh
   - chmod +x send.sh
   - ./send.sh success
+
 after_failure:
   - wget https://raw.githubusercontent.com/snkrsnkampa/travis-ci-discord-webhook/master/send.sh
   - chmod +x send.sh
   - ./send.sh failure
+

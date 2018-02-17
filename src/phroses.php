@@ -85,7 +85,7 @@ abstract class Phroses {
 	 */
 	static public function start() {
 		self::$out = new Output();
-
+		
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
 		Events::attach("modeset", [ (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
@@ -180,7 +180,7 @@ abstract class Phroses {
 			PATH,
 			BASEURL
 		]);
-
+		
 		// if site doesn't exist, create a new one (script ends here)
 		if(count($info) == 0) {
 			if($showNewSite) include "system/newsite.php";

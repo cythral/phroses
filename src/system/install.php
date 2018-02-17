@@ -4,7 +4,7 @@ use \reqc\Output;
 use \phyrex\Template;
 use function \Phroses\handleMethod;
 
-use const \Phroses\{ DEPS, ROOT, SRC, SCHEMAVER, INCLUDES };
+use const \Phroses\{ DEPS, ROOT, SRC, SCHEMAVER, INCLUDES, INPHAR };
 use const \reqc\{ MIME_TYPES };
 
 $out = new Output();
