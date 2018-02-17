@@ -1,6 +1,11 @@
-var editors = {};
+var editors = {}, controller;
 
-function Phroses() {}
+function Phroses() {
+	var $this = this;
+	$this.adminuri = $("#phroses-script").data("adminuri");
+}
+
+
 Phroses.errors = {
 	"write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
     "api" : "There was a problem accessing the api.  Please try again later",
@@ -17,6 +22,11 @@ Phroses.errors = {
 		"failed_upl" : "There was an error uploading that file, it may be too large.",
 		"topupldir_notfound" : "The /uploads directory does not exist, please create it and give Phroses write access.",
 		"siteupldir_notfound" : "The uploads sub directory for this website does not exist.  Please give phroses write access to the /uploads folder."
+	},
+
+	"admin" : {
+		"resource_exists" : "That page already exists",
+		"bad_uri" : "Please use a valid uri that is not '/'"
 	}
 };
 
@@ -64,8 +74,7 @@ Phroses.reloadStyles = function() {
 		if(href.substring(0, 1) === "/" && href.substring(1, 2) !== "/") pass = true; // relative
 		if(href.replace(/http(s)?\:/g, "").substring(0, origin.length) === origin) pass = true; // on the same domain
 
-
-		if(href !== "/phr-assets/css/main.css" && pass) {
+		if(href !== controller.adminuri+"/assets/css/main.css" && pass) {
 			
 			$.get(href, function(body) {
 				$("head").append('<style class="phr-reloaded" data-href="'+href+'">'+body+'</style>');
@@ -161,7 +170,7 @@ jQuery.fn.shake = function(interval,distance,times){
 
 $(function() {
 	console.log("-== Phroses Initialized ==-");
-	
+	controller = new Phroses();
 
 	$(document).on("click", ".jlink", function() {
 		document.location = $(this).data("href");
@@ -170,7 +179,8 @@ $(function() {
 	if(!$("#phr-admin-page").val()) {
 		var content = $("body").html();
 		$("body").html('<div id="phr-container">'+content+"</div>");
-		$.post("/admin/api/pst", { uri : window.location.pathname }, function(data) {
+
+		$.post(controller.adminuri+"/api/pst", { uri : window.location.pathname }, function(data) {
 			$("body").append(data.content);
 			
 			Phroses.setupButtons();
@@ -282,7 +292,7 @@ $(function() {
 				},
 				success: function(pdata) {
 					$("#pst-es-fields").html(pdata.typefields);
-					createEditors();
+					Phroses.createEditors();
 					if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
 					$("#pst-es-fields").slideDown();
 					if(data.type !== "redirect") Phroses.displaySaved();
@@ -304,6 +314,7 @@ $(function() {
 				success: function() {}
 			});
 		});
+		
 
 	} else {
 
@@ -449,148 +460,57 @@ $(function() {
 			}
 		});
 
-
-
-
-		$(document).on("click", ".upload", function() {
-			var file = $(this).data("filename");
-			var ext = file.substring(file.indexOf(".") + 1);
-
-			if(["png", "jpg", "gif"].includes(ext)) {
-				$("#preview img").attr('src', "/uploads/"+file);
-			} else {
-				$("#preview img").attr("src", "https://www.adcosales.com/files/products/no-preview-available.jpg");
-			}
-
-			$("#seefull").attr("href", "/uploads/"+file);
-			$("#preview").fadeIn();
-		});
-
-		$(document).on("click", ".upload input", function(e) {
-			e.preventDefault();
-			e.stopImmediatePropagation();
-		});
-
 		Phroses.formify({
-			selector: ".upload input",
+			selector: ".admin-uri input",
 			action: "change",
 			collect: function() {
-				return { action : "rename", filename : $(this).parent().data("filename"), to : $(this).val() };
+				return { uri : $(this).val() };
 			},
 			success: function() {
-				console.log($(this).parent().selector);
-				var upel = $(this).parent();
-				upel.data("filename", $(this).val());
+				Phroses.displaySaved();
+				let olduri = $(this).data("initial-value"), newuri = $(this).val();
 
-				upel.addClass("saved");
-				setTimeout(function() {
-					upel.removeClass("saved");
-				}.bind(this), 1000);
+				$(".adminlink").each(function() {
+					$(this).attr("href", $(this).attr("href").replace(new RegExp("^"+olduri, 'g'), newuri));
+				});
+
+				history.replaceState({}, document.title, $(this).val());
+				$(this).data("initial-value", $(this).val());
+			},
+			failure: function(data) {
+				$(this).val($(this).data("initial-value"));
+				data = data.responseJSON;
+
+				Phroses.genericError(Phroses.errors.admin[data.error] || Phroses.errors[data.error]);
 			}
 		});
 
 		Phroses.formify({
-			selector: ".upload-delete",
-			action: "click",
-			collect: function() {
-				return { action: "delete", filename: $(this).parent().parent().data("filename") };
-			},
+			selector: ".maintenance-select select",
+			action: "change",
+			collect: function() { return { "maintenance" : $(this).val() } },
+			success: Phroses.displaySaved
+		});
+		
+		Phroses.formify({
+			selector: ".site-namer input",
+			action: "change",
+			collect: function() { return { "name" : $(this).val() } },
+			success: Phroses.displaySaved
+		});
+		
+		Phroses.formify({
+			selector: ".siteurl-changer input",
+			action: "change",
+			collect: function() { return { "url" : $(this).val() } },
 			success: function() {
-				$(this).parent().parent().slideUp(); 
-			}
-		});
-
-		$("#upload").on("drag dragstart dragend dragover dragenter dragleave drop", function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-		});
-
-		$("#upload:not(.active)").on("dragenter", function() { $(this).addClass("dragover"); });
-		$("#upload:not(.active)").on("dragleave", function() { $(this).removeClass("dragover"); });
-		$("#upload:not(.active)").on("drop", function(e, byclick) {
-			$(this).addClass("active");
-			$(this).removeClass("dragover");
-			
-			file = (typeof byclick === 'undefined') ? e.originalEvent.dataTransfer.files[0] : $("#file").prop("files")[0];
-			$(this).find("label").fadeOut(400, function() { $("#upload-namer").fadeIn(); });
-			
-			var resetUplForm = function() {
-				$("#upload").fadeOut(400, function() {
-					$("#upload").off("submit");
-					$("#upload-namer").fadeOut();
-					$("#upload-namer input").val('');
-					$("#upload label").fadeIn();
-					$("#upload").removeClass("active");
-					$(".phr-progress-bar").css({width:"0"});
-					$(".phr-progress").removeClass("done");
-					$(".phr-progress").fadeOut();
-				});
-			};
-
-			var submit = function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-				$("#upload .phr-progress").fadeIn();
-
-				var data = new FormData(), filename = $("[name='filename']").val();
-				data.append("filename", filename);
-				data.append("file", file);
-				data.append("action", "new");
+				Phroses.displaySaved();
+				var url = $(this).val();
 				
-				$.ajax({
-					url : "",
-					data : data,
-					method : "post",
-					processData : false,
-					dataType : 'json',
-					contentType : false,
-					xhr: function() {
-						var xhr = new window.XMLHttpRequest();
-						xhr.upload.addEventListener("progress", function(evt){
-							if (evt.lengthComputable) {  
-								var percentComplete = evt.loaded / evt.total;
-								$(".phr-progress-bar").css({width:percentComplete+"%"});
-							}
-						}, false); 
-
-						return xhr;
-					},
-					success : function() {
-						$(".phr-progress-bar").css({width:"100%"});
-						$(".phr-progress").addClass("done");
-
-						setTimeout(resetUplForm, 2000);
-
-						$(".admin-page.uploads ul").append('<li class="upload" data-filename="'+filename+'"><input value="'+filename+'" data-method="post"><div class="upload-icons"><a href="/uploads/'+filename+'" class="fa fa-link"></a><a href="#" class="fa fa-search-plus"></a><a href="#" class="fa fa-times upload-delete" data-method="post"></a></div></li>');
-
-					},
-					error: function(data) {
-						$(".phr-progress").addClass("error");
-
-						setTimeout(function() {
-							$(".phr-progress-bar").css({width:0});
-							$(".phr-progress").removeClass("error");
-							$(".phr-progress").fadeOut();
-
-							if(data.responseJSON.error === "resource_exists") {
-								$("#upload-namer input").val('');
-							} else {
-								resetUplForm();
-							}
-
-						}, 2000);
-
-						Phroses.genericError(Phroses.errors.uploads[data.responseJSON.error] || data.responseJSON);
-						$("#upload").one("submit", submit);
-					}
-				});
-			};
-
-			$("#upload").one("submit", submit);
-		});
-
-		$("#upload #file").change(function() {
-			$("#upload").trigger('drop', true);
+				setTimeout(function() {
+					window.location.href = "http://" + url + window.location.pathname;
+				}, 2000);
+			}
 		});
 	}
 });

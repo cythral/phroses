@@ -4,11 +4,24 @@
 @primary: #673AB7; 
 @saved: #009688;
 
+.phroses-container {
+    * {
+        border-radius: 0;
+        border: none;
+        outline: none;
+        box-sizing: border-box;
+
+        -webkit-appearance: none;
+        -moz-appearance: none; 
+        appearance: none;
+    }
+}
+
 @import "animations"; 
 @import "pst";  
 @import "panel";
 
-.c { color: @primary; } 
+.c { color: @primary; }
 .oxygen { font-family: Oxygen; } 
 .underline { text-decoration: underline; } 
 
@@ -221,7 +234,9 @@ ul.inline {
 
     input {
         background: none;
-        border: none;
+        border-right: none !important;
+        border-left: none !important;
+        border-top: none !important;
         outline: none !important;
         border-bottom: 3px solid @primary;
         display: inline-block;
@@ -233,6 +248,8 @@ ul.inline {
         font-size: 1.3em;
         color: @primary;
         margin-bottom: 30px;
+        border-radius: 0 !important;
+        box-shadow: none !important;
 
         &[type="submit"] {
             background: @primary;
@@ -306,7 +323,7 @@ ul.inline {
     padding: 5px;
     min-width: 200px;
 }
-
+ 
 
 
 /** session tools **/
@@ -541,7 +558,7 @@ select.c {
                 margin: 0 10px 0 10px;
             }
 
-            &:hover, &.saved {
+            &:hover, &.saved, &.error {
                 background: @primary;
                 color: white;
                 input { color: white; }
@@ -550,6 +567,10 @@ select.c {
 
             &.saved {
                 background: @saved;
+            }
+
+            &.error {
+                background: red;
             }
         }
     }
@@ -632,4 +653,11 @@ select.c {
         display: none;
         margin-top: 30px;
     }
+    
+    .upload-cancel {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+    }
 }
+

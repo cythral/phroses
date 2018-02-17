@@ -1,4 +1,8 @@
 <?php
+/**
+ * Write Exception for when writing to the filesystem fails
+ * (used primarily during updates)
+ */
 
 namespace Phroses\Exceptions;
 

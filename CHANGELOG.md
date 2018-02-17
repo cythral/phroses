@@ -1,5 +1,37 @@
 # CHANGE LOG
 
+## v0.7.0
+### New Features
+- **Fix Incomplete Redirects**: you can now fix incomplete redirects on-page.  A more detailed error is displayed as well.
+- **Configurable Admin URI**: you can now configure /admin and subpages to have a different base uri
+- **Site Maintenance Mode**: you can now turn on maintenance mode for specific sites rather than all of them
+- **Site Renaming**: you can now rename the site from the dashboard
+- **Change Site URL**: you can now change the url of the website from the dashboard.  
+### Bug Fixes & Minor Changes
+- Fixes an overflow issue on PST icons (issue #7)
+- Fixes an issue where iOS still had a border and radius on inputs (issue #6)
+- JavaScript for the uploads feature is now in its own file
+- Upload progress is now more accurate
+- Naming upload files is now required
+- Upload file sizes are checked before uploading instead of waiting for the server to give the error
+- Fixes an issue where you could rename an upload to an existing filename (issue #8)
+- New page object replaces the SITE["PAGE"] constant
+- The error that displays if no site was detected and the **expose** config in phroses.conf equals false was redone.
+- The error that dislays if the default theme was not detected was redone
+- THEME response was removed
+- ASSET response was added, switches handling from PAGE[404].  Theme assets are also accessible when maintenance mode is turned on.
+- Improvements to session handling
+- Parser class was removed in favor of zbateson/MailMimeParser
+- Phroses\JsonOutput, Phroses\JsonOutputError, Phroses\sendEvent and Phroses\mapValue have been removed
+- Phroses\mapError added (shorthand for outputting a json error if an expression evaluates to true)
+- Phroses\allKeysExist, Phroses\allKeysDontExist, Phroses\safeArrayValEquals array utilities added
+
+<br />
+
+---
+
+<br />
+
 ## v0.6.1
 - fixes an issue where css dependencies (cythral/icons, oxygen font) could be loaded over http when on https.  
 

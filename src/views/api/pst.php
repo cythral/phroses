@@ -22,6 +22,7 @@ handleMethod("post", function($out) {
         $pst->visibility = "checked";
         $pst->title = "";
         $pst->id = -1;
+
     } else {
         $pst->pst_type = "existing";
 
@@ -29,11 +30,9 @@ handleMethod("post", function($out) {
         $page->content = json_decode($page->content);
 
         ob_start();
-        foreach($theme->GetContentFields($page->type) as $key => $field) {
-            if($field == "editor") { ?><pre class="form_field content editor" id="<?= $page->type; ?>-main" data-id="<?= $key; ?>"><?= 
-trim(htmlspecialchars($page->content->{$key} ?? "")); ?></pre><? }
-            else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" 
-class="form_input form_field content" value="<?= htmlspecialchars($page->content->{$key} ?? ""); ?>"><? }
+        foreach($theme->getContentFields($page->type) as $key => $field) {
+            if($field == "editor") { ?><pre class="form_field content editor" id="<?= $page->type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars($page->content->{$key} ?? "")); ?></pre><? }
+            else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= htmlspecialchars($page->content->{$key} ?? ""); ?>"><? }
         }
 
         $pst->id = $page->id;
@@ -42,6 +41,6 @@ class="form_input form_field content" value="<?= htmlspecialchars($page->content
         $pst->visibility = $page->public ? "checked" : "";
     }
 
-    foreach($theme->GetTypes() as $type2) $pst->push("types", ["type" => $type2, "checked" => ($page && $page->type == $type2) ? "selected" : "" ]);
+    foreach($theme->getTypes() as $type2) $pst->push("types", ["type" => $type2, "checked" => ($page && $page->type == $type2) ? "selected" : "" ]);
     $out->send(["type" => "success", "content" => (String)$pst ], 200);
 });

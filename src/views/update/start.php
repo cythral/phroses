@@ -6,7 +6,8 @@ use const Phroses\{ROOT, VERSION, INCLUDES, IMPORTANT_FILES};
 
 ob_end_clean();
 ob_end_clean();
-ob_end_clean();
+ob_end_clean(); // third times the charm
+
 ini_set("memory_limit", "50M");
 self::$out = new reqc\EventStream\Server();
 
@@ -18,7 +19,7 @@ if(!is_writable(ROOT) || (file_exists(ROOT."/phroses.tar.gz") && !unlink(ROOT."/
 try {
     chdir(ROOT);
     
-    Phroses::setMaintenance(Phroses::ON);
+    self::setMaintenance(self::MM_ON);
     
     $version = json_decode(@file_get_contents("http://api.phroses.com/version"))->latest_version ?? null;
     if(!$version) throw new Exception("api");
@@ -26,9 +27,9 @@ try {
     // backup 
     if(!file_exists("tmp") && !mkdir("tmp")) throw new WriteException("create", ROOT."/tmp/");
     foreach(IMPORTANT_FILES as $backup) {
-    if(is_dir(ROOT."/$backup")) {
-        if(!rename(ROOT."/$backup", ROOT."/tmp/$backup")) throw new WriteException("move", ROOT."/tmp/$backup");
-    } else if(!copy($backup, "tmp/$backup")) throw new WriteException("move", ROOT."/tmp/$backup");
+        if(is_dir(ROOT."/$backup")) {
+            if(!rename(ROOT."/$backup", ROOT."/tmp/$backup")) throw new WriteException("move", ROOT."/tmp/$backup");
+        } else if(!copy($backup, "tmp/$backup")) throw new WriteException("move", ROOT."/tmp/$backup");
     }
     self::$out->send("progress", [ "progress" => 10 ]);
     
@@ -44,6 +45,7 @@ try {
     if(!rrmdir(INCLUDES["THEMES"])) throw new WriteException("delete", INCLUDES["THEMES"]);
     if(!rrmdir(INCLUDES["PLUGINS"])) throw new WriteException("delete", INCLUDES["PLUGINS"]);
     self::$out->send("progress", [ "progress" => 40 ]);
+
     if(!rename("tmp/themes", INCLUDES["THEMES"])) throw new WriteException("restore", INCLUDES["THEMES"]);
     if(!rename("tmp/plugins", INCLUDES["PLUGINS"])) throw new WriteException("restore", INCLUDES["PLUGINS"]);
     if(!rename("tmp/phroses.conf", "phroses.conf")) throw new WriteException("restore", ROOT."/tmp/phroses.conf");
@@ -67,22 +69,22 @@ try {
     // if error occurred and tmp dir still exists, move everything in tmp back
     // todo: add error checking here
     if(file_exists("tmp")) {
-    foreach(IMPORTANT_FILES as $file) {
-        if(file_exists("tmp/$file")) {
-        if(is_dir("tmp/$file")) { 
-            if(file_exists($file)) rrmdir($file);
-            rename("tmp/$file", $file);
-        
-        } else {
-            if(file_exists($file)) unlink($file);
-            rename("tmp/$file", $file);
+        foreach(IMPORTANT_FILES as $file) {
+            if(file_exists("tmp/$file")) {
+            if(is_dir("tmp/$file")) { 
+                if(file_exists($file)) rrmdir($file);
+                rename("tmp/$file", $file);
+            
+            } else {
+                if(file_exists($file)) unlink($file);
+                rename("tmp/$file", $file);
+            }
+            }
         }
-        }
-    }
-    unlink("tmp");
+        unlink("tmp");
     }
     
-    Phroses::SetMaintenance(Phroses::OFF);
+    self::setMaintenance(self::MM_OFF);
 }
 
 die;

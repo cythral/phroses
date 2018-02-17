@@ -28,6 +28,7 @@
 
 
 <form id="upload" class="container screen aln-c">
+    <a class="pst_btn upload-cancel" data-target="upload" data-action="fadeOut"><i class="ci ci-close"></i></a>
     <input id="file" name="file" type="file">
     <label for="file"><strong>Choose a file</strong> or drag it here</label>
 
@@ -36,7 +37,7 @@
             <h2>Name the file:</h2>
             <div class="form_icfix c aln-l">
                 <div>Filename:</div>
-                <input name="filename" class="form_input form_field" placeholder="filename.jpg" autocomplete="off">     
+                <input required name="filename" class="form_input form_field" placeholder="filename.jpg" autocomplete="off">     
             </div>
 
             <a class="pst_btn txt" data-target="upload" data-action="submit">Upload</a>
@@ -45,3 +46,7 @@
         </div>
     </div>
 </form>
+
+
+<input type="hidden" id="maxuplsize" value="<{var::maxuplsize}>">
+<input type="hidden" id="maxformsize" value="<{var::maxformsize}>">

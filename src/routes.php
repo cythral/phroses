@@ -8,295 +8,219 @@
 namespace Phroses;
 
 use \reqc;
-use \Phroses\DB;
 use \reqc\Output;
+use \reqc\JSON\Server as JSONServer;
 use \listen\Events;
 use \inix\Config as inix;
 use \phyrex\Template;
-use const \reqc\{ VARS, MIME_TYPES };
 
-self::route("get", self::RESPONSES["PAGE"][200], function() {
-	ob_start("ob_gzhandler");
+// request variables
+use const \reqc\{ VARS, MIME_TYPES, PATH, EXTENSION, METHOD, HOST, BASEURL };
 
-	if(isset($_GET["mode"]) && $_GET["mode"] == "json") {
-		DB::Query("UPDATE `pages` SET `views` = `views` - 1 WHERE `id`=?", [ SITE["PAGE"]["ID"] ]);
+/**
+ * GET PAGE/200
+ * This route gets page information and either displays it as html or json
+ */
+self::addRoute("get", self::RESPONSES["PAGE"][200], function(&$page) {
 
-		self::$out = new \reqc\JSON\Server();
-		self::$out->send([
-			"id" => SITE["PAGE"]["ID"],
-			"title" => SITE["PAGE"]["TITLE"],
-			"type" => SITE["PAGE"]["TYPE"],
-			"views" => SITE["PAGE"]["VIEWS"] - 1,
-			"dateCreated" => SITE["PAGE"]["DATECREATED"],
-			"dateModified" => SITE["PAGE"]["DATEMODIFIED"],
-			"content" => SITE["PAGE"]["CONTENT"]
-		], 200);
+	if(safeArrayValEquals($_GET, "mode", "json")) {
+		self::$out = new JSONServer();
+		self::$out->send($page->getData(), 200);
 	}
 
-
-	// pages with an extension may have their content type autoset by reqc
-	// since this is a page make sure its set to html
-	self::$out->setContentType(reqc\MIME_TYPES["HTML"]); 
-
-	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
-	$theme->title = SITE["PAGE"]["TITLE"];
-	echo $theme;
-
-	if(inix::get("mode") == "production") {
-		ob_end_flush();
-		flush();
-	}
+	$page->display();
 });
 
-self::route("get", self::RESPONSES["PAGE"][301], function() {
-	ob_start("ob_gzhandler");
-	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
+/**
+ * GET PAGE/301
+ * This route redirects to a different page.  If the destination is not specified, an error is displayed instead
+ */
+self::addRoute("get", self::RESPONSES["PAGE"][301], function(&$page) {
 
-	if(isset(SITE["PAGE"]["CONTENT"]["destination"])) {
-        self::$out->redirect(SITE["PAGE"]["CONTENT"]["destination"]);
-        
-	} else echo "incomplete redirect"; // todo: add a fixer form here
-
-	echo $theme;
-
-	if(inix::get("mode") == "production") {
-		ob_end_flush();
-		flush();
-	}
-});
-
-self::route("get", self::RESPONSES["SYS"][200], function() {
-	ob_start("ob_gzhandler");
-	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
-
-	if(!is_dir(INCLUDES["VIEWS"].reqc\PATH) &&
-		file_exists(INCLUDES["VIEWS"].reqc\PATH) &&
-		strtolower(reqc\EXTENSION) != "php") {
-		ReadfileCached(INCLUDES["VIEWS"].reqc\PATH);
-
-	} else {
-		ob_start();
-		if(!$_SESSION) {
-			$theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-			$theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
-			self::$out->setCode(401);
-			include INCLUDES["VIEWS"]."/admin/login.php";
-		
-		} else {
-			if(reqc\METHOD == "GET") {
-				$theme->push("stylesheets", [ "src" => "/phr-assets/css/main.css" ]);
-				$theme->push("scripts", [ "src" => "/phr-assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
-				
-				$dashbar = new Template(INCLUDES["TPL"]."/dashbar.tpl");
-				$dashbar->host = reqc\HOST;
-				echo $dashbar;
-			}
-			if(file_exists(INCLUDES["VIEWS"].reqc\PATH."/index.php")) include INCLUDES["VIEWS"].reqc\PATH."/index.php";
-			else if(substr(reqc\PATH, 0, 13) == "/admin/pages/") {
-				$_GET["id"] = substr(reqc\PATH, 13);
-				include INCLUDES["VIEWS"]."/admin/pages/edit.php";
-			} else if(file_exists(INCLUDES["VIEWS"].reqc\PATH.'.php')) include INCLUDES["VIEWS"].reqc\PATH.".php";
-			else echo "resource not found";
-		}
-
-		echo '<input type="hidden" id="phr-admin-page" value="true">';
-
-		if($theme->HasType("admin")) $theme->SetType("admin", true);
-		$theme->title = $title ?? "Phroses System Page";
-		$theme->main = trim(ob_get_clean());
-		$theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-	}
-
-	echo $theme;
-
-	if(inix::get("mode") == "production") {
-		ob_end_flush();
-		flush();
-	}
-});
-
-self::route("get", self::RESPONSES["PAGE"][404], function() {
-	ob_start("ob_gzhandler");
-	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
-
-	if($theme->AssetExists(reqc\PATH) && $_SERVER["REQUEST_URI"] != "/") {
-		$theme->AssetRead(reqc\PATH); // Assets
-	} else if($theme->ErrorExists("404")) {
-		self::$out->setCode(404);
-		self::$out->setContentType(MIME_TYPES["HTML"]);
-		$theme->ErrorRead("404"); 
-		die;
-
-	} else { // Generic Site 404
-		self::$out->setCode(404);
-		self::$out->setContentType(MIME_TYPES["HTML"]);
-		
-		$theme->SetType("page", true);
-		$theme->title = "404 Not Found";
-		$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
-	}
-
-	echo $theme;
-	if(inix::get("mode") == "production") {
-		ob_end_flush();
-		flush();
-	}
-});
-
-
-$api = function() {
-	ob_start("ob_gzhandler");
-	$theme = new Theme(SITE["THEME"], SITE["PAGE"]["TYPE"]);
-
-	if(!$theme->HasAPI()) {
-		self::$out->setCode(404);
-		$theme->title = "404 Not Found";
-		$theme->main = "<h1>404 Not Found</h1><p>The page you are looking for could not be found.  Please check your spelling and try again.</p>";
-	} else {
-		$theme->RunAPI();
-		die;
-	}
-
-	echo $theme;
-	if(inix::get("mode") == "production") {
-		ob_end_flush();
-		flush();
-	}
-};
-
-self::route("get", self::RESPONSES["API"], $api);
-self::route("post", self::RESPONSES["API"], $api);
-self::route("put", self::RESPONSES["API"], $api);
-self::route("delete", self::RESPONSES["API"], $api);
-self::route("patch", self::RESPONSES["API"], $api);
-
-
-self::route("post", self::RESPONSES["DEFAULT"], function() {
-	self::$out = new reqc\JSON\Server();
-
-	if(reqc\URI == "/api" && ($theme = new Theme(SITE["THEME"], "page"))->HasAPI()) {
-		$theme->RunAPI();
-		die;
-	}
+	if(array_key_exists("destination", $page->content) && !empty($page->content["destination"]) && $page->content["destination"] != PATH) {
+        self::$out->redirect($page->content["destination"]);
+	} 
 	
-	unset($theme);
+	$page->theme->setType("page", true);
+	$page->display([ "main" => (string) new Template(INCLUDES["TPL"]."/errors/redirect.tpl") ]);
+});
 
-	// Validation
-	if(!$_SESSION) self::$out->send(["type" => "error", "error" => "access_denied"], 401);
-	
-	foreach(["title","type"] as $type) {
-		if(!in_array($type, array_keys($_REQUEST))) {
-			self::$out->send([ "type" => "error", "error" => "missing_value", "field" => $type], 400);
-		}
+/**
+ * GET SYS/200
+ * Displays an internal phroses "view" (can be a dashboard page or asset file)
+ */
+self::addRoute("get", self::RESPONSES["SYS"][200], function(&$page) {
+	$path = substr(PATH, strlen(SITE["ADMINURI"]));
+
+	if(!is_dir($file = INCLUDES["VIEWS"].$path) && file_exists($file) && strtolower(EXTENSION) != "php") {
+		readfileCached($file);
 	}
-
-	if(SITE["RESPONSE"] != self::RESPONSES["PAGE"][404]) self::$out->send([ "type" => "error", "error" => "resource_exists" ], 400);
-	
-	try { 
-		$theme = new Theme(SITE["THEME"], $_REQUEST["type"]); 
-	} catch(\Exception $e) { 
-		self::$out->send(["type" => "error", "error" => "bad_value", "field" => "type" ], 400); 
-	}
-
-	DB::Query("INSERT INTO `pages` (`uri`,`title`,`type`,`content`, `siteID`,`dateCreated`) VALUES (?, ?, ?, ?, ?, NOW())", [
-		reqc\PATH,
-		$_REQUEST["title"],
-		$_REQUEST["type"],
-		$_REQUEST["content"] ?? "{}",
-		SITE["ID"]
-	]);
-
-	$output = [ "type" => "success", "id" => DB::LastID(), "content" => $theme->GetBody() ];
 
 	ob_start();
-	foreach($theme->GetContentFields($_REQUEST["type"]) as $key => $field) {
-		if($field == "editor")  { ?><div class="form_field content editor" id="<?= $_REQUEST["type"] ?>-main" data-id="<?= $key; ?>"></div><? }
-		else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value=""><? }
-	}
-	$output["typefields"] = trim(ob_get_clean());
+	$page->theme->push("stylesheets", [ "src" => SITE["ADMINURI"]."/assets/css/main.css" ]);
+	$page->theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
+	$page->theme->push("scripts", [ "src" => SITE["ADMINURI"]."/assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
 
-	self::$out->send($output, 200);
+	if(!$_SESSION) {
+		self::$out->setCode(401);
+		include INCLUDES["VIEWS"]."/login.php";
+	
+	} else {
+		if(METHOD == "GET") {				
+			$dashbar = new Template(INCLUDES["TPL"]."/dashbar.tpl");
+			$dashbar->host = HOST;
+			$dashbar->adminuri = SITE["ADMINURI"];
+			echo $dashbar;
+		}
+
+		if(file_exists($file = INCLUDES["VIEWS"].$path."/index.php")) include $file;
+		else if(file_exists($file = INCLUDES["VIEWS"].$path.'.php')) include $file;
+		else echo new Template(INCLUDES["TPL"]."/errors/404.tpl");
+	}
+
+	if($page->theme->hasType("admin")) $page->theme->setType("admin", true);
+	$content = new Template(INCLUDES["TPL"]."/admin.tpl");
+	$content->content = trim(ob_get_clean());
+
+	$page->theme->title = $title ?? "Phroses System Page";
+	$page->theme->main = (string) $content;
+
+	$page->display();
 });
 
-self::route("patch", self::RESPONSES["DEFAULT"], function() {
-	self::$out = new reqc\JSON\Server();
+/**
+ * GET PAGE/404
+ * Displays a a 404 not found error when a page or asset is not found.
+ */
+self::addRoute("get", self::RESPONSES["PAGE"][404], function(&$page) {		
+	self::$out->setCode(404);
+	self::$out->setContentType(MIME_TYPES["HTML"]);
+	
+	if($page->theme->errorExists("404")) die($page->theme->errorRead("404"));
+
+	$page->theme->setType("page", true);
+	$page->theme->title = "404 Not Found";
+	$page->theme->main = (string) new Template(INCLUDES["TPL"]."/errors/404.tpl");
+
+	$page->display();
+});
+
+/**
+ * (All) ASSET
+ * Serves theme asset files
+ */
+self::addRoute(null, self::RESPONSES["ASSET"], function(&$page) { 
+	$page->theme->assetRead(PATH); 
+});
+
+/**
+ * (All) API
+ * Runs the theme API, if it has one
+ */
+self::addRoute(null, self::RESPONSES["API"], function(&$page) { 
+	$page->theme->runAPI(); 
+});
+
+/**
+ * POST (Default handler)
+ * This handles all post requests.  If a page does not exist, this route creates one based on request parameters.
+ */
+self::addRoute("post", self::RESPONSES["DEFAULT"], function(&$page) {
+	self::$out = new JSONServer();
 
 	// Validation
-	if(!$_SESSION) self::$out->send(["type" => "error", "error" => "access_denied"], 401);
+	mapError("access_denied", !$_SESSION, null, 401);
+	mapError("resource_exists", self::$response != self::RESPONSES["PAGE"][404]);
 
-	foreach(["id"] as $type) {
-		if(!in_array($type, array_keys(VARS))) self::$out->send([ "type" => "error", "error" => "missing_value", "field" => $type], 400);
+	foreach(["title","type"] as $type) {
+		mapError("missing_value", !array_key_exists($type, $_REQUEST), [ "field" => $type ]);
 	}
 
-	if(SITE["RESPONSE"] != self::RESPONSES["PAGE"][200] && SITE["RESPONSE"] != self::RESPONSES["PAGE"][301]) {
-		self::$out->send([ "type" => "error", "error" => "resource_missing" ], 400);
-	}
+	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"]), [ "field" => "type" ]);
 
-	try { 
-		$theme = new Theme(SITE["THEME"], $_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]); 
-	} catch(\Exception $e) { 
-		self::$out->send(["type" => "error", "error" => "bad_value", "field" => "type" ], 400); 
-	}
+	$id = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", SITE["ID"]);
+	$theme = new Theme(SITE["THEME"], $_REQUEST["type"]);
 
-	// if no change was made, dont update the db
-	if(!isset($_REQUEST["type"]) && 
-		!isset($_REQUEST["uri"]) && 
-		!isset($_REQUEST["title"]) && 
-		!isset($_REQUEST["content"]) && 
-		!isset($_REQUEST["public"])) {
-			self::$out->send(["type" => "error", "error" => "no_change" ], 400);
-	}
+	self::$out->send([ 
+		"type" => "success",
+		"id" => $id, 
+		"content" => $theme->getBody(),
+		"typefields" => $theme->getEditorFields()
+	], 200);
+});
+
+/**
+ * PATCH (Default handler)
+ * This handles all put requests.  If a page exists, this route edits it based on request parameters.
+ */
+self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
+	self::$out = new JSONServer();
+
+	// Validation
+	mapError("access_denied", !$_SESSION, null, 401);
+	mapError("resource_missing", !in_array(self::$response, [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
+	mapError("no_change", allKeysDontExist(["type", "uri", "title", "content", "public"], $_REQUEST));
+	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
 
 	if(isset($_REQUEST["uri"])) {
-		$count = DB::Query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ SITE["ID"], $_REQUEST["uri"]])[0] ?? 0;
-		if($count->count > 0) self::$out->send(["type" => "error", "error" => "resource_exists"], 400);
+		$count = DB::query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ SITE["ID"], $_REQUEST["uri"]])[0]->count ?? 0;
+		mapError("resource_exists", $count > 0);
 	}
 
 	// do NOT update the database if the request is to change the page to a redirect and there is no content specifying the destination.
 	// if the page is a type redirect and there is no destination, an error will be displayed which we should be trying to avoid
-	if(!(isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect" && (!isset($_REQUEST["content"]) || 
+	if(!(safeArrayValEquals($_REQUEST, "type", "redirect") && (!isset($_REQUEST["content"]) || 
 		(isset($_REQUEST["content"]) && !isset(json_decode($_REQUEST["content"])->destination))))) {
-
-		DB::Query("UPDATE `pages` SET `title`=?, `uri`=?, `content`=?, `type`=?, `public`=? WHERE `id`=?", [
-			$_REQUEST["title"] ?? SITE["PAGE"]["TITLE"],
-			urldecode($_REQUEST["uri"] ?? reqc\URI),
-			(isset($_REQUEST["type"]) && $_REQUEST["type"] != "redirect") ? "{}" : (htmlspecialchars_decode($_REQUEST["content"] ?? json_encode(SITE["PAGE"]["CONTENT"]))),
-			urldecode($_REQUEST["type"] ?? SITE["PAGE"]["TYPE"]),
-			$_REQUEST["public"] ?? SITE["PAGE"]["VISIBILITY"],
-			(int)$_REQUEST["id"]
-		]);
+			
+		if(isset($_REQUEST["title"])) $page->title = $_REQUEST["title"];
+		if(isset($_REQUEST["uri"])) $page->uri = urldecode($_REQUEST["uri"]);
+		if(isset($_REQUEST["public"])) $page->public = $_REQUEST["public"];
+		if(isset($_REQUEST["content"])) $page->content = htmlspecialchars_decode($_REQUEST["content"]);
+		if(isset($_REQUEST["type"])) {
+			$page->type = urldecode($_REQUEST["type"]);
+			$page->theme = new Theme(SITE["THEME"], $page->type);
+			if($_REQUEST["type"] != "redirect") $page->content = "{}";
+		} 
 	}
 
 	$output = [ "type" => "success" ];
-	if(!isset($_REQUEST["nocontent"])) $output["content"] = $theme->GetBody();
-	if(isset($_REQUEST["type"])) {
-
-		ob_start();
-		foreach($theme->GetContentFields($_REQUEST["type"]) as $key => $field) {
-			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $_REQUEST["type"] ?>-main" data-id="<?= $key; ?>"></div><? }
-			else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value=""><? }
-		}
-		$output["typefields"] = trim(ob_get_clean());
-	}
+	if(!isset($_REQUEST["nocontent"])) $output["content"] = $page->theme->getBody();
+	if(isset($_REQUEST["type"])) $output["typefields"] = $page->theme->getEditorFields($_REQUEST["type"]);
 
 	// if we are changing to type redirect or the page is a redirect, there is no content
 	if(SITE["PAGE"]["TYPE"] == "redirect" || (isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect")) unset($output["content"]);
 	self::$out->send($output, 200);
 });
 
+/**
+ * DELETE (Default Handler)
+ * This handles all delete requests. If a page exists, this route deletes it.
+ */
+self::addRoute("delete", self::RESPONSES["DEFAULT"], function(&$page) {
+	self::$out = new JSONServer();
+	 
+	mapError("access_denied", !$_SESSION, null, 401);
+	mapError("resource_missing", !in_array(Phroses::$response, [ self::RESPONSES["PAGE"][200], self::RESPONSES["PAGE"][301] ]));
 
-self::route("delete", self::RESPONSES["DEFAULT"], function() {
-	self::$out = new reqc\JSON\Server();
-	if(!$_SESSION) self::$out->send(["type" => "error", "error" => "access_denied"], 401);
-	if(SITE["RESPONSE"] != self::RESPONSES["PAGE"][200] && SITE["RESPONSE"] != self::RESPONSES["PAGE"][301]) self::$out->send([ "type" => "error", "error" => "resource_missing" ], 400);
-
-	DB::Query("DELETE FROM `pages` WHERE `uri`=? AND `siteID`=?", [ reqc\PATH, SITE["ID"] ]);
+	$page->delete();
 	self::$out->send(["type" => "success"], 200);
 });
 
-
-self::route("get", self::RESPONSES["UPLOAD"], function() {
-	ReadfileCached(INCLUDES["UPLOADS"]."/".reqc\BASEURL."/".substr(reqc\PATH, 8));
+/**
+ * GET UPLOAD
+ * This route serves upload files.
+ */
+self::addRoute("get", self::RESPONSES["UPLOAD"], function() {
+	readfileCached(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8));
 });
 
-return self::$handlers;
+/**
+ * (All) MAINTENANCE
+ * This route displays maintenance mode if a site is in one.
+ */
+self::addRoute(null, self::RESPONSES["MAINTENANCE"], function(&$page) {
+	self::$out->setCode(503);
+	die(new Template(INCLUDES["TPL"]."/maintenance.tpl"));
+});
+
+return self::$routes;  // return a list of routes for the listen event
