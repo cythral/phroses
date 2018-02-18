@@ -34,7 +34,7 @@ abstract class Phroses {
 	
 	static private $out;
 	static private $routes = [];
-	static private $cmds = [];
+	static private $commands = [];
 	static private $page;
 	static private $modes = [
 		"development" => [

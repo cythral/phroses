@@ -391,7 +391,7 @@ $(function() {
 			e.preventDefault();
 			$(this).fadeIn();
 			
-			var ev = new EventSource("/admin/update/start");
+			var ev = new EventSource(controller.adminuri+"/update/start");
 			ev.addEventListener("progress", function(e) {
 				console.log(e.data);
 				$(".phr-progress-bar").css({width: JSON.parse(e.data).progress+"%" });
