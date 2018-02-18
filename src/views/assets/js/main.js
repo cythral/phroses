@@ -468,7 +468,7 @@ $(function() {
 			},
 			success: function() {
 				Phroses.displaySaved();
-				let olduri = $(this).data("initial-value"), newuri = $(this).val();
+				var olduri = $(this).data("initial-value"), newuri = $(this).val();
 
 				$(".adminlink").each(function() {
 					$(this).attr("href", $(this).attr("href").replace(new RegExp("^"+olduri, 'g'), newuri));

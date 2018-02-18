@@ -7,10 +7,12 @@ before_script:
   - phpenv config-add php.ini
   - npm install -g less@2.7.2
   - npm install -g less-plugin-clean-css
+  - npm install -g uglify-js
   - composer install
   
 script:
   - lessc --clean-css src/views/assets/less/main.less src/views/assets/css/main.css
+  - uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/views/assets/js/main.min.js
   - rm -rf src/views/assets/less
   - php build.php
   - php phroses.phar
