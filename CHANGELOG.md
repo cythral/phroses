@@ -1,5 +1,8 @@
 # CHANGE LOG
 
+## v0.7.1 
+- JavaScript now gets minified on each build (rather than relying on IDE functionality).  Replaced main javascript file in production with a newer version.
+
 ## v0.7.0
 ### New Features
 - **Fix Incomplete Redirects**: you can now fix incomplete redirects on-page.  A more detailed error is displayed as well.
