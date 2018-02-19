@@ -14,9 +14,9 @@ script:
   - lessc --clean-css src/views/assets/less/main.less src/views/assets/css/main.css
   - uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/views/assets/js/main.min.js
   - rm -rf src/views/assets/less
+  - phpunit
   - php build.php
   - php phroses.phar
-  - php tests/bootstrap.php
   
 deploy:
   provider: releases
