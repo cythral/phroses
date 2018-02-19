@@ -8,18 +8,31 @@ use \reqc;
 use \inix\Config as inix;
 use \phyrex\Template as Template;
 
+// exception handling
+use \Phroses\Exceptions\ThemeException;
+use const \Phroses\Exceptions\THEME_ERRORS;
+
 /**
  * This class is a custom implementation of templates that provides
  * an easy way to display a consistent look across a website.  This reads
  * files from a theme directory created in /themes */ 
 
 final class Theme extends Template {
-	private $root;
+	
     public $name;
-	private $types = ["redirect"];
 	private $useconst = true;
 	private $type;
 	private $content;
+	private $loader = self::LOADERS["FOLDER"];
+
+	// deprecated
+	private $types = ["redirect"];
+	private $root;
+
+
+	const LOADERS = [
+		"FOLDER" => "\Phroses\Theme\Loaders\FolderLoader"
+	];
 	
 	/**
 	* Theme constructor.  Sets up the theme root, loads stylesheets,
@@ -28,33 +41,32 @@ final class Theme extends Template {
 	* @param string $name The name of the theme, there must be a theme directory with the same name.
 	* @param string $type The page type to use when outputting the theme
 	*/
-	public function __construct(string $name, string $type) {
-		$this->root = INCLUDES["THEMES"]."/".strtolower($name);
-		$this->setType($type);
-		$this->name = $name;
-		$this->content = SITE["PAGE"]["CONTENT"];
+	public function __construct(string $name, string $type, ?array $content = null) {
+		$this->name = strtolower($name);
+		$this->loader = new $this->loader($this->name);
+		$this->content = $content ?? @SITE["PAGE"]["CONTENT"] ?? [];
         
 		// make sure theme directory and page type exists
-		if(!file_exists($this->root)) throw new Exception("Theme doesn't exist");
+		if(!$this->loader->exists()) throw new ThemeException(THEME_ERRORS["NOT_FOUND"], $this->name);
+		$this->loadAssets();
 		
-		
-		// load stylesheets, scripts and page types
+		if($type == "redirect") return;
+		parent::__construct($this->loader->getType($type));
+	}
+
+	/**
+	 * Load assets from the loader, automatically pushes everything in the css and js directories.
+	 */
+	private function loadAssets() {
 		$this->push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "defer"]);
-		foreach(fileList("{$this->root}/assets/css") as $style) $this->push("stylesheets", [ "src" => "/css/".pathinfo($style, PATHINFO_BASENAME)]);
-		foreach(fileList("{$this->root}/assets/js") as $style) $this->push("scripts", [ "src" => "/js/".pathinfo($style, PATHINFO_BASENAME), "attrs" => "defer"]);
-		foreach(glob("{$this->root}/*.tpl") as $ctype) $this->types[] = pathinfo($ctype, PATHINFO_FILENAME);
-		
-		if($type != "redirect") {
-			parent::__construct("{$this->root}/{$type}.tpl"); // redirects wont have any filters
-		}
+		foreach($this->loader->getAssets("css") as $style) $this->push("stylesheets", [ "src" => "/{$style}" ]);
+		foreach($this->loader->getAssets("js") as $script) $this->push("scripts", [ "src" => "/{$script}", "attrs" => "defer"]);
 	}
 	
 	/**
-	* Sets up sessiontools (on page buttons/screens) for page deletion, editing and more.
-	*
-	* @param string $type the current page type
+	* Sets up sessiontools (on page buttons/screens) for page deletion, editing and more
 	*/
-	private function setupSessionTools() {
+	private function loadSessionTools() {
 		if($_SESSION && reqc\METHOD == "GET" && in_array(Phroses::$response, [Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->push("stylesheets", [ "src" => SITE["ADMINURI"]."/assets/css/main.css" ]);
@@ -69,8 +81,8 @@ final class Theme extends Template {
 	* @param $asset Filename of the asset to check for
 	* @return bool whether or not the specified asset exists
 	*/
-	public function assetExists(string $asset) : bool {
-		return $asset == "/" ? false : file_exists("{$this->root}/assets{$asset}");
+	public function hasAsset(string $asset) : bool {
+		return $this->loader->hasAsset($asset);
 	}
 	
 	/**
@@ -78,45 +90,43 @@ final class Theme extends Template {
 	*
 	* @param $asset Filename of the asset
 	*/
-	public function assetRead(string $asset) {
-		if($this->assetExists($asset)) readfileCached("{$this->root}/assets{$asset}");
+	public function readAsset(string $asset) {
+		$this->loader->readAsset($asset);
 	}
 	
-	public function ErrorExists(string $error) : bool {
-		return (file_exists("{$this->root}/errors/{$error}.php"));
+	public function hasError(string $error) : bool {
+		return $this->loader->hasError($error);
 	}
 	
-	public function errorRead(string $error) {
+	public function readError(string $error) {
         $this->setType("page", true);
-		if($this->errorExists($error)) {
-			ob_start();
-			include "{$this->root}/errors/{$error}.php";
-			$this->main = trim(ob_get_clean());
-			$this->title = $title ?? "404 Not Found";
+		if($this->hasError($error)) {
+			$this->main = $this->loader->getError($error);
+			$this->title = "404 Not Found";
 			echo $this;
 		}
 	}
 	
-	public function hasAPI() : bool {
-		return (file_exists("{$this->root}/api.php"));
+	public function hasApi() : bool {
+		return $this->loader->hasApi();
 	}
 	
-	public function runAPI() {
-		if($this->hasAPI()) include "{$this->root}/api.php";
+	public function runApi() {
+		return $this->loader->runApi();
 	}
 	
     public function hasType($type) {
-        return file_exists("{$this->root}/{$type}.tpl") || $type == "redirect";
+        return in_array($type, $this->getTypes());
 	}
 	
-	public function getTypes() : array {
-		return $this->types;
+	public function getTypes(): array {
+		return array_merge($this->loader->getTypes(), ["redirect"]);
 	}
     
     public function setType(string $type, bool $reload = false) {
-        if(!file_exists("{$this->root}/{$type}.tpl") && $type != "redirect") throw new Exception("Theme template doesn't exist");
+        if(!$this->loader->hasType($type)) throw new ThemeException(THEME_ERRORS["NO_TEMPLATE"], $this->name, $type);
         $this->type = $type;
-        if($reload) $this->tpl = file_get_contents("{$this->root}/{$this->type}.tpl");
+        if($reload) $this->tpl = $this->loader->getType($type);
     }
 	
 	public function getBody() {
@@ -128,24 +138,23 @@ final class Theme extends Template {
         $body = $src->getElementsByTagName('body')->item(0);
         if(!$body) return;
         
-        foreach ($body->childNodes as $child){
+        foreach ($body->childNodes as $child) {
             $dest->appendChild($dest->importNode($child, true));
         }
         
         return $dest->saveHTML();
 	}
     
-    protected function process($parseSession = true) {
-        if($parseSession) $this->setupSessionTools();
+    protected function process($loadSessionTools = true) {
+        if($loadSessionTools) $this->loadSessionTools();
         parent::process();
     }
 	
 	static public function list() : array {
-		$list = [];
-		foreach(glob(INCLUDES["THEMES"] . '/*' , GLOB_ONLYDIR) as $dir) {
-			if($dir != "") $list[] = str_replace(INCLUDES["THEMES"]."/", "", $dir);
-		}
-		return $list;
+		return array_map(
+			function($value) { return str_replace(INCLUDES["THEMES"]."/", "", $value); },
+			array_filter(glob(INCLUDES["THEMES"]."/*", GLOB_ONLYDIR), function($val) { return $val != ""; }) // get directories in the themes folder
+		);
 	}
 
 	public function setContent($content) {
@@ -153,9 +162,9 @@ final class Theme extends Template {
 	}
 
 	public function getContentFields(string $tpl) {
-		if($tpl == "redirect") return ["destination" => "text"];
-		if(!file_exists("{$this->root}/{$tpl}.tpl")) return [];
-		preg_match_all("/<{content(::((?!}>).)*)?}>/is", file_get_contents("{$this->root}/{$tpl}.tpl"), $matches, PREG_SET_ORDER);
+		if($tpl == "redirect") return [ "destination" => "text" ];
+		preg_match_all("/<{content(::((?!}>).)*)?}>/is", $this->loader->getType($tpl), $matches, PREG_SET_ORDER);
+		
 		$return = [];
 		foreach($matches as $match) {
 			$fields = explode("::", substr($match[1], 2));
@@ -180,7 +189,7 @@ final class Theme extends Template {
 
 
 Theme::$filters["include"] = function($file) {
-	if(file_exists("{$this->root}/{$file}.php")) include "{$this->root}/{$file}.php";
+	if(file_exists("{$this->loader->getPath()}/{$file}.php")) include "{$this->loader->getPath()}/{$file}.php";
 };
 
 Theme::$filters["content"] = function($key, $fieldtype) {

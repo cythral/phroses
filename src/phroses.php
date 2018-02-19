@@ -92,6 +92,7 @@ abstract class Phroses {
 
 		// page or asset
 		if(TYPE != TYPES["CLI"]) {
+			Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
@@ -167,6 +168,14 @@ abstract class Phroses {
 
 		return true;
 	}
+
+	static public function setExceptionHandler() {
+		set_exception_handler(function(\Exception $e) {
+			$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
+			$out->message = $e->getMessage();
+			echo $out;
+		});
+	}
 	
 	/**
 	 * Loads information about a site.  Creates the SITE[] constant (which
@@ -226,9 +235,9 @@ abstract class Phroses {
 			"PAGE" => $pageData,
 			"MAINTENANCE" => $info->maintenance
 		]);
-
+		
 		self::$page = new Page($pageData);
-		if(in_array(self::$response, [ self::RESPONSES["MAINTENANCE"], self::RESPONSES["PAGE"][404] ]) && self::$page->theme->assetExists(PATH)) self::$response = self::RESPONSES["ASSET"];
+		if(in_array(self::$response, [ self::RESPONSES["MAINTENANCE"], self::RESPONSES["PAGE"][404] ]) && self::$page->theme->hasAsset(PATH)) self::$response = self::RESPONSES["ASSET"];
 		if(self::$response == self::RESPONSES["API"] && !self::$page->theme->hasApi()) self::$response = self::RESPONSES["PAGE"][404];
 	}
 	

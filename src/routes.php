@@ -96,7 +96,7 @@ self::addRoute("get", self::RESPONSES["PAGE"][404], function(&$page) {
 	self::$out->setCode(404);
 	self::$out->setContentType(MIME_TYPES["HTML"]);
 	
-	if($page->theme->errorExists("404")) die($page->theme->errorRead("404"));
+	if($page->theme->hasError("404")) die($page->theme->readError("404"));
 
 	$page->theme->setType("page", true);
 	$page->theme->title = "404 Not Found";
@@ -110,7 +110,7 @@ self::addRoute("get", self::RESPONSES["PAGE"][404], function(&$page) {
  * Serves theme asset files
  */
 self::addRoute(null, self::RESPONSES["ASSET"], function(&$page) { 
-	$page->theme->assetRead(PATH); 
+	$page->theme->readAsset(PATH); 
 });
 
 /**
@@ -118,7 +118,7 @@ self::addRoute(null, self::RESPONSES["ASSET"], function(&$page) {
  * Runs the theme API, if it has one
  */
 self::addRoute(null, self::RESPONSES["API"], function(&$page) { 
-	$page->theme->runAPI(); 
+	$page->theme->runApi(); 
 });
 
 /**

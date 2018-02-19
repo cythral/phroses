@@ -158,3 +158,17 @@ function parseSize($size) {
     $unit = strtolower(substr($size, -1, 1));
     return (int) $size * pow(1024, stripos('bkmgtpezy', $unit));
 }
+
+/**
+ * Return the output of an include
+ * 
+ * @param string $include the file to include
+ * @return string the output of the included file
+ */
+function getIncludeOutput(string $include): ?string {
+    if(!file_exists($include)) return null;
+
+    ob_start();
+    include $include;
+    return trim(ob_get_clean());
+}

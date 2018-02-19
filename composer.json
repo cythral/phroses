@@ -20,5 +20,8 @@
         "cythral/inix": "^0.1.1",
         "cythral/listen": "^0.1.0",
         "zbateson/mail-mime-parser": "^0.4.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0"
     }
 }
