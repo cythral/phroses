@@ -1,7 +1,7 @@
 <?php
 
 use phyrex\Template;
-use \Phroses\{ DB, Theme };
+use \Phroses\{ DB, Theme\Theme };
 use function Phroses\{ HandleMethod, mapError };
 use const \Phroses\{ SITE, INCLUDES };
 use const \reqc\{ HOST };

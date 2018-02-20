@@ -10,7 +10,6 @@ interface Loader {
     public function hasError(string $error): bool;
     public function hasApi(): bool;
     public function getName(): string;
-    public function getPath(): string;
     public function getType(string $type): ?string;
     public function getTypes(): array;
     public function getAsset(string $asset): ?string;

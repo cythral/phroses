@@ -6,6 +6,7 @@
 
 namespace Phroses;
 
+use \Phroses\Theme\Theme;
 use \Exception;
 use \reqc\Output;
 use \inix\Config as inix;

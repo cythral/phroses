@@ -79,12 +79,12 @@ self::addRoute("get", self::RESPONSES["SYS"][200], function(&$page) {
 	}
 
 	if($page->theme->hasType("admin")) $page->theme->setType("admin", true);
+	else $page->theme->setType("page", true);
 	$content = new Template(INCLUDES["TPL"]."/admin.tpl");
 	$content->content = trim(ob_get_clean());
 
 	$page->theme->title = $title ?? "Phroses System Page";
 	$page->theme->main = (string) $content;
-
 	$page->display();
 });
 

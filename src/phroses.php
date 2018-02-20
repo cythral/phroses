@@ -16,10 +16,12 @@ $loader = include ((INPHAR) ? SRC : ROOT) . "/vendor/autoload.php";
 $loader->addPsr4("Phroses\\", SRC."/models");
 include SRC."/functions.php";
 
+
 use \reqc;
 use \reqc\Output;
 use \listen\Events;
 use \phyrex\Template;
+use \Phroses\Theme\Theme;
 use \inix\Config as inix;
 
 // request variables
@@ -92,7 +94,7 @@ abstract class Phroses {
 
 		// page or asset
 		if(TYPE != TYPES["CLI"]) {
-			Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
+			//Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
