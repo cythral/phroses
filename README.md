@@ -1,5 +1,5 @@
 # Phroses [![Build Status](https://travis-ci.org/cythral/phroses.svg?branch=master)](https://travis-ci.org/cythral/phroses)
-Phroses is a multi-site content management system and dispatcher.  It is currently still in early development, with many initial features and systems still being implemented and ironed out. Phroses is easy to use, and extensible with customizable themes using [phyrex](https://github.com/cythral/phyrex) templating, along with plugins using [listen](https://github.com/cythral/listen).  Phroses has only been tested on apache, support for nginx is coming later on. 
+Phroses is a multi-site content management system and dispatcher.  Initial systems and features are fully implemented, while more advanced ones are still in development. Phroses is easy to use, and extensible with customizable themes using [phyrex](https://github.com/cythral/phyrex) templating, along with plugins using [listen](https://github.com/cythral/listen).  Phroses has only been tested on apache, support for nginx is coming later on. 
 
 ## Installation
 Phroses requires PHP 7.2 with dom, json, session, curl, date and pdo_mysql extensions enabled.
