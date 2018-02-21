@@ -17,4 +17,5 @@ interface Loader {
     public function getError(string $error): ?string;
     public function readAsset(string $asset): void;
     public function runApi(): void;
+    static public function list(): array;
 }

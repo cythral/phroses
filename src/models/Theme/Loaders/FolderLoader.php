@@ -92,4 +92,11 @@ class FolderLoader implements Loader {
     public function runApi(): void {
         if($this->hasApi()) include "{$this->path}/api.php";
     }
+
+    static public function list(): array {
+        return array_map(
+			function($value) { return str_replace(self::DIR."/", "", $value); },
+			array_filter(glob(self::DIR."/*", GLOB_ONLYDIR), function($val) { return $val != ""; }) // get directories in the themes folder
+		);
+    }
 }

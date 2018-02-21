@@ -36,7 +36,8 @@ final class Theme extends Template {
 
 
 	const LOADERS = [
-		"FOLDER" => "\Phroses\Theme\Loaders\FolderLoader"
+		"FOLDER" => "\Phroses\Theme\Loaders\FolderLoader",
+		"DUMMY" => "\Phroses\Theme\Loaders\DummyLoader"
 	];
 	
 	/**
@@ -49,7 +50,7 @@ final class Theme extends Template {
 	public function __construct(string $name, string $type = "page", ?array $content = null, ?string $loader = null) {
 		parent::__construct("");
 		$this->name = strtolower($name);
-		$this->content = $content ?? @SITE["PAGE"]["CONTENT"] ?? [];
+		$this->content = $content ?? (defined("SITE") ? SITE["PAGE"]["CONTENT"] : []);
 		$this->setupLoader($loader);
 		
         
@@ -59,17 +60,30 @@ final class Theme extends Template {
 		$this->loadAssets();
 	}
 
-	
-	public function setupLoader(?string $loader = null) {
+	/**
+	 * Sets up the theme loader
+	 * 
+	 * @param string $loader the loader to use.  If null, the default one is used (FolderLoader)
+	 */
+	public function setupLoader(?string $loader = null): void {
 		if($loader) $this->loader = $loader;
 		$this->loader = new $this->loader($this->name);
+	}
+
+	/**
+	 * Getter for the loader property.
+	 * 
+	 * @param Loader the currently used loader
+	 */
+	public function getLoader(): Loader {
+		return $this->loader;
 	}
 
 
 	/**
 	 * Load assets from the loader, automatically pushes everything in the css and js directories.
 	 */
-	private function loadAssets() {
+	private function loadAssets(): void {
 		$this->push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "defer"]);
 		foreach($this->loader->getAssets("css") as $style) $this->push("stylesheets", [ "src" => "/{$style}" ]);
 		foreach($this->loader->getAssets("js") as $script) $this->push("scripts", [ "src" => "/{$script}", "attrs" => "defer"]);
@@ -78,7 +92,7 @@ final class Theme extends Template {
 	/**
 	* Sets up sessiontools (on page buttons/screens) for page deletion, editing and more
 	*/
-	private function loadSessionTools() {
+	private function loadSessionTools(): void {
 		if($_SESSION && reqc\METHOD == "GET" && in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->push("stylesheets", [ "src" => SITE["ADMINURI"]."/assets/css/main.css" ]);
@@ -169,7 +183,7 @@ final class Theme extends Template {
 	 *
 	 * @return bool true if the theme has an api, false if not
 	 */
-	public function hasApi() : bool {
+	public function hasApi(): bool {
 		return $this->loader->hasApi();
 	}
 	
@@ -234,8 +248,10 @@ final class Theme extends Template {
 	/**
 	 * Generate editor fields.  (These are passed to the session tools on page save - if the page type changed)
 	 *
+	 * @param string $type the theme type to get editor fields from
+	 * @return string the editor fields
 	 */
-	public function getEditorFields(?string $type = null) {
+	public function getEditorFields(?string $type = null): string {
 		ob_start();
 		foreach($this->getContentFields($type ?? $this->type) as $key => $field) {
 			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type ?>-main" data-id="<?= $key; ?>"></div><? }
@@ -261,10 +277,7 @@ final class Theme extends Template {
 	 * @return array a list of theme names
 	 */
 	static public function list() : array {
-		return array_map(
-			function($value) { return str_replace(INCLUDES["THEMES"]."/", "", $value); },
-			array_filter(glob(INCLUDES["THEMES"]."/*", GLOB_ONLYDIR), function($val) { return $val != ""; }) // get directories in the themes folder
-		);
+		return array_merge(...array_map(function($val) { return $val::list(); }, array_values(self::LOADERS)));
 	}
 }
 

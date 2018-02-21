@@ -1,6 +1,8 @@
 <?php
 
-use \PHPUnit\Framework\TestCase;
+namespace Phroses\Testing\Integration;
+
+use \Phroses\Testing\TestCase;
 use \Phroses\Theme\Loaders\FolderLoader;
 use function \Phroses\{ getIncludeOutput };
 
@@ -101,6 +103,10 @@ class FolderLoaderTest extends TestCase {
             if($exists) $this->assertEquals(getIncludeOutput("{$loader->getPath()}/errors/{$error}.php"), $loader->getError($error));
             else $this->assertEquals(null, $loader->getError($error));
         }
+    }
+
+    public function testList() {
+        $this->assertArrayEquals(["bloom","bloom2"], FolderLoader::list());
     }
 
     public function existsProvider() {
