@@ -1,4 +1,5 @@
 <?php
 
 echo "hi";
-die;
+
+throw new \Phroses\Exceptions\ExitException;

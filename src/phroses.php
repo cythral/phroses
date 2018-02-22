@@ -94,7 +94,7 @@ abstract class Phroses {
 
 		// page or asset
 		if(TYPE != TYPES["CLI"]) {
-			//Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
+			Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
@@ -172,10 +172,13 @@ abstract class Phroses {
 	}
 
 	static public function setExceptionHandler() {
-		set_exception_handler(function(\Exception $e) {
-			$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
-			$out->message = $e->getMessage();
-			echo $out;
+		set_exception_handler(function(\Throwable $e) {
+			if($e instanceof \Phroses\Exceptions\ExitException) exit($e->code ?? 0);
+			else {
+				$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
+				$out->message = $e->getMessage();
+				echo $out;
+			}
 		});
 	}
 	

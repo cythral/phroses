@@ -1,7 +1,8 @@
 <?php
 
 use phyrex\Template;
-use Phroses\{ DB, Theme };
+use Phroses\{ DB };
+use Phroses\Theme\Theme;
 use function Phroses\{ handleMethod };
 use const Phroses\{ INCLUDES, SITE };
 
@@ -25,18 +26,8 @@ handleMethod("post", function($out) {
 
     } else {
         $pst->pst_type = "existing";
-
-        
-        $page->content = json_decode($page->content);
-
-        ob_start();
-        foreach($theme->getContentFields($page->type) as $key => $field) {
-            if($field == "editor") { ?><pre class="form_field content editor" id="<?= $page->type; ?>-main" data-id="<?= $key; ?>"><?= trim(htmlspecialchars($page->content->{$key} ?? "")); ?></pre><? }
-            else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value="<?= htmlspecialchars($page->content->{$key} ?? ""); ?>"><? }
-        }
-
         $pst->id = $page->id;
-        $pst->fields = trim(ob_get_clean());
+        $pst->fields = $theme->getEditorFields(null, json_decode($page->content, true));
         $pst->title = $page->title;
         $pst->visibility = $page->public ? "checked" : "";
     }

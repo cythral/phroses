@@ -13,8 +13,9 @@
 <body itemscope itemtype="http://schema.org/Organization">
 	<{include::header}>
 	<main>
-	blahblah
+		Test different page type
 		<{content::main::editor}>
+		Created by <{content::author::text}>
 	</main>
 	<{include::footer}>
 </body>

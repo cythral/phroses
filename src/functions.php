@@ -6,6 +6,7 @@
 namespace Phroses;
 
 use \reqc;
+use \DOMDocument;
 use \RecursiveIteratorIterator as FileIterator;
 use \RecursiveDirectoryIterator as DirectoryIterator;
 
@@ -171,4 +172,46 @@ function getIncludeOutput(string $include): ?string {
     ob_start();
     include $include;
     return trim(ob_get_clean());
+}
+
+/**
+ * Returns array keys whose values equal true
+ * 
+ * @param array $array the input array
+ * @return array an array of keys whose values were equal to true
+ */
+function trueArrayKeys(array $input): array {
+    return array_keys(array_filter($input, function($value) { return $value; }));
+}
+
+/**
+ * Gets the html contents inside a tagname
+ * 
+ * @param string $html the source html to search
+ * @param string $tag the tagname to return the contents of
+ * @return string the contents of the tagname that was searched or null if that tag does not exist
+ */
+function getTagContents(string $html, string $tag): ?string {
+    $src = new DOMDocument;
+    $dest = new DOMDocument;
+    @$src->loadHTML($html);
+
+    $body = $src->getElementsByTagName($tag)->item(0);
+    if(!$body) return null;
+    
+    foreach($body->childNodes as $child) {
+        $dest->appendChild($dest->importNode($child, true));
+    }
+    
+    return trim($dest->saveHTML());
+}
+
+/**
+ * Strips strings of phyrex template fields
+ * 
+ * @param string $input the input string
+ * @return string the input string without phyrex template fields
+ */
+function stripPhyrexFields(string $input): string {
+    return preg_replace("/<{([a-z]+)(::((?!}>).)*)?}>/is", "", $input);
 }

@@ -13,6 +13,7 @@ use \reqc\JSON\Server as JSONServer;
 use \listen\Events;
 use \inix\Config as inix;
 use \phyrex\Template;
+use \Phroses\Theme\Theme;
 
 // request variables
 use const \reqc\{ VARS, MIME_TYPES, PATH, EXTENSION, METHOD, HOST, BASEURL };

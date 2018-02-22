@@ -17,6 +17,7 @@ use \inix\Config as inix;
 use \phyrex\Template as Template;
 use \Phroses\Phroses;
 use const \Phroses\{ SITE, INCLUDES };
+use function \Phroses\{ getTagContents };
 
 // exception handling
 use \Phroses\Exceptions\ThemeException;
@@ -24,7 +25,7 @@ use const \Phroses\Exceptions\THEME_ERRORS;
 
 final class Theme extends Template {
 	
-    public $name;
+    private $name;
 	private $type; // active type template to use
 	private $content; // content used in the content filter
 	private $useconst = true;
@@ -38,6 +39,12 @@ final class Theme extends Template {
 	const LOADERS = [
 		"FOLDER" => "\Phroses\Theme\Loaders\FolderLoader",
 		"DUMMY" => "\Phroses\Theme\Loaders\DummyLoader"
+	];
+
+	const FIELDS = [
+		"EDITOR" => '<div class="form_field content editor" id="<{var::type}>-main" data-id="<{var::key}>"><{var::value}></div>',
+		"TEXT" => '<input id="<{var::key}>" placeholder="<{var::key}>" type="text" class="form_input form_field content" value="<{var::value}>">',
+		"URL" => '<input id="<{var::key}>" placeholder="<{var::key}>" type="url" class="form_input form_field content" value="<{var::value}>">'
 	];
 	
 	/**
@@ -56,7 +63,7 @@ final class Theme extends Template {
         
 		// make sure theme directory and page type exists
 		if(!$this->loader->exists()) throw new ThemeException(THEME_ERRORS["NOT_FOUND"], $this->name);
-		$this->setType($type);
+		$this->setType($type, true);
 		$this->loadAssets();
 	}
 
@@ -93,7 +100,7 @@ final class Theme extends Template {
 	* Sets up sessiontools (on page buttons/screens) for page deletion, editing and more
 	*/
 	private function loadSessionTools(): void {
-		if($_SESSION && reqc\METHOD == "GET" && in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
+		if(isset($_SESSION) && reqc\METHOD == "GET" && in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->push("stylesheets", [ "src" => SITE["ADMINURI"]."/assets/css/main.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
@@ -212,19 +219,8 @@ final class Theme extends Template {
 	 * @return string the content inside the parsed theme's <body> tag
 	 */
 	public function getBody(): ?string {
-        $this->useconst = false;
-        $src = new DOMDocument;
-		$dest = new DOMDocument;
-		
-        @$src->loadHTML((string) $this);
-        $body = $src->getElementsByTagName('body')->item(0);
-        if(!$body) return null;
-        
-        foreach($body->childNodes as $child) {
-            $dest->appendChild($dest->importNode($child, true));
-        }
-        
-        return $dest->saveHTML();
+		$this->useconst = false;
+		return getTagContents((string) $this, "body");
 	}
 	
 	/**
@@ -246,16 +242,21 @@ final class Theme extends Template {
 	}
 	
 	/**
-	 * Generate editor fields.  (These are passed to the session tools on page save - if the page type changed)
+	 * Generate editor fields.  (These are passed to the session tools for editing)
 	 *
 	 * @param string $type the theme type to get editor fields from
+	 * @param array $content an array of content to populate the editor fields with
 	 * @return string the editor fields
 	 */
-	public function getEditorFields(?string $type = null): string {
+	public function getEditorFields(?string $type = null, array $content = []): string {
 		ob_start();
+
 		foreach($this->getContentFields($type ?? $this->type) as $key => $field) {
-			if($field == "editor")  { ?><div class="form_field content editor" id="<?= $type ?>-main" data-id="<?= $key; ?>"></div><? }
-			else if(in_array($field, ["text", "url"])) { ?><input id="<?= $key; ?>" placeholder="<?= $key; ?>" type="<?= $field; ?>" class="form_input form_field content" value=""><? }
+			$tpl = new Template(self::FIELDS[strtoupper($field)]);
+			$tpl->type = $type ?? $this->type;
+			$tpl->key = $key;
+			$tpl->value = trim(htmlspecialchars($content[$key] ?? ""));
+			echo $tpl;
 		}
 
 		return trim(ob_get_clean());
@@ -269,7 +270,34 @@ final class Theme extends Template {
 	protected function process(bool $loadSessionTools = true) {
         if($loadSessionTools) $this->loadSessionTools();
         parent::process();
-    }
+	}
+	
+	/**
+	 * Getter for the tpl property
+	 * 
+	 * @return string the tpl property
+	 */
+	public function getTpl() {
+		return $this->tpl;
+	}
+
+	/**
+	 * Getter for the name property
+	 * 
+	 * @return string the theme name
+	 */
+	public function getName() {
+		return $this->name;
+	}
+
+	/**
+	 * Getter for the theme's path
+	 * 
+	 * @return string the path returned by the theme's loader
+	 */
+	public function getPath() {
+		return $this->loader->getPath();
+	}
 	
 	/**
 	 * Returns a list of themes that are available. 
