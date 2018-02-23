@@ -1,0 +1,14 @@
+{
+    "sites" : [
+        {
+            "id": 1,
+            "url": "phroses.dev",
+            "theme": "bloom",
+            "name": "phroses",
+            "adminUri": "/admin",
+            "adminUsername": "root",
+            "adminPassword": "{password}",
+            "maintenance" : false
+        }
+    ]
+}

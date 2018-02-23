@@ -176,10 +176,13 @@ self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 		if(isset($_REQUEST["title"])) $page->title = $_REQUEST["title"];
 		if(isset($_REQUEST["uri"])) $page->uri = urldecode($_REQUEST["uri"]);
 		if(isset($_REQUEST["public"])) $page->public = $_REQUEST["public"];
-		if(isset($_REQUEST["content"])) $page->content = htmlspecialchars_decode($_REQUEST["content"]);
+
+		if(isset($_REQUEST["content"])) {
+			$page->content = htmlspecialchars_decode($_REQUEST["content"]);
+		}
+
 		if(isset($_REQUEST["type"])) {
 			$page->type = urldecode($_REQUEST["type"]);
-			$page->theme = new Theme(SITE["THEME"], $page->type);
 			if($_REQUEST["type"] != "redirect") $page->content = "{}";
 		} 
 	}

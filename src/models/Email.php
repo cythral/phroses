@@ -1,6 +1,7 @@
 <?php
 /**
  * This is a simple OO wrapper for php's mail function
+ * @todo move this to cythral/utils
  */
 
 namespace Phroses;

@@ -27,7 +27,7 @@ handleMethod("post", function($out) {
     } else {
         $pst->pst_type = "existing";
         $pst->id = $page->id;
-        $pst->fields = $theme->getEditorFields(null, json_decode($page->content, true));
+        $pst->fields = $theme->getEditorFields($page->type, json_decode($page->content, true));
         $pst->title = $page->title;
         $pst->visibility = $page->public ? "checked" : "";
     }

@@ -16,8 +16,9 @@ use const \reqc\{ MIME_TYPES };
 class Page {
     private $data;
     private $oh;
-
+    
     public $theme;
+    public $useDB = true;
 
     const REQUIRED_OPTIONS = [
         "id",
@@ -60,7 +61,14 @@ class Page {
      * if the page id is not empty.
      */
     public function __set($key, $val) {
-        if($this->id) DB::query("UPDATE `pages` SET `$key`=? WHERE `id`=?", [$val, $this->id]);
+        if($this->id && $this->useDB) DB::query("UPDATE `pages` SET `$key`=? WHERE `id`=?", [$val, $this->id]);
+        
+        if($key == "type") $this->theme->setType($val, true);
+        if($key == "content") {
+            if(is_string($val)) $val = json_decode($val, true);
+            $this->theme->setContent($val);
+        }
+
         $this->data[$key] = $val;
         return true;
     }
@@ -96,9 +104,14 @@ class Page {
 
     /**
      * Deletes a page if the id is not empty
+     * 
+     * @return bool true on success, false on failure
      */
-    public function delete() {
-        if($this->id) DB::query("DELETE FROM `pages` WHERE `id`=?", [ $this->id ]);
+    public function delete(): bool {
+        if(!($this->id && $this->useDB)) return false;
+
+        DB::query("DELETE FROM `pages` WHERE `id`=?", [ $this->id ]);
+        return true;
     }
 
     /**

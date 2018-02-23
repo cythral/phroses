@@ -2,6 +2,12 @@ language: php
 
 php:
   - '7.2'
+
+services:
+  - mysql
+
+before_install:
+  - sudo mysql -e "CREATE DATABASE phroses;"
   
 before_script: 
   - phpenv config-add php.ini
@@ -9,12 +15,13 @@ before_script:
   - npm install -g less-plugin-clean-css
   - npm install -g uglify-js
   - composer install
+  - mv phroses.travis.conf phroses.conf
   
 script:
   - lessc --clean-css src/views/assets/less/main.less src/views/assets/css/main.css
   - uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/views/assets/js/main.min.js
   - rm -rf src/views/assets/less
-  - phpunit
+  - phpunit && php tests/teardown.php
   - php build.php
   - php phroses.phar
   
@@ -37,3 +44,5 @@ after_failure:
   - chmod +x send.sh
   - ./send.sh failure
 
+addons:
+  mariadb: '10.2'

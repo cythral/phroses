@@ -14,3 +14,4 @@ vendor/
 /src/composer.lock
 themes/untitled/
 uploads/
+tests/backup.sql
