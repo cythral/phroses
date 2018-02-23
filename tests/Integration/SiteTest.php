@@ -24,7 +24,6 @@ class SiteTest extends TestCase {
     }
 
     public function testGenerate() {
-        var_dump(DB::query("select * from sites", [])[0]);
         $site = Site::generate(1);
         $this->assertInstanceOf(Site::class, $site);
     }
