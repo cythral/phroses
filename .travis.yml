@@ -17,7 +17,7 @@ before_script:
   - npm install -g uglify-js
   - composer install
   - mv phroses.travis.conf phroses.conf
-  - sudo mysql -e "CREATE DATABASE `phroses`;"
+  - sudo mysql -e 'CREATE DATABASE phroses;'
   
   # postfix
   - sudo service postfix stop
