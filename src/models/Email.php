@@ -6,13 +6,15 @@
 namespace Phroses;
 
 
-class Email {    
-    private $to;
-    private $from;
-    private $subject;
-    private $message;
+class Email { 
+    public $to;
+    public $from;
+    public $subject;
+    public $message;
+    public $replyTo;
+    public $headers = [];
+
     public $useHtml = true;
-    private $headers;
 
     /**
      * Constructor, takes an array of email options and sets them
@@ -21,7 +23,17 @@ class Email {
      * @param array $options an array of options to use for the email
      */
     public function __construct(array $options) {
-        foreach($options as $key => $val) $this->{$key} = $val;
+        [ 
+            "to" => $this->to, 
+            "from" => $this->from, 
+            "subject" => $this->subject, 
+            "message" => $this->message
+            
+        ] = $options;
+
+        foreach([ "headers", "replyTo", "useHtml" ] as $optional) {
+            if(isset($options[$optional])) $this->{$optional} = $options[$optional];
+        }
     }
 
     /**
@@ -30,8 +42,7 @@ class Email {
      * @return bool true on success and false on failure
      */
     public function __invoke(): bool {
-        $this->parseHeaders();
-        return mail($this->to, $this->subject, $this->message, $this->headers);
+        return mail($this->to, $this->subject, $this->message, $this->getParsedHeaders());
     }
 
     /**
@@ -44,25 +55,30 @@ class Email {
     }
 
     /**
-     * Adds a header to the email
-     */
-    private function addHeader($header) {
-        $this->headers .= $header."\r\n";
-    }
-
-    /**
      * Turns various properties into headers
      */
-    private function parseHeaders() {
+    private function setupHeaders() {
         // HTML Emails
         if($this->useHtml) {
-            $this->addHeader("MIME-Version: 1.0");
-            $this->addHeader("Content-type: text/html; charset=iso-8859-1");
+            $this->headers["mime-version"] =  "1.0";
+            $this->headers["content-type"] = "text/html; charset=iso-8859-1";
+
+        } else unset($this->headers["mime-version"], $this->headers["content-type"]);
+        
+
+        if(isset($this->sender)) $this->headers["sender"] = $this->sender;
+        if(isset($this->from)) $this->headers["from"] = $this->from;
+        if(isset($this->replyTo)) $this->headers["reply-to"] = $this->replyTo;
+    }
+
+    public function getParsedHeaders() {
+        $this->setupHeaders();
+        $parsed = "";
+
+        foreach($this->headers as $key => $val) {
+            $parsed .= "{$key}: {$val}\r\n";
         }
 
-        // From
-        if(isset($this->sender)) $this->addHeader("Sender: $this->sender");
-        if(isset($this->from)) $this->addHeader("From: $this->from");
-        if(isset($this->replyto)) $this->addHeader("Reply-To: $this->replyto");
+        return trim($parsed);
     }
 }

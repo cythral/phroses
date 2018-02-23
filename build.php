@@ -32,7 +32,8 @@ if(file_exists("tmp")) rrmdir("tmp"); // empty the tmp dir if it exiss
 // make tmp dir, copy themes and plugins there so they can be recursively added to the tar archive
 mkdir("tmp"); 
 rcopy("themes", "tmp/themes"); 
-rcopy("plugins", "tmp/plugins"); 
+rcopy("plugins", "tmp/plugins");
+rrmdir("tmp/themes/bloom2"); 
 exec("chmod -R 775 tmp/themes"); 
 chmod(".htaccess", 0775); 
 
