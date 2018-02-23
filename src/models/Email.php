@@ -28,7 +28,7 @@ class Email {
             "from" => $this->from, 
             "subject" => $this->subject, 
             "message" => $this->message
-            
+
         ] = $options;
 
         foreach([ "headers", "replyTo", "useHtml" ] as $optional) {
@@ -57,7 +57,7 @@ class Email {
     /**
      * Turns various properties into headers
      */
-    private function setupHeaders() {
+    private function setupHeaders(): void {
         // HTML Emails
         if($this->useHtml) {
             $this->headers["mime-version"] =  "1.0";
@@ -71,7 +71,13 @@ class Email {
         if(isset($this->replyTo)) $this->headers["reply-to"] = $this->replyTo;
     }
 
-    public function getParsedHeaders() {
+    /**
+     * Iterates through all headers and parses them into a string
+     * for the headers parameter in php's mail()
+     * 
+     * @return string the parsed headers
+     */
+    public function getParsedHeaders(): string {
         $this->setupHeaders();
         $parsed = "";
 
