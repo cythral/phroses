@@ -9,7 +9,6 @@
 
 namespace Phroses\Theme; 
 
-
 use \DOMDocument;
 use \Exception;
 use \reqc; 
@@ -17,6 +16,7 @@ use \inix\Config as inix;
 use \phyrex\Template as Template;
 use \Phroses\Phroses;
 use const \Phroses\{ SITE, INCLUDES };
+use const \reqc\{ VARS };
 use function \Phroses\{ getTagContents };
 
 // exception handling
@@ -25,22 +25,28 @@ use const \Phroses\Exceptions\THEME_ERRORS;
 
 final class Theme extends Template {
 	
-    private $name;
-	private $type; // active type template to use
-	private $content; // content used in the content filter
-	private $useconst = true;
-	private $loader = self::LOADERS["FOLDER"]; // the theme loader
+	/** @var string the name of the theme */
+	private $name;
+	
+	/** @var string active theme type in use */
+	private $type;
 
-	// deprecated
-	private $types = ["redirect"];
-	private $root;
+	/** @var array an array of content fields */
+	private $content;
 
+	/** @var bool whether or not to use the reqc VARS in the content filter */
+	public $useReqcVars = false;
 
+	/** @var string|Loader the theme's internal loader, loads theme metadata, assets, etc. */
+	private $loader = self::LOADERS["FOLDER"]; 
+
+	/** @var array loader classes to use for the theme's internal loader */
 	const LOADERS = [
 		"FOLDER" => "\Phroses\Theme\Loaders\FolderLoader",
 		"DUMMY" => "\Phroses\Theme\Loaders\DummyLoader"
 	];
 
+	/** @var array field templates for generating editor fields */
 	const FIELDS = [
 		"EDITOR" => '<div class="form_field content editor" id="<{var::type}>-main" data-id="<{var::key}>"><{var::value}></div>',
 		"TEXT" => '<input id="<{var::key}>" placeholder="<{var::key}>" type="text" class="form_input form_field content" value="<{var::value}>">',
@@ -219,7 +225,6 @@ final class Theme extends Template {
 	 * @return string the content inside the parsed theme's <body> tag
 	 */
 	public function getBody(): ?string {
-		$this->useconst = false;
 		return getTagContents((string) $this, "body");
 	}
 	
@@ -317,7 +322,7 @@ Theme::$filters["include"] = function($file) {
 
 Theme::$filters["content"] = function($key, $fieldtype) {
 	$content = $this->content;
-	if(!$this->useconst) $content = json_decode($_REQUEST["content"] ?? "{}", true);
+	if($this->useReqcVars) $content = json_decode(VARS["content"] ?? "{}", true);
 	
 	if(array_key_exists($key, $content ?? [])) echo $content[$key];
 	else if(array_key_exists($key, $this->vars)) echo $this->vars[$key];
