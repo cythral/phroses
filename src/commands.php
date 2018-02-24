@@ -51,13 +51,24 @@ self::addCmd("test", function() {
  * Resets the database
  */
 self::addCmd("reset", function() {
-	echo "Are you sure?  Doing this will reset the database, all data will be lost (Y/n): ";
-	$answer = strtolower(trim(fgets(STDIN)));
-	
-	if($answer == "y") {
+	$answer = strtolower(ask("Are you sure?  Doing this will reset the database, all data will be lost (Y/n): "));
+		
+	if(in_array($answer, ['y', ''])) {
 		DB::unpreparedQuery(file_get_contents(SRC."/schema/install.sql"));
 		echo "The database has been successfully reset.".PHP_EOL;
 	}
+});
+
+/**
+ * Restores the database from a backup.  A sql file should be piped to the script
+ */
+self::addCmd("restore", function() {
+	if(!@DB::unpreparedQuery(file_get_contents("php://stdin"))) {
+		echo "There was an error restoring the database.".PHP_EOL;
+		exit(1);
+	}
+
+	echo "Successfully restored the database from your backup.".PHP_EOL;
 });
 
 return self::$commands; // return a list of commands for the listen event

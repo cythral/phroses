@@ -215,3 +215,26 @@ function getTagContents(string $html, string $tag): ?string {
 function stripPhyrexFields(string $input): string {
     return preg_replace("/<{([a-z]+)(::((?!}>).)*)?}>/is", "", $input);
 }
+
+
+/**
+ * Command line utility for asking a question and returning the response
+ */
+function ask(string $output, array $valid = ['y','n',''], bool $addeol = false): string {
+    $done = false;
+
+    while(!$done) {
+        echo $output;
+        if($addeol) echo PHP_EOL;
+        $answer = strtolower(trim(fgets(STDIN)));
+        
+        if(!in_array($answer, $valid)) {
+            echo "Invalid option '$answer'".PHP_EOL;
+            continue;
+        }
+        
+        break;
+    }
+
+    return $answer;
+}
