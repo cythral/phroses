@@ -60,7 +60,9 @@ foreach((array)$dataset as $tablename => $table) {
 
 }
 
-var_dump($pdo->query("select * from sites"));
+foreach($pdo->query("select * from sites") as $site) {
+    var_dump($site);
+}
 
 class TestCase extends \PHPUnit\Framework\TestCase {
     public function assertArrayEquals($expected, $actual) {
