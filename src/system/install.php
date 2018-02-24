@@ -41,7 +41,7 @@ handleMethod("post", function($out) {
 }, ["host", "database", "username", "password"]);
 
 
-$installer = new Template(INCLUDES["TPL"]."/installer.tpl");
-$installer->styles = file_get_contents(SRC."/views/assets/css/main.css");
-$installer->script = file_get_contents(SRC."/views/assets/js/install.js");
-echo $installer;
+$install = new Template(INCLUDES["TPL"]."/installer.tpl");
+$install->styles = file_get_contents(SRC."/views/assets/css/main.css");
+$install->script = file_get_contents(SRC."/views/assets/js/install.js");
+echo $install;

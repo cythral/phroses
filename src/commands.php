@@ -39,9 +39,25 @@ self::addCmd("email", function($args, $flags) {
 	]);
 });
 
+/**
+ * This command is used during testing
+ */
 self::addCmd("test", function() {
 	// will do more here later
 	echo "TEST OK";
+});
+
+/**
+ * Resets the database
+ */
+self::addCmd("reset", function() {
+	echo "Are you sure?  Doing this will reset the database, all data will be lost (Y/n): ";
+	$answer = strtolower(trim(fgets(STDIN)));
+	
+	if($answer == "y") {
+		DB::unpreparedQuery(file_get_contents(SRC."/schema/install.sql"));
+		echo "The database has been successfully reset.".PHP_EOL;
+	}
 });
 
 return self::$commands; // return a list of commands for the listen event
