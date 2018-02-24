@@ -30,7 +30,7 @@ script:
   - uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/views/assets/js/main.min.js
   - rm -rf src/views/assets/less
 
-  - phpunit; php tests/teardown.php
+  - phpunit
   - php build.php
   - php phroses.phar test
   

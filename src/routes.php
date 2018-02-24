@@ -18,8 +18,6 @@ use \Phroses\Theme\Theme;
 // request variables
 use const \reqc\{ VARS, MIME_TYPES, PATH, EXTENSION, METHOD, HOST, BASEURL };
 
-
-
 /**
  * GET PAGE/200
  * This route gets page information and either displays it as html or json
@@ -38,8 +36,6 @@ self::addRoute(new class extends Route {
 		$page->display();
 	}
 });
-
-
 
 /**
  * GET PAGE/301
@@ -300,6 +296,7 @@ self::addRoute(new class extends Route {
 self::addRoute(new class extends Route {
 	public $method = "delete";
 	public $response = Phroses::RESPONSES["DEFAULT"];
+
 	public function follow(&$page, &$site, &$out) {
 		$out = new JSONServer();
 		
@@ -347,6 +344,7 @@ self::addRoute(new class extends Route {
 		$out->setCode(503);
 		die(new Template(INCLUDES["TPL"]."/maintenance.tpl"));
 	}
+
 	public function rules(&$page, &$site, &$cascade) {
 		return [
 			6 => function() use (&$site, &$cascade) { 
