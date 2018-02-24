@@ -37,6 +37,8 @@ abstract class Phroses {
 	static private $out;
 	static private $routes = [];
 	static private $commands = [];
+	static private $cascadeRules = [];
+	static private $cascade;
 	static private $page;
 
 	static public $site;
@@ -89,6 +91,7 @@ abstract class Phroses {
 	 */
 	static public function start() {
 		self::$out = new Output();
+		self::$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
 		
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
@@ -232,63 +235,17 @@ abstract class Phroses {
 		]);
 	}
 
-	static public function determineRoute() {
-		// Determine Response Type
-		$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
-
-		// page not found
-		$cascade->addRule(!self::$page->id, self::RESPONSES["PAGE"][404]);
-
-		// admin/dashboard pages
-		$cascade->addRule(
-			(
-				PATH != "/" &&
-				stringStartsWith(PATH, self::$site->adminURI) && (
-
-					file_exists(($adminpath = INCLUDES["VIEWS"].substr(PATH, strlen(self::$site->adminURI))).".php") || // views/page.php
-					file_exists($adminpath) || // views/page.css
-					file_exists("$adminpath/index.php") // views/page/index.php
-				)
-			), self::RESPONSES["SYS"][200]
-		);
-
-		// uploads
-		$cascade->addRule(
-			(
-				stringStartsWith(PATH, "/uploads") && 
-				file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8)) && 
-				trim(PATH, "/") != "uploads"
-
-			), self::RESPONSES["UPLOAD"]
-		);
-
-		// api
-		$cascade->addRule(
-			(
-				stringStartsWith(PATH, "/api") && 
-				self::$page->theme->hasApi()
-			), self::RESPONSES["API"]
-		);
-
-		// redirects
-		$cascade->addRule(self::$page->type == "redirect", self::RESPONSES["PAGE"][301]);
+	/**
+	 * Determines the route to take based on cascade rules added in ./routes.php
+	 */
+	static public function determineRoute(): void {
+		sort(self::$cascadeRules); // make sure rules get executed in order based on key
 		
-		// if on a nonpublic page and not signed in switch to 404
-		$cascade->addRule($cascade->getResult() == self::RESPONSES["PAGE"][200] && !self::$page->visibility && !$_SESSION, self::RESPONSES["PAGE"][404]); 
+		foreach(self::$cascadeRules as list($response, $expr)) {
+			self::$cascade->addRule($expr(), $response);
+		}
 
-		// display maintenance mode if not signed in and it is turned on
-		$cascade->addRule(self::$site->maintenance && !$_SESSION && $cascade->getResult() != self::RESPONSES["SYS"][200], self::RESPONSES["MAINTENANCE"]);
-
-		// assets, allow access even if in maintenance mode
-		$cascade->addRule(
-			(
-				in_array($cascade->getResult(), [ self::RESPONSES["MAINTENANCE"], self::RESPONSES["PAGE"][404] ]) && 
-				self::$page->theme->hasAsset(PATH)
-
-			), self::RESPONSES["ASSET"]
-		);
-		
-		self::$response = $cascade->getResult();
+		self::$response = self::$cascade->getResult();
 	}
 	
 	/**
@@ -307,13 +264,16 @@ abstract class Phroses {
 	 * @param int $response the response identifier (see self::RESPONSES for acceptable responses)
 	 * @param callable $handler the route handler, executed by followRoute
 	 */
-	static public function addRoute(?string $method, int $response, callable $handler) {
-		$methods = ($method) ? [ strtoupper($method) ] : [ "GET", "POST", "PUT", "PATCH", "DELETE" ]; // if method was null, create a route for all methods
+	static public function addRoute(Route $route) {
+		$methods = ($route->method) ? [ strtoupper($route->method) ] : [ "GET", "POST", "PUT", "PATCH", "DELETE" ]; // if method was null, create a route for all methods
 
 		foreach($methods as $method) {
 			if(!isset(self::$routes[$method])) self::$routes[$method] = [];
-			self::$routes[$method][$response] = $handler;
+			self::$routes[$method][$route->response] = $route;
 		}
+
+		$cascadeRules = array_map(function($expr) use ($route) { return [ $route->response, $expr ]; }, $route->rules(self::$page, self::$site, self::$cascade));
+		self::$cascadeRules = array_merge(self::$cascadeRules, $cascadeRules);
 	}
 	
 	/**
@@ -326,7 +286,7 @@ abstract class Phroses {
 	static public function followRoute(string $method, int $response) {
 		if($response == self::RESPONSES["SYS"][200]) $method = "GET";
 		if(!isset(self::$routes[$method][$response])) $response = self::RESPONSES["DEFAULT"];
-		return self::$routes[$method][$response](self::$page, self::$site);
+		return self::$routes[$method][$response]->follow(self::$page, self::$site, self::$out);
 	}
 	
 	/**
