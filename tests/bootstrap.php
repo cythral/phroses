@@ -56,6 +56,7 @@ foreach($dataset as $tablename => $table) {
         foreach($row as $key => $val) $q .= ":{$key}, ";
         $q = rtrim($q, ", ").")";
 
+        echo $q;
         $stmt = $pdo->prepare($q);
         foreach($row as $key => $val) $stmt->bindValue(":{$key}", $val);
         $stmt->execute();
@@ -63,7 +64,7 @@ foreach($dataset as $tablename => $table) {
 
 }
 
-foreach($pdo->query("select * from sites") as $site) {
+foreach($pdo->query("describe sites") as $site) {
     var_dump($site);
 }
 

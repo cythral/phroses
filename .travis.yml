@@ -24,6 +24,7 @@ before_script:
   
 script:
   - sudo mysql phroses < src/schema/install.sql
+  - sudo mysql phroses -e "show tables"
   
   - lessc --clean-css src/views/assets/less/main.less src/views/assets/css/main.css
   - uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/views/assets/js/main.min.js
