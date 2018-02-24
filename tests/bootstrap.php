@@ -37,20 +37,17 @@ try {
 // backup any existing data
 exec("mysqldump --user={$conf["user"]} --password={$conf["password"]} --host={$conf["host"]} {$conf["name"]} > ".\Phroses\ROOT."/tests/backup.sql");
 
-// drop all tables, reinstall schema
-$pdo->query("SELECT concat('DROP TABLE IF EXISTS ', table_name, ';') FROM information_schema.tables WHERE table_schema = '{$conf["name"]}';");
+// reinstall schema
 $pdo->query(file_get_contents(\Phroses\SRC."/schema/install.sql"));
 
 // get dataset
 inix::set("test.password", bin2hex(openssl_random_pseudo_bytes(12)));
 $dataset = file_get_contents(\Phroses\ROOT."/tests/dataset.json");
 $dataset = str_replace("{password}", password_hash(inix::get("pepper").inix::get("test.password"), PASSWORD_DEFAULT), $dataset);
-$dataset = json_decode($dataset);
-
-
+$dataset = json_decode($dataset, true);
 
 // insert data
-foreach((array)$dataset as $tablename => $table) {
+foreach($dataset as $tablename => $table) {
 
     foreach($table as $row) {
         $q = "INSERT INTO `{$tablename}` (";
