@@ -60,13 +60,11 @@ foreach($dataset as $tablename => $table) {
         $stmt = $pdo->prepare($q);
         foreach($row as $key => $val) $stmt->bindValue(":{$key}", $val);
         $stmt->execute();
+        var_dump($stmt->errorInfo());
     }
 
 }
 
-foreach($pdo->query("describe sites") as $site) {
-    var_dump($site);
-}
 
 class TestCase extends \PHPUnit\Framework\TestCase {
     public function assertArrayEquals($expected, $actual) {
