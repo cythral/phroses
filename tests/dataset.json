@@ -8,7 +8,7 @@
             "adminUri": "/admin",
             "adminUsername": "root",
             "adminPassword": "{password}",
-            "maintenance" : false
+            "maintenance" : 0
         }
     ]
 }
