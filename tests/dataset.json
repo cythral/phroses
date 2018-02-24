@@ -5,7 +5,7 @@
             "url": "phroses.dev",
             "theme": "bloom",
             "name": "phroses",
-            "adminUri": "/admin",
+            "adminURI": "/admin",
             "adminUsername": "root",
             "adminPassword": "{password}",
             "maintenance" : 0

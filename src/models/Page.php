@@ -6,6 +6,7 @@
 
 namespace Phroses;
 
+use \Phroses\Phroses;
 use \Phroses\Theme\Theme;
 use \Exception;
 use \reqc\Output;
@@ -46,7 +47,7 @@ class Page {
 
         $this->data = $options;
         $this->oh = new Output();
-        $this->theme = new Theme(SITE["THEME"], $this->type);
+        $this->theme = new Theme(Phroses::$site->theme, $this->type);
     }
 
     /**

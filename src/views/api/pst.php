@@ -6,15 +6,15 @@ use Phroses\Theme\Theme;
 use function Phroses\{ handleMethod };
 use const Phroses\{ INCLUDES, SITE };
 
-handleMethod("post", function($out) {
+handleMethod("post", function($out) use (&$site) {
     ob_end_clean();
 
-    $theme = new Theme(SITE["THEME"], "page");
+    $theme = new Theme($site->theme, "page");
 
     $pst = new Template(INCLUDES["TPL"]."/pst.tpl");
     $pst->uri = $_REQUEST["uri"];
 
-    $info = DB::Query("SELECT `title`, `content`, `public`, `type`, `id` FROM `pages` WHERE `uri`=? AND `siteID`=?", [ $_REQUEST["uri"], SITE["ID"] ]);
+    $info = DB::Query("SELECT `title`, `content`, `public`, `type`, `id` FROM `pages` WHERE `uri`=? AND `siteID`=?", [ $_REQUEST["uri"], $site->id ]);
     $page = $info[0] ?? null;
 
     if(count($info) == 0) {

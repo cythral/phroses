@@ -15,7 +15,7 @@ class Site {
         "name",
         "theme",
         "url",
-        "adminUri",
+        "adminURI",
         "adminUsername",
         "adminPassword",
         "maintenance"
@@ -52,9 +52,9 @@ class Site {
     }
 
     static public function create(string $name, string $url, string $theme, string $adminUri, string $adminUsername, string $adminPassword, bool $maintenance) {
-        $adminPassword = password_hash(inix::get("pepper").$val, PASSWORD_DEFAULT);
+        $adminPassword = password_hash(inix::get("pepper").$adminPassword, PASSWORD_DEFAULT);
 
-        DB::query("INSERT INTO `sites` (`name`, `url`, `theme`, `adminUri` `adminUsername`, `adminPassword`, `maintenance`) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+        DB::query("INSERT INTO `sites` (`name`, `url`, `theme`, `adminURI`, `adminUsername`, `adminPassword`, `maintenance`) VALUES (?, ?, ?, ?, ?, ?, ?)", [
             $name,
             $url,
             $theme,
@@ -70,5 +70,9 @@ class Site {
     static public function generate(int $id): ?Site {
         $siteInfo = DB::query("SELECT * FROM `sites` WHERE `id`=?", [ $id ], PDO::FETCH_ASSOC)[0] ?? null;
         return ($siteInfo) ? new Site($siteInfo) : null;
+    }
+
+    static public function list(): array {
+        return array_map(function($val) { return $val[0]; }, DB::query("SELECT `id`,`url` FROM `sites`", [], PDO::FETCH_COLUMN|PDO::FETCH_GROUP));
     }
 }

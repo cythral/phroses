@@ -50,17 +50,17 @@ self::addRoute("get", self::RESPONSES["PAGE"][301], function(&$page) {
  * GET SYS/200
  * Displays an internal phroses "view" (can be a dashboard page or asset file)
  */
-self::addRoute("get", self::RESPONSES["SYS"][200], function(&$page) {
-	$path = substr(PATH, strlen(SITE["ADMINURI"]));
+self::addRoute("get", self::RESPONSES["SYS"][200], function(&$page, &$site) {
+	$path = substr(PATH, strlen($site->adminURI));
 
 	if(!is_dir($file = INCLUDES["VIEWS"].$path) && file_exists($file) && strtolower(EXTENSION) != "php") {
 		readfileCached($file);
 	}
 
 	ob_start();
-	$page->theme->push("stylesheets", [ "src" => SITE["ADMINURI"]."/assets/css/main.css" ]);
+	$page->theme->push("stylesheets", [ "src" => $site->adminURI."/assets/css/main.css" ]);
 	$page->theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-	$page->theme->push("scripts", [ "src" => SITE["ADMINURI"]."/assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
+	$page->theme->push("scripts", [ "src" => $site->adminURI."/assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => "defer" ]);
 
 	if(!$_SESSION) {
 		self::$out->setCode(401);
@@ -70,7 +70,7 @@ self::addRoute("get", self::RESPONSES["SYS"][200], function(&$page) {
 		if(METHOD == "GET") {				
 			$dashbar = new Template(INCLUDES["TPL"]."/dashbar.tpl");
 			$dashbar->host = HOST;
-			$dashbar->adminuri = SITE["ADMINURI"];
+			$dashbar->adminuri = $site->adminURI;
 			echo $dashbar;
 		}
 
@@ -126,7 +126,7 @@ self::addRoute(null, self::RESPONSES["API"], function(&$page) {
  * POST (Default handler)
  * This handles all post requests.  If a page does not exist, this route creates one based on request parameters.
  */
-self::addRoute("post", self::RESPONSES["DEFAULT"], function(&$page) {
+self::addRoute("post", self::RESPONSES["DEFAULT"], function(&$page, &$site) {
 	self::$out = new JSONServer();
 
 	// Validation
@@ -139,8 +139,8 @@ self::addRoute("post", self::RESPONSES["DEFAULT"], function(&$page) {
 
 	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"]), [ "field" => "type" ]);
 
-	$id = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", SITE["ID"]);
-	$theme = new Theme(SITE["THEME"], $_REQUEST["type"]);
+	$id = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", $site->id);
+	$theme = new Theme($site->theme, $_REQUEST["type"]);
 
 	self::$out->send([ 
 		"type" => "success",
@@ -154,7 +154,7 @@ self::addRoute("post", self::RESPONSES["DEFAULT"], function(&$page) {
  * PATCH (Default handler)
  * This handles all put requests.  If a page exists, this route edits it based on request parameters.
  */
-self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
+self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page, &$site) {
 	self::$out = new JSONServer();
 
 	// Validation
@@ -164,7 +164,7 @@ self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 	mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
 
 	if(isset($_REQUEST["uri"])) {
-		$count = DB::query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ SITE["ID"], $_REQUEST["uri"]])[0]->count ?? 0;
+		$count = DB::query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ $site->id, $_REQUEST["uri"]])[0]->count ?? 0;
 		mapError("resource_exists", $count > 0);
 	}
 
@@ -192,7 +192,7 @@ self::addRoute("patch", self::RESPONSES["DEFAULT"], function(&$page) {
 	if(isset($_REQUEST["type"])) $output["typefields"] = $page->theme->getEditorFields($_REQUEST["type"]);
 
 	// if we are changing to type redirect or the page is a redirect, there is no content
-	if(SITE["PAGE"]["TYPE"] == "redirect" || (isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect")) unset($output["content"]);
+	if($page->type == "redirect" || (isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect")) unset($output["content"]);
 	self::$out->send($output, 200);
 });
 

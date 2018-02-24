@@ -63,7 +63,7 @@ final class Theme extends Template {
 	public function __construct(string $name, string $type = "page", ?array $content = null, ?string $loader = null) {
 		parent::__construct("");
 		$this->name = strtolower($name);
-		$this->content = $content ?? (defined("SITE") ? SITE["PAGE"]["CONTENT"] : []);
+		$this->content = $content ?? Phroses::$page->content ?? [];
 		$this->setupLoader($loader);
 		
         
@@ -108,9 +108,9 @@ final class Theme extends Template {
 	private function loadSessionTools(): void {
 		if(isset($_SESSION) && reqc\METHOD == "GET" && in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-			$this->push("stylesheets", [ "src" => SITE["ADMINURI"]."/assets/css/main.css" ]);
+			$this->push("stylesheets", [ "src" => Phroses::$site->adminURI."/assets/css/main.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
-			$this->push("scripts", [ "src" => SITE["ADMINURI"]."/assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => 'defer data-adminuri="'.SITE["ADMINURI"].'" id="phroses-script"' ]);
+			$this->push("scripts", [ "src" => Phroses::$site->adminURI."/assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => 'defer data-adminuri="'.Phroses::$site->adminURI.'" id="phroses-script"' ]);
 		}
 	}
 	
@@ -331,7 +331,7 @@ Theme::$filters["content"] = function($key, $fieldtype) {
 Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertype = "ASC") {
 	if(!in_array(strtoupper($ordertype), ["ASC", "DESC"])) return;
 	
-    $tlist = DB::query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=? ORDER BY `{$orderby}` {$ordertype}", [ SITE["ID"], $type ]);
+    $tlist = DB::query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=? ORDER BY `{$orderby}` {$ordertype}", [ Phroses::$site->id, $type ]);
     foreach($tlist as $page) {
         $out = $field;
         
@@ -345,5 +345,5 @@ Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertyp
 };
 
 Theme::$filters["site"] = function($var) {
-    echo SITE[strtoupper($var)] ?? "";
+    echo Phroses::$site->{$var} ?? "";
 };

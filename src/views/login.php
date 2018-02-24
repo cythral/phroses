@@ -1,5 +1,6 @@
 <?php
 
+use Phroses\Phroses;
 use phyrex\Template;
 use inix\Config as inix;
 use Phroses\DB;
@@ -15,12 +16,12 @@ handleMethod("POST", function($out) {
         inix::set("pepper", bin2hex(openssl_random_pseudo_bytes(10)));
     }
 
-    if(password_verify($_POST["password"], SITE["PASSWORD"])) {
-        DB::Query("UPDATE `sites` SET `adminPassword`=? WHERE `id`=?", [ password_hash(inix::get("pepper").$_POST["password"], PASSWORD_DEFAULT), SITE["ID"] ]);
+    if(password_verify($_POST["password"], Phroses::$site->adminPassword)) {
+        DB::Query("UPDATE `sites` SET `adminPassword`=? WHERE `id`=?", [ password_hash(inix::get("pepper").$_POST["password"], PASSWORD_DEFAULT), Phroses::$site->id ]);
         $_SESSION["live"] = "true";
         $out->send(["type" => "success"], 200);
 
-    } else if(password_verify(inix::get("pepper").$_POST["password"], SITE["PASSWORD"]) && $_POST["username"] == SITE["USERNAME"]) {
+    } else if(password_verify(inix::get("pepper").$_POST["password"], Phroses::$site->adminPassword) && $_POST["username"] == Phroses::$site->adminUsername) {
         $_SESSION["live"] = "true";
         $out->send(["type" => "success"], 200);
     }

@@ -38,6 +38,8 @@ abstract class Phroses {
 	static private $routes = [];
 	static private $commands = [];
 	static private $page;
+
+	static public $site;
 	static private $modes = [
 		"development" => [
 			"display_errors" => 1,
@@ -228,17 +230,16 @@ abstract class Phroses {
 			"CONTENT" => json_decode($info->content, true) ?? [],
 			"VISIBILITY" => $info->public
 		];
-		
-		// make this into an object instead
-		define("Phroses\SITE", [
-			"ID" => $info->id,
-			"NAME" => $info->name,
-			"THEME" => $info->theme,
-			"ADMINURI" => $info->adminURI ?? "/admin",
-			"USERNAME" => $info->adminUsername,
-			"PASSWORD" => $info->adminPassword,
-			"PAGE" => $pageData,
-			"MAINTENANCE" => $info->maintenance
+
+		self::$site = new Site([
+			"id" => $info->id,
+			"url" => BASEURL,
+			"name" => $info->name,
+			"theme" => $info->theme,
+			"adminURI" => $info->adminURI ?? "/admin",
+			"adminUsername" => $info->adminUsername,
+			"adminPassword" => $info->adminPassword,
+			"maintenance" => (bool)$info->maintenance
 		]);
 		
 		self::$page = new Page($pageData);
@@ -281,7 +282,7 @@ abstract class Phroses {
 	static public function followRoute(string $method, int $response) {
 		if($response == self::RESPONSES["SYS"][200]) $method = "GET";
 		if(!isset(self::$routes[$method][$response])) $response = self::RESPONSES["DEFAULT"];
-		return self::$routes[$method][$response](self::$page);
+		return self::$routes[$method][$response](self::$page, self::$site);
 	}
 	
 	/**

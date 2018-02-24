@@ -1,6 +1,6 @@
 <header>
     <h1 class="header_sitename">
-        <a class="header_sitename_link" href="/"><?= Phroses\SITE["NAME"]; ?></a>
+        <a class="header_sitename_link" href="/"><?= Phroses\Phroses::$site->name; ?></a>
     </h1>
     
     <nav class="header_nav">
