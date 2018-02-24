@@ -10,6 +10,7 @@ $loader->addPsr4("Phroses\\", \Phroses\SRC."/models");
 include \Phroses\SRC."/functions.php";
 
 use \PDO;
+use \PDOException;
 use \inix\Config as inix;
 
 define("Phroses\SITE", [
@@ -26,7 +27,12 @@ define("Phroses\SITE", [
 inix::load(\Phroses\ROOT."/phroses.conf");
 $conf = inix::get("database");
 
-$pdo = new PDO("mysql:host=".$conf["host"].";dbname=".$conf["name"], $conf["user"], $conf["password"]);
+try {
+    $pdo = new PDO("mysql:host=".$conf["host"].";dbname=".$conf["name"], $conf["user"], $conf["password"]);
+} catch(PDOException $e) {
+    echo "Database Connection failed.";
+    exit(1);
+}
 
 // backup any existing data
 exec("mysqldump --user={$conf["user"]} --password={$conf["password"]} --host={$conf["host"]} {$conf["name"]} > ".\Phroses\ROOT."/tests/backup.sql");

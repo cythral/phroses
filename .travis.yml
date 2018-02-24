@@ -15,7 +15,6 @@ before_script:
   - composer install
   - mv phroses.travis.conf phroses.conf
   - sudo mysql -e 'CREATE DATABASE phroses;'
-  - sudo mysql phroses < src/schema/install.sql
   
   # postfix
   - sudo service postfix stop
@@ -24,12 +23,15 @@ before_script:
   - echo 'sendmail_path = "/usr/sbin/sendmail -t -i "' | sudo tee "/home/travis/.phpenv/versions/`php -i | grep "PHP Version" | head -n 1 | grep -o -P '\d+\.\d+\.\d+.*'`/etc/conf.d/sendmail.ini"
   
 script:
+  - sudo mysql phroses < src/schema/install.sql
+  
   - lessc --clean-css src/views/assets/less/main.less src/views/assets/css/main.css
   - uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/views/assets/js/main.min.js
   - rm -rf src/views/assets/less
+
   - phpunit && php tests/teardown.php
   - php build.php
-  - php phroses.phar
+  - php phroses.phar test
   
 deploy:
   provider: releases

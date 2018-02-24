@@ -39,4 +39,9 @@ self::addCmd("email", function($args, $flags) {
 	]);
 });
 
+self::addCmd("test", function() {
+	// will do more here later
+	echo "TEST OK";
+});
+
 return self::$commands; // return a list of commands for the listen event
