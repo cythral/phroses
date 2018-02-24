@@ -1,6 +1,6 @@
 <?php
 
-use \Phroses\DB;
+use \Phroses\Site;
 use \phyrex\Template;
 use \inix\Config as inix;
 use function \Phroses\{ handleMethod, mapError };
@@ -10,14 +10,8 @@ use const \reqc\{ BASEURL };
 handleMethod("post", function($out) {
 
     mapError("pw_length", strlen($_POST["password"]) > 50);
-
-    DB::query("INSERT INTO `sites` (`url`, `theme`, `name`,`adminUsername`, `adminPassword`) VALUES (?, 'bloom', ?, ?, ?)", [
-        BASEURL,
-        $_POST["name"],
-        $_POST["username"],
-        password_hash(inix::get("pepper").$_POST["password"], PASSWORD_DEFAULT)
-    ]);
-
+    mapError("create_fail", !Site::create($_POST["name"], BASEURL, 'bloom', '/admin', $_POST["username"], $_POST["password"]));
+    
     $out->send(["type" => "success"], 200);
 
 }, ["name", "username", "password"]);
