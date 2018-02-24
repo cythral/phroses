@@ -100,6 +100,7 @@ abstract class Phroses {
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
+			Events::attach("routedetermined", [], "\Phroses\Phroses::determineRoute");
 			if((bool) (inix::get("notrailingslashes") ?? true)) self::removeTrailingSlash();
 			Events::attach("routesfollow", [ METHOD, self::$response ], "\Phroses\Phroses::followRoute");
 
@@ -206,30 +207,7 @@ abstract class Phroses {
 			}
 		}
 
-
-		// Determine Response Type
-		if(!isset(($info = $info[0])->pageID)) self::$response = self::RESPONSES["PAGE"][404];
-		if(PATH != "/" && substr(PATH, 0, strlen($info->adminURI)) == $info->adminURI &&
-			(file_exists(INCLUDES["VIEWS"].($adminpath = substr(PATH, strlen($info->adminURI))).".php") ||
-			file_exists(INCLUDES["VIEWS"].$adminpath) ||
-			file_exists(INCLUDES["VIEWS"]."$adminpath/index.php"))) self::$response = self::RESPONSES["SYS"][200];
-
-		if(substr(PATH, 0, 8) == "/uploads" && file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8)) && trim(PATH, "/") != "uploads") self::$response = self::RESPONSES["UPLOAD"];
-		if(substr(PATH, 0, 4) == "/api") self::$response = self::RESPONSES["API"];
-		if($info->type == "redirect") self::$response = self::RESPONSES["PAGE"][301];
-		if(self::$response == self::RESPONSES["PAGE"][200] && !$info->public && !$_SESSION) self::$response = self::RESPONSES["PAGE"][404];
-		if($info->maintenance && !$_SESSION && self::$response != self::RESPONSES["SYS"][200]) self::$response = self::RESPONSES["MAINTENANCE"];
-		
-		$pageData = [
-			"ID" => $info->pageID,
-			"TYPE" => $info->type ?? "page",
-			"VIEWS" => $info->views + 1,
-			"DATECREATED" => $info->dateCreated,
-			"DATEMODIFIED" => $info->dateModified,
-			"TITLE" => $info->title,
-			"CONTENT" => json_decode($info->content, true) ?? [],
-			"VISIBILITY" => $info->public
-		];
+		$info = $info[0];
 
 		self::$site = new Site([
 			"id" => $info->id,
@@ -242,9 +220,75 @@ abstract class Phroses {
 			"maintenance" => (bool)$info->maintenance
 		]);
 		
-		self::$page = new Page($pageData);
-		if(in_array(self::$response, [ self::RESPONSES["MAINTENANCE"], self::RESPONSES["PAGE"][404] ]) && self::$page->theme->hasAsset(PATH)) self::$response = self::RESPONSES["ASSET"];
-		if(self::$response == self::RESPONSES["API"] && !self::$page->theme->hasApi()) self::$response = self::RESPONSES["PAGE"][404];
+		self::$page = new Page([
+			"id" => $info->pageID,
+			"type" => $info->type ?? "page",
+			"views" => $info->views + 1,
+			"dateCreated" => $info->dateCreated,
+			"dateModified" => $info->dateModified,
+			"title" => $info->title,
+			"content" => json_decode($info->content, true) ?? [],
+			"visibility" => $info->public
+		]);
+	}
+
+	static public function determineRoute() {
+		// Determine Response Type
+		$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
+
+		// page not found
+		$cascade->addRule(!self::$page->id, self::RESPONSES["PAGE"][404]);
+
+		// admin/dashboard pages
+		$cascade->addRule(
+			(
+				PATH != "/" &&
+				stringStartsWith(PATH, self::$site->adminURI) && (
+
+					file_exists(($adminpath = INCLUDES["VIEWS"].substr(PATH, strlen(self::$site->adminURI))).".php") || // views/page.php
+					file_exists($adminpath) || // views/page.css
+					file_exists("$adminpath/index.php") // views/page/index.php
+				)
+			), self::RESPONSES["SYS"][200]
+		);
+
+		// uploads
+		$cascade->addRule(
+			(
+				stringStartsWith(PATH, "/uploads") && 
+				file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8)) && 
+				trim(PATH, "/") != "uploads"
+
+			), self::RESPONSES["UPLOAD"]
+		);
+
+		// api
+		$cascade->addRule(
+			(
+				stringStartsWith(PATH, "/api") && 
+				self::$page->theme->hasApi()
+			), self::RESPONSES["API"]
+		);
+
+		// redirects
+		$cascade->addRule(self::$page->type == "redirect", self::RESPONSES["PAGE"][301]);
+		
+		// if on a nonpublic page and not signed in switch to 404
+		$cascade->addRule($cascade->getResult() == self::RESPONSES["PAGE"][200] && !self::$page->visibility && !$_SESSION, self::RESPONSES["PAGE"][404]); 
+
+		// display maintenance mode if not signed in and it is turned on
+		$cascade->addRule(self::$site->maintenance && !$_SESSION && $cascade->getResult() != self::RESPONSES["SYS"][200], self::RESPONSES["MAINTENANCE"]);
+
+		// assets, allow access even if in maintenance mode
+		$cascade->addRule(
+			(
+				in_array($cascade->getResult(), [ self::RESPONSES["MAINTENANCE"], self::RESPONSES["PAGE"][404] ]) && 
+				self::$page->theme->hasAsset(PATH)
+
+			), self::RESPONSES["ASSET"]
+		);
+		
+		self::$response = $cascade->getResult();
 	}
 	
 	/**

@@ -238,3 +238,7 @@ function ask(string $output, array $valid = ['y','n',''], bool $addeol = false):
 
     return $answer;
 }
+
+function stringStartsWith(string $string, ?string $start) {
+    return $start != null && substr($string, 0, strlen($start)) == $start;
+}
