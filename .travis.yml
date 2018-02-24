@@ -2,10 +2,7 @@ language: php
 
 php:
   - '7.2'
-
-services:
-  - mysql
-
+  
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq postfix

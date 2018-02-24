@@ -41,6 +41,8 @@ $dataset = file_get_contents(\Phroses\ROOT."/tests/dataset.json");
 $dataset = str_replace("{password}", password_hash(inix::get("pepper").inix::get("test.password"), PASSWORD_DEFAULT), $dataset);
 $dataset = json_decode($dataset);
 
+
+
 // insert data
 foreach((array)$dataset as $tablename => $table) {
 
@@ -55,9 +57,10 @@ foreach((array)$dataset as $tablename => $table) {
         foreach($row as $key => $val) $stmt->bindValue(":{$key}", $val);
         $stmt->execute();
     }
-    
+
 }
 
+var_dump($pdo->query("select * from sites"));
 
 class TestCase extends \PHPUnit\Framework\TestCase {
     public function assertArrayEquals($expected, $actual) {
