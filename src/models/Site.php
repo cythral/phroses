@@ -80,7 +80,7 @@ class Site {
             $adminUri, 
             $adminUsername,
             $adminPassword,
-            $maintenance
+            (int)$maintenance
         ]);
 
         return self::generate(DB::lastID());
