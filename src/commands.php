@@ -39,4 +39,4 @@ self::addCmd("email", function($args, $flags) {
 	]);
 });
 
-return self::$cmds; // return a list of commands for the listen event
+return self::$commands; // return a list of commands for the listen event
