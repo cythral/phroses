@@ -2,8 +2,6 @@
 
 namespace Phroses;
 
-
-
 include __DIR__."/../src/constants.php";
 
 // setup autoloader, functions
@@ -69,7 +67,6 @@ foreach($dataset as $tablename => $table) {
     }
 
 }
-
 
 class TestCase extends \PHPUnit\Framework\TestCase {
     public function assertArrayEquals($expected, $actual) {

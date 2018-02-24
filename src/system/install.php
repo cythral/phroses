@@ -1,5 +1,7 @@
 <?php 
 
+use \Phroses\Installer;
+use \Phroses\Exceptions\InstallerException;
 use \reqc\Output;
 use \phyrex\Template;
 use function \Phroses\handleMethod;
@@ -19,35 +21,19 @@ if(!is_writable(ROOT)) {
 handleMethod("post", function($out) {
     try {
 
-        // setup database
-        $db = new PDO("mysql:host=".$_POST["host"].";dbname=".$_POST["database"], $_POST["username"], $_POST["password"]);
-        if(version_compare($db->query("select version()")->fetchColumn(), DEPS["MYSQL"], "<")) throw new Exception("version");
-        $schema = new Template(SRC."/schema/install.sql");
-        $schema->schemaver = SCHEMAVER;
-        $db->query($schema);
-
-        // setup configuration file
-        $c = new Template(SRC."/phroses.conf");
-        $c->mode = (INPHAR) ? "production" : "development";
-        $c->host = $_POST["host"];
-        $c->username = $_POST["username"];
-        $c->password = $_POST["password"];
-        $c->database = $_POST["database"];
-        $c->pepper = bin2hex(openssl_random_pseudo_bytes(10));
-
-        file_put_contents(ROOT."/phroses.conf", $c);
-        chown(ROOT."/phroses.conf", posix_getpwuid(posix_geteuid())['name']);
-        chmod(ROOT."/phroses.conf", 0775);
+        $installer = new Installer;
+        $installer->setupDatabase($_POST["host"], $_POST["database"], $_POST["username"], $_POST["password"], DEPS["MYSQL"]);
+        $installer->installSchema(SRC."/schema/install.sql", SCHEMAVER);
+        $installer->setupConfFile(SRC."/phroses.conf", ROOT."/phroses.conf", [
+            "mode" => (INPHAR) ? "production" : "development",
+            "pepper" => bin2hex(openssl_random_pseudo_bytes(10))
+        ]);
 
         $out->send(["type" => "success"], 200);
 
-    } catch(Exception $e) {
-        $output = [ "type" => "error", "error" => "credentials" ];
-
-        if($e->getMessage() == "version") {
-            $output["error"] = "version";
-            $output["minver"] = DEPS["MYSQL"];
-        }
+    } catch(InstallerException $e) {
+        $output = [ "type" => "error", "error" => $e->getMessage() ];
+        if($e->getMessage() == "version") $output["minver"] = DEPS["MYSQL"];
 
         $out->send($output, 400);
     }
