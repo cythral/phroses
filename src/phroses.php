@@ -39,9 +39,10 @@ abstract class Phroses {
 	static private $commands = [];
 	static private $cascadeRules = [];
 	static private $cascade;
-	static private $page;
 
+	static public $page;
 	static public $site;
+	
 	static private $modes = [
 		"development" => [
 			"display_errors" => 1,
@@ -58,6 +59,7 @@ abstract class Phroses {
 
 	const MM_ON = true;
 	const MM_OFF = false;
+
 	const RESPONSES = [
 		"DEFAULT" => 0,
 
@@ -189,9 +191,7 @@ abstract class Phroses {
 	}
 	
 	/**
-	 * Loads information about a site.  Creates the SITE[] constant (which
-	 * will be eventually phased out in favor of a class), as well as a Page
-	 * object.
+	 * Loads information about the site and page requested
 	 * 
 	 * @param bool $showNewSite whether or not to show the form to create a new site
 	 */
@@ -239,7 +239,7 @@ abstract class Phroses {
 	 * Determines the route to take based on cascade rules added in ./routes.php
 	 */
 	static public function determineRoute(): void {
-		sort(self::$cascadeRules); // make sure rules get executed in order based on key
+		sort(self::$cascadeRules); // make sure rules get executed in order
 		
 		foreach(self::$cascadeRules as list($response, $expr)) {
 			self::$cascade->addRule($expr(), $response);
@@ -260,9 +260,7 @@ abstract class Phroses {
 	/**
 	 * Adds an HTTP route.  Routes should be added using this method in ./routes.php
 	 * 
-	 * @param ?string $method the http method/verb (get, post, put, etc.) leave null for all of them
-	 * @param int $response the response identifier (see self::RESPONSES for acceptable responses)
-	 * @param callable $handler the route handler, executed by followRoute
+	 * @param Route a route object
 	 */
 	static public function addRoute(Route $route) {
 		$methods = ($route->method) ? [ strtoupper($route->method) ] : [ "GET", "POST", "PUT", "PATCH", "DELETE" ]; // if method was null, create a route for all methods

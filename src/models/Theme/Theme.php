@@ -317,7 +317,13 @@ final class Theme extends Template {
 
 
 Theme::$filters["include"] = function($file) {
-	if(file_exists("{$this->loader->getPath()}/{$file}.php")) include "{$this->loader->getPath()}/{$file}.php";
+	if(file_exists("{$this->loader->getPath()}/{$file}.php")) {
+		// allow easy access to site, page variables
+		$site = Phroses::$site;
+		$page = Phroses::$page;
+		
+		include "{$this->loader->getPath()}/{$file}.php";
+	}
 };
 
 Theme::$filters["content"] = function($key, $fieldtype) {

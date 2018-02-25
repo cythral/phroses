@@ -70,7 +70,6 @@ self::addRoute(new class extends Route {
  * Displays an internal phroses "view" (can be a dashboard page or asset file)
  */
 self::addRoute(new class extends Route {
-
 	public $method = "get";
 	public $response = Phroses::RESPONSES["SYS"][200];
 
