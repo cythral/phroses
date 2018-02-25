@@ -9,19 +9,32 @@ $loader = include ROOT."/vendor/autoload.php";
 $loader->addPsr4("Phroses\\", SRC."/models");
 include SRC."/functions.php";
 
-abstract class Phroses { static public $site; }
+abstract class Phroses { static public $site; static public $page; }
+
 Phroses::$site = new Site([
     "id" => null,
     "url" => null,
     "name" => null,
-    "theme" => null,
+    "theme" => "bloom",
     "adminURI" => null,
     "adminUsername" => null,
     "adminPassword" => null,
     "maintenance" => false,
 ]);
 
+Phroses::$page = new Page([
+    "id" => null,
+    "type" => "page",
+    "views" => null,
+    "dateCreated" => null,
+    "dateModified" => null,
+    "title" => null,
+    "content" => null,
+    "visibility" => null
+]);
+
 Phroses::$site->useDB = false;
+Phroses::$page->useDB = false;
 
 namespace Phroses\Testing;
 

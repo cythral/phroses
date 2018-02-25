@@ -101,7 +101,7 @@ abstract class Phroses {
 		// page or asset
 		if(TYPE != TYPES["CLI"]) {
 			self::$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
-			
+
 			Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
@@ -180,6 +180,9 @@ abstract class Phroses {
 		return true;
 	}
 
+	/**
+	 * Sets the default exception handler
+	 */
 	static public function setExceptionHandler() {
 		set_exception_handler(function(\Throwable $e) {
 			if($e instanceof \Phroses\Exceptions\ExitException) exit($e->code ?? 0);

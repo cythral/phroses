@@ -7,8 +7,7 @@ use Phroses\DB;
 use function \Phroses\{ handleMethod };
 use const \Phroses\{ SITE, INCLUDES };
 
-if($_SESSION) self::$out->redirect("/admin");
-
+if($_SESSION) $out->redirect("/admin");
 
 handleMethod("POST", function($out) use (&$site) {
     // generate pepper if its not there

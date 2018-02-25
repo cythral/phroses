@@ -220,7 +220,7 @@ function stripPhyrexFields(string $input): string {
 /**
  * Command line utility for asking a question and returning the response
  */
-function ask(string $output, array $valid = ['y','n',''], bool $addeol = false): string {
+function ask(string $output, ?array $valid = ['y','n',''], bool $addeol = false): string {
     $done = false;
 
     while(!$done) {
@@ -228,9 +228,11 @@ function ask(string $output, array $valid = ['y','n',''], bool $addeol = false):
         if($addeol) echo PHP_EOL;
         $answer = strtolower(trim(fgets(STDIN)));
         
-        if(!in_array($answer, $valid)) {
-            echo "Invalid option '$answer'".PHP_EOL;
-            continue;
+        if($valid) {
+            if(!in_array($answer, $valid)) {
+                echo "Invalid option '$answer'".PHP_EOL;
+                continue;
+            }
         }
         
         break;
@@ -239,6 +241,13 @@ function ask(string $output, array $valid = ['y','n',''], bool $addeol = false):
     return $answer;
 }
 
-function stringStartsWith(string $string, ?string $start) {
+/**
+ * Utility for checking to see if a string starts with another string
+ * 
+ * @param string $string the haystack / input string
+ * @param string $start the string to check for at the beginning of $string
+ * @return bool true if $string starts with $start, false if not
+ */
+function stringStartsWith(string $string, ?string $start): bool {
     return $start != null && substr($string, 0, strlen($start)) == $start;
 }
