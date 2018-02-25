@@ -106,7 +106,7 @@ final class Theme extends Template {
 	* Sets up sessiontools (on page buttons/screens) for page deletion, editing and more
 	*/
 	private function loadSessionTools(): void {
-		if(isset($_SESSION) && reqc\METHOD == "GET" && in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
+		if(isset($_SESSION['live']) && reqc\METHOD == "GET" && in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->push("stylesheets", [ "src" => Phroses::$site->adminURI."/assets/css/main.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
@@ -319,9 +319,7 @@ final class Theme extends Template {
 Theme::$filters["include"] = function($file) {
 	if(file_exists("{$this->loader->getPath()}/{$file}.php")) {
 		// allow easy access to site, page variables
-		$site = Phroses::$site;
-		$page = Phroses::$page;
-		
+		extract([ "page" => Phroses::$page, "site" => Phroses::$site ]);
 		include "{$this->loader->getPath()}/{$file}.php";
 	}
 };

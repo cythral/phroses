@@ -42,7 +42,7 @@ abstract class Phroses {
 
 	static public $page;
 	static public $site;
-	
+
 	static private $modes = [
 		"development" => [
 			"display_errors" => 1,
@@ -93,7 +93,6 @@ abstract class Phroses {
 	 */
 	static public function start() {
 		self::$out = new Output();
-		self::$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
 		
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
@@ -101,6 +100,8 @@ abstract class Phroses {
 
 		// page or asset
 		if(TYPE != TYPES["CLI"]) {
+			self::$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
+			
 			Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
