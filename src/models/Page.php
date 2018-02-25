@@ -37,15 +37,16 @@ class Page {
      * Creates a new page object based on the array of options
      * passed to it.
      * 
-     * @param array $options an array of options (see self::REQUIRED_OPTIONS for the required ones)
+     * @param array $options an array containing page data (see self::REQUIRED_OPTIONS for the required keys)
+     * @param string $theme the name of the theme to use for displaying the page.  Defaults to the default theme name
      */
-    public function __construct(array $options) {
+    public function __construct(array $options, string $theme = Theme::DEFAULT) {
         $options = array_change_key_case($options);
         $this->unpackOptions($options, $this->data);
 
         $this->data = $options;
         $this->oh = new Output();
-        $this->theme = new Theme(Phroses::$site->theme, $this->type);
+        $this->theme = new Theme($theme, $this->type);
     }
 
     /**
@@ -123,17 +124,26 @@ class Page {
      * @param $siteId the id of the site to attach to
      * @return int the id of the page inserted
      */
-    static public function create($path, $title, $type, $content = "{}", $siteId = null) {
-        if(!$siteId && !defined("SITE")) throw new Exception("No siteID Present");
-
+    static public function create($path, $title, $type, $content = "{}", $siteId) {
         DB::query("INSERT INTO `pages` (`uri`,`title`,`type`,`content`, `siteID`,`dateCreated`) VALUES (?, ?, ?, ?, ?, NOW())", [
             $path,
             $title,
             $type,
             $content,
-            $siteId ?? SITE["ID"]
+            $siteId
         ]);
 
         return DB::lastID();
+    }
+
+    /**
+     * Generates a Page object from an id
+     * 
+     * @param int $id the id to generate a Page object for
+     * @return Page|null the page object that was created or null if it doesn't exist.
+     */
+    static public function generate(int $id): ?Page {
+        $pageData = DB::query("SELECT * FROM `pages` WHERE `id`=?", [ $id ])[0] ?? null;
+        return ($pageData) ? new Page($pageData) : null;
     }
 }

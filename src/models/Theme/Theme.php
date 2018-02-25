@@ -52,6 +52,8 @@ final class Theme extends Template {
 		"TEXT" => '<input id="<{var::key}>" placeholder="<{var::key}>" type="text" class="form_input form_field content" value="<{var::value}>">',
 		"URL" => '<input id="<{var::key}>" placeholder="<{var::key}>" type="url" class="form_input form_field content" value="<{var::value}>">'
 	];
+
+	const DEFAULT = "bloom";
 	
 	/**
 	* Theme constructor.  Sets up the theme root, loads stylesheets,

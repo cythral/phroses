@@ -236,7 +236,7 @@ abstract class Phroses {
 			"title" => $info->title,
 			"content" => json_decode($info->content, true) ?? [],
 			"visibility" => $info->public
-		]);
+		], self::$site->theme);
 	}
 
 	/**
