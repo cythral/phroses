@@ -4,7 +4,6 @@
  * This file builds a packaged phar archive from the src directory
  */
 
-
 include __DIR__."/src/functions.php"; 
 
 // this is done in travis but in case we are building without travis, compile less anyways
@@ -13,7 +12,7 @@ exec("uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/vie
 
 // package dependencies into the phar
 copy("composer.json", "src/composer.json"); 
-exec("cd src && composer update"); 
+exec("cd src && composer update --no-dev"); 
 
 use function \Phroses\{ rrmdir, rcopy };
 
