@@ -9,6 +9,7 @@ namespace Phroses;
 
 use \inix\Config as inix;
 use \PDO;
+use \PDOStatement;
 
 abstract class DB {
 
@@ -31,6 +32,16 @@ abstract class DB {
 		self::$schemaVersion = $versions->sver;
 		self::$setup = true;
 	}
+
+	static public function prepare(string $query, array $values): PDOStatement {
+		$q = self::$db->prepare($query);
+		foreach($values as $key => $val) {
+			$q->bindValue(is_integer($key) ? $key + 1 : $key, $val);
+		}
+
+		$q->execute();
+		return $q;
+	}
 	
 	/**
 	 * Performs a query against the database
@@ -40,12 +51,19 @@ abstract class DB {
 	 * @param int $fetchStyle the style to fetch results in (PDO::FETCH_OBJ, PDO::FETCH_ARRAY, etc.)
 	 * @return array an array of rows returned by the query
 	 */
-	static public function query(string $query, array $values, int $fetchStyle = PDO::FETCH_OBJ): array {
-		$q = self::$db->prepare($query);
-		foreach($values as $key => $val) $q->bindValue($key + 1, $val);
-		$q->execute();
-		
-		return $q->fetchAll($fetchStyle);
+	static public function query(string $query, array $values, int $fetchStyle = PDO::FETCH_OBJ): array {		
+		return self::prepare($query, $values)->fetchAll($fetchStyle);
+	}
+
+	/**
+	 * Performs a query against the database and returns the affected row count
+	 * 
+	 * @param string $query the query to execute
+	 * @param array $values an array of values to bind to prepared parameters
+	 * @return int number of rows affected by the query
+	 */
+	static public function affected(string $query, array $values): int {
+		return self::prepare($query, $values)->rowCount();
 	}
 	
 	/**

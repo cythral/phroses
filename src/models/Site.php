@@ -65,8 +65,7 @@ class Site {
      */
     public function delete(): bool {
         if(!($this->id && $this->useDB)) return false;
-        DB::query("DELETE FROM `sites` WHERE `id`=?", [ $this->id ]);
-        return true;
+        return DB::affected("DELETE FROM `sites` WHERE `id`=:id", [ ":id" => $this->id ]) > 0;
     }
 
     /**

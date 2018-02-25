@@ -109,9 +109,7 @@ class Page {
      */
     public function delete(): bool {
         if(!($this->id && $this->useDB)) return false;
-
-        DB::query("DELETE FROM `pages` WHERE `id`=?", [ $this->id ]);
-        return true;
+        return DB::affected("DELETE FROM `pages` WHERE `id`=:id", [ ":id" => $this->id ]) > 0;
     }
 
     /**
