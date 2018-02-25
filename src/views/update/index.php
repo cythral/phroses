@@ -18,8 +18,8 @@ if($version == null) { ?>
 <div id="phr-update-avail" class="container aln-c phr-update">
     <h1 class="c">An update is available</h1>
     <div class="phr-update-icon">
-        <img src="<?= Phroses::$site->adminURI; ?>/assets/img/update-ring.png">
-        <img src="<?= Phroses::$site->adminURI; ?>/assets/img/update-arrow.png">
+        <img src="<?= $site->adminURI; ?>/assets/img/update-ring.png">
+        <img src="<?= $site->adminURI; ?>/assets/img/update-arrow.png">
     </div>
         <p class="c">click the above icon to start updating</p>
 </div>
@@ -35,7 +35,7 @@ if($version == null) { ?>
 <div id="phr-update-noavail" class="container aln-c phr-update c">
     <h1>
         Phroses is up-to-date
-        <div><img src="<?= Phroses::$site->adminURI; ?>/assets/img/checkmark.png" style="width:250px;height:250px;"></div>
+        <div><img src="<?= $site->adminURI; ?>/assets/img/checkmark.png" style="width:250px;height:250px;"></div>
     </h1>
 </div>
 

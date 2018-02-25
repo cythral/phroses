@@ -1,5 +1,6 @@
 <?php
 
+use Phroses\Phroses;
 use phyrex\Template;
 use Phroses\{ DB };
 use Phroses\Theme\Theme;
@@ -14,7 +15,7 @@ handleMethod("post", function($out) use (&$site) {
     $pst = new Template(INCLUDES["TPL"]."/pst.tpl");
     $pst->uri = $_REQUEST["uri"];
 
-    $info = DB::Query("SELECT `title`, `content`, `public`, `type`, `id` FROM `pages` WHERE `uri`=? AND `siteID`=?", [ $_REQUEST["uri"], $site->id ]);
+    $info = DB::query("SELECT `title`, `content`, `public`, `type`, `id` FROM `pages` WHERE `uri`=? AND `siteID`=?", [ $_REQUEST["uri"], $site->id ]);
     $page = $info[0] ?? null;
 
     if(count($info) == 0) {
@@ -33,5 +34,8 @@ handleMethod("post", function($out) use (&$site) {
     }
 
     foreach($theme->getTypes() as $type2) $pst->push("types", ["type" => $type2, "checked" => ($page && $page->type == $type2) ? "selected" : "" ]);
-    $out->send(["type" => "success", "content" => (String)$pst ], 200);
+    $out->send(["type" => "success", "content" => (string) $pst ], 200);
 });
+
+ob_end_clean();
+Phroses::followRoute("GET", Phroses::RESPONSES["PAGE"][404]);

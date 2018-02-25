@@ -6,7 +6,7 @@ use Phroses\DB;
 use const Phroses\{ SITE, INCLUDES };
 use const reqc\{ BASEURL };
 
-$q = DB::Query("SELECT * FROM `pages` WHERE `siteID`=?", [ Phroses::$site->id ]);
+$q = DB::query("SELECT * FROM `pages` WHERE `siteID`=?", [ $site->id ]);
 
 $pages = new Template(INCLUDES["TPL"]."/admin/pages.tpl");
 

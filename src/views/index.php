@@ -23,7 +23,7 @@ handleMethod("POST", function($out) use (&$site) {
         $site->adminURI = $_POST["uri"];
     }
 
-    if(isset($_POST["maintenance"])) $site->maintenance = (bool)$_POST["maintenance"];    
+    if(isset($_POST["maintenance"])) $site->maintenance = (bool) $_POST["maintenance"];    
     if(!empty($_POST["name"])) $site->name = $_POST["name"];
     if(!empty($_POST["url"])) $site->url = $_POST["url"];
 

@@ -21,6 +21,7 @@ class Page {
     public $theme;
     public $useDB = true;
 
+    use \Phroses\Traits\UnpackOptions;
     const REQUIRED_OPTIONS = [
         "id",
         "type",
@@ -40,10 +41,7 @@ class Page {
      */
     public function __construct(array $options) {
         $options = array_change_key_case($options);
-
-        foreach(self::REQUIRED_OPTIONS as $option) {
-            if(!array_key_exists($option, $options)) throw new Exception("Missing required option $option");
-        }
+        $this->unpackOptions($options, $this->data);
 
         $this->data = $options;
         $this->oh = new Output();

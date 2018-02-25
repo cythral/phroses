@@ -1,5 +1,19 @@
 # CHANGE LOG
 
+## v0.8.0
+### New Features
+### Bug Fixes & Minor Changes
+ - Refactored routing.  Introduced a Route and Cascade class to handle routing and cascading route rules
+ - Refactored installation, installation functions have been moved to a class
+ - The Theme class uses a 'Loader' to load errors, assets and types.  DummyLoader and FolderLoader are the current ones, PharLoader to be added in a future version.
+- New Site class replaces the SITE[] constant
+
+<br />
+
+---
+
+<br />
+
 ## v0.7.1 
 - JavaScript now gets minified on each build (rather than relying on IDE functionality).  Replaced main javascript file in production with a newer version.
 - Fixes an issue where cli commands were not executing properly
