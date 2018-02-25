@@ -59,6 +59,17 @@ class Site {
     }
 
     /**
+     * Deletes the site
+     *
+     * @return boolean true on success and false on failure
+     */
+    public function delete(): bool {
+        if(!($this->id && $this->useDB)) return false;
+        DB::query("DELETE FROM `sites` WHERE `id`=?", [ $this->id ]);
+        return true;
+    }
+
+    /**
      * Creates a new site
      * 
      * @param string $name the site's name
@@ -103,6 +114,11 @@ class Site {
      * @return array an array containing items that are id => url
      */
     static public function list(): array {
-        return array_map(function($val) { return $val[0]; }, DB::query("SELECT `id`,`url` FROM `sites`", [], PDO::FETCH_COLUMN|PDO::FETCH_GROUP));
+        return array_map(
+            function($val) { 
+                return $val[0]; 
+            }, 
+            DB::query("SELECT `id`,`url` FROM `sites`", [], PDO::FETCH_COLUMN|PDO::FETCH_GROUP)
+        );
     }
 }
