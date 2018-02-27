@@ -200,7 +200,7 @@ abstract class Phroses {
 	 * @param bool $showNewSite whether or not to show the form to create a new site
 	 */
 	static public function loadSiteInfo(bool $showNewSite) {
-		$info = DB::query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `sites`.`maintenance`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
+		$info = DB::query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `sites`.`maintenance`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified`, `page`.`css` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			PATH,
 			BASEURL
 		]);
@@ -235,7 +235,8 @@ abstract class Phroses {
 			"dateModified" => $info->dateModified,
 			"title" => $info->title,
 			"content" => json_decode($info->content, true) ?? [],
-			"visibility" => $info->public
+			"public" => $info->public,
+			"css" => $info->css
 		], self::$site->theme);
 	}
 

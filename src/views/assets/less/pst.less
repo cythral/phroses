@@ -72,9 +72,8 @@
     &:hover:before { content: "move"; }
 }
 
-#pst-edit {
+#pst-edit-trg {
     animation-delay: 1.4s;
-    &:hover:before { content: "edit"; }
 }
 
 #pst-new {
@@ -89,12 +88,12 @@
     opacity: .8;
     transition: opacity .3s;
     z-index: 99;
-
+    transition: right 1s;
     
 
     &:hover { opacity: 1; }
     &.new { 
-        #pst-edit, #pst-move, #pst-delete, #pst-vis { display: none; }
+        #pst-move, #pst-delete, #pst-vis, #pst-edit-trg { display: none; }
     }
 
     &.existing {
@@ -229,11 +228,9 @@
 #pst-es-type {
     background: transparent;
     height: 50px;
-    width: 200px;
     padding: 0 10px 0 10px;
-    border-radius: 25px;
-    border: 5px solid #673AB7;
-    color: #673AB7;
+    background: #673AB7;
+    color: white;
     font-weight: bold;
     font-size: 1.05em;
     position:relative;
@@ -245,5 +242,110 @@
     cursor: pointer;
     text-align-last: center;
     text-transform: uppercase;
+    width: 100%;
+    border: none;
+
+    &:after {
+        content:"\f0d7";
+        font-family: fontAwesome;
+    }
 }
 
+#pst-edit-trg {
+    transition: transform .5s, box-shadow .5s;
+}
+
+#phr-container {
+    width: 100vw;
+    transition: width 1s;
+}
+
+#pst-edit {
+    width: 30vw;
+    left: auto;
+    right: -30vw;
+    display: block;
+    transition: right 1s;
+
+    #css-editor {
+        height: ~"calc(100% - 110px)";
+    }
+}
+
+#mode-content {
+    /** if there is only one editor and nothing else, make it's height 100% **/
+    > *:first-child:nth-last-child(1),
+    > *:first-child:nth-last-child(1) ~ .editor {
+        height: ~"calc(100% - 110px)";
+    }
+
+    > *:first-child:nth-last-child(2),
+    > *:first-child:nth-last-child(2) ~ .editor:first-child {
+        height: ~"calc(100% - 160px)";
+    }
+}
+
+.mode-view {
+    height: 100%;
+}
+
+.mode-switcher {
+    height: 50px;
+
+    .mode {
+        display: inline-block;
+        width: 50%;
+        text-align: center;
+        vertical-align: middle;
+        color: @primary;
+        text-transform: uppercase;
+        line-height: 50px;
+        height: 50px;
+        margin-right: -5px;
+        cursor: pointer;
+    }
+}
+
+.pst-content {
+    &[data-view="mode-style"] {
+        .mode-style { font-weight: bold; }
+        #mode-style { display: block; }
+        #mode-content { display: none; }
+    }
+
+    &[data-view="mode-content"] {
+        .mode-content { font-weight: bold; }
+        #mode-content { display: block; }
+        #mode-style { display: none; }
+    }
+}
+
+#pst-save {
+    animation: none;
+    position: absolute;
+    right: 20px;
+    bottom: 110px;
+}
+
+body.editView {
+    #phr-container {
+        width: 70vw;
+    }
+
+    #pst-edit { 
+        right: 0;
+    }
+
+    #pst {
+        right: 30vw;
+    }
+
+    #pst-edit-trg {
+        transform: rotate(-180deg);
+        box-shadow: 0 0 0 10px @saved !important;
+    }
+
+    #pst-save {
+        animation: bounceIn .3s forwards;
+    }
+}

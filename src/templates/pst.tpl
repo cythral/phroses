@@ -5,27 +5,14 @@
     </div>
     <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn" data-scroll="off"><i class="ci ci-delete"></i></a>
     <a href="#" id="pst-move" class="pst_btn" data-target="pst-ms" data-action="fadeIn" data-scroll="off"><i class="ci ci-urlmove"></i></a>
-    <a href="#" id="pst-edit" class="pst_btn" data-target="pst-es" data-action="fadeIn" data-scroll="off"><i class="ci ci-edit"></i></a>
+    <a href="#" id="pst-edit-trg" class="pst_btn"><i class="ci ci-edit"></i></a>
+    <a href="#" id="pst-save" class="pst_btn" data-target="pst-edit" data-action="submit"><i class="ci ci-save"></i></a>
     <a href="#" id="pst-new" class="pst_btn" data-target="pst-ns" data-action="fadeIn" data-scroll="off"><i class="ci ci-new"></i></a>
 </div>
 <div id="saved">saved</div>
 <div id="error">error</div>
 
-
 <input type="hidden" id="pid" value="<{var::id}>">
-
-<form id="pst-es" class="container screen" data-method="PATCH" data-url="">
-  <div id="pst-es-top">
-    <input id="pst-es-title" name="title" placeholder="Page Title" value="<{var::title}>">
-    <div id="pst-es-actions">
-      <select id="pst-es-type" data-method="patch" data-url=""><{array::types::<option value="@type" @checked>@type</option>}></select>
-      <a id="pst-es-save" href="#" class="pst_btn" data-target="pst-es" data-action="submit"><i class="ci ci-save"></i></a>
-      <a id="pst-es-done" href="#" class="pst_btn" data-target="pst-es" data-action="fadeOut" data-scroll="on"><i class="ci ci-close"></i></a>
-    </div>
-  </div>
-  
-  <div id="pst-es-fields"><{var::fields}></div>
-</form>
 
 <form id="pst-ds" class="container screen" data-method="DELETE" data-url="">
   <h1>Are you sure?</h1>
@@ -65,4 +52,22 @@
 	<a id="pst-ns-s" href="#" class="pst_btn txt" data-target="pst-ns" data-action="submit" data-scroll="on">Submit</a>
   <a id="pst-ns-c" href="#" class="pst_btn txt" data-target="pst-ns" data-action="fadeOut" data-scroll="on">Cancel</a>
 </form>
+
+<form id="pst-edit" class="container screen pst-content" data-method="PATCH" data-url="" data-view="mode-content">
+  <select id="pst-es-type" data-method="patch" data-url=""><{array::types::<option value="@type" @checked>@type</option>}></select>
+
+  <div class="mode-switcher">
+    <div class="mode mode-content" data-view="mode-content">Content</div>
+    <div class="mode mode-style" data-view="mode-style">style</div>
+  </div>
+  
+  <div id="mode-content" class="mode-view">
+      <{var::fields}>
+  </div>
+
+  <div id="mode-style" class="mode-view">
+    <div class="editor" id="css-editor" data-mode="css"><{var::css}></div>
+  </div>
+</form>
+
 <script> </script><!-- LEAVE THIS HERE (see https://bugs.chromium.org/p/chromium/issues/detail?id=332189) -->

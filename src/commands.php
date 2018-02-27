@@ -71,4 +71,8 @@ self::addCmd("restore", function() {
 	echo "Successfully restored the database from your backup.".PHP_EOL;
 });
 
+self::addCmd("version", function() {
+	echo VERSION.PHP_EOL;
+});
+
 return self::$commands; // return a list of commands for the listen event

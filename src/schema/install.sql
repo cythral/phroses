@@ -37,6 +37,7 @@ CREATE TABLE `pages` (
   `uri` varchar(800) NOT NULL,
   `content` LONGTEXT NOT NULL,
   `public` BOOLEAN DEFAULT TRUE NOT NULL,
+  `css` LONGTEXT NULL,
 
   CONSTRAINT `pagesite_un` UNIQUE (`siteID`, `uri`),  
   CONSTRAINT `pages_siteID_fk` 

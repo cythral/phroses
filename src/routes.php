@@ -33,6 +33,13 @@ self::addRoute(new class extends Route {
 			$out->send($page->getData(), 200);
 		}
 
+		if(safeArrayValEquals($_GET, "mode", "css")) {
+			$out->setContentType(reqc\MIME_TYPES["CSS"]);
+			die($page->css);
+		}
+
+		
+		if($page->css != null) $page->theme->push("stylesheets", [ "src" => "?mode=css"] );
 		$page->display();
 	}
 });
@@ -155,7 +162,7 @@ self::addRoute(new class extends Route {
 		return [ 
 			0 => function() use (&$page) { return !$page->id; },
 			5 => function() use (&$page, &$cascade) { 
-				return $cascade->getResult() == Phroses::RESPONSES["PAGE"][200] && !$page->visibility && !$_SESSION; 
+				return $cascade->getResult() == Phroses::RESPONSES["PAGE"][200] && !$page->public && !$_SESSION; 
 			}
 		];
 	}
@@ -225,14 +232,13 @@ self::addRoute(new class extends Route {
 
 		mapError("bad_value", !$page->theme->hasType($_REQUEST["type"]), [ "field" => "type" ]);
 
-		$id = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", $site->id);
-		$theme = new Theme($site->theme, $_REQUEST["type"]);
+		$page = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", $site->id, $site->theme);
 
 		$out->send([ 
 			"type" => "success",
-			"id" => $id, 
-			"content" => $theme->getBody(),
-			"typefields" => $theme->getEditorFields()
+			"id" => $page->id, 
+			"content" => $page->theme->getBody(),
+			"typefields" => $page->theme->getEditorFields()
 		], 200);
 	}
 });
@@ -251,7 +257,7 @@ self::addRoute(new class extends Route {
 		// Validation
 		mapError("access_denied", !$_SESSION, null, 401);
 		mapError("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
-		mapError("no_change", allKeysDontExist(["type", "uri", "title", "content", "public"], $_REQUEST));
+		mapError("no_change", allKeysDontExist(["type", "uri", "title", "content", "public", "css"], $_REQUEST));
 		mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
 
 		if(isset($_REQUEST["uri"])) {
@@ -267,6 +273,7 @@ self::addRoute(new class extends Route {
 			if(isset($_REQUEST["title"])) $page->title = $_REQUEST["title"];
 			if(isset($_REQUEST["uri"])) $page->uri = urldecode($_REQUEST["uri"]);
 			if(isset($_REQUEST["public"])) $page->public = $_REQUEST["public"];
+			if(isset($_REQUEST["css"])) $page->css = urldecode($_REQUEST["css"]);
 
 			if(isset($_REQUEST["content"])) {
 				$page->content = htmlspecialchars_decode($_REQUEST["content"]);

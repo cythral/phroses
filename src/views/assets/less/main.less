@@ -21,8 +21,8 @@
 @import "pst";  
 @import "panel";
 
-.c { color: @primary; }
-.oxygen { font-family: Oxygen; } 
+.c { color: @primary; } 
+.oxygen { font-family: Oxygen; }  
 .underline { text-decoration: underline; } 
 
 body.noscroll { overflow: hidden; }
@@ -30,20 +30,20 @@ body.noscroll { overflow: hidden; }
 ul.inline {
     list-style-type: none;
     li { 
-        display: inline-block; 
-        margin: 0; 
+        display: inline-block;  
+        margin: 0;   
 
         &:not(:last-of-type) {
             margin-right: -4px; 
-        }
-    }
-}
+        } 
+    } 
+}   
 
-/* INSTALL FLOW */
-#install-welcome {
+/* INSTALL FLOW */ 
+#install-welcome { 
     display: block;
     padding-top: 35vh;
-    color: @primary;
+    color: @primary; 
     text-align: center;
     animation: fadeOut 1s forwards;
     animation-delay: 4s;
@@ -109,7 +109,7 @@ ul.inline {
     }
 } 
 
-* {
+* { 
     box-sizing: border-box;
     outline: none !important;
     padding: 0;
@@ -161,8 +161,8 @@ ul.inline {
 .form_submit {
     padding: 10px;
     background: #260E3F;
-    color: white;
-}
+    color: white; 
+} 
 
 .form_icfix {
     height: 50px;
@@ -172,7 +172,7 @@ ul.inline {
         position: absolute;
         z-index: 1;
         line-height: 50px;
-        width: 15%;
+        width: 15%; 
         font-weight: bold;
         overflow: hidden;
         white-space: nowrap;
@@ -201,13 +201,13 @@ ul.inline {
     text-transform: uppercase;
     letter-spacing: 1px;
     height: 30px;
-    box-sizing: content-box;
+    box-sizing: content-box; 
     transition: transform .3s;
     position: fixed;
-    bottom: 0;
+    bottom: 0;  
     left: 0;
     width: 100%;
-    z-index: 999;
+    z-index: 999;  
     transform: scaleY(0);
     transform-origin: bottom;
 
@@ -431,13 +431,13 @@ select.c {
         &:nth-child(1) {
             animation-name: rotate; 
             animation-duration: 4s; 
-            animation-iteration-count: infinite;
+            animation-iteration-count: infinite; 
             animation-timing-function: linear;
-            z-index: 0;
+            z-index: 0; 
         }
-
-        &:nth-child(2) {
-            z-index: 1;
+ 
+        &:nth-child(2) { 
+            z-index: 1; 
             transition: transform .5s;
 
             &:hover {
@@ -535,7 +535,7 @@ select.c {
                     border-radius: 25px;
                     cursor: pointer;
                     &:hover { box-shadow: 0 0 10px #000; }
-                }
+               }
                 
                 i { 
                     margin-left: 5%;
@@ -547,7 +547,7 @@ select.c {
                     &:hover:before {
                         text-shadow: 0 0 10px #000;
                     }
-                }
+                } 
             }
 
             a {
@@ -591,7 +591,7 @@ select.c {
     img {
         margin-top: 10vh;
         height: 50vh;
-        max-width: 90%;
+        max-width: 90%; 
         display: inline-block;
     }
 
@@ -640,13 +640,13 @@ select.c {
         text-align: center;
 
         .container {
-            width: 80%;
+            width: 80%; 
             display: inline-block;
         }
-
-        a {
+ 
+        a {  
             margin-top: 30px;
-        }
+        } 
     }
 
     .phr-progress {

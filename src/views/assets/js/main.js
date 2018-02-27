@@ -141,14 +141,14 @@ Phroses.createEditors = function() {
 		var id = $(this).attr("id");
 		editors[id] = ace.edit(id);
 		editors[id].setTheme("ace/theme/monokai");
-		editors[id].getSession().setMode("ace/mode/html");
+		editors[id].getSession().setMode("ace/mode/"+($(this).data("mode") || "html"));
 
 		editors[id].commands.addCommand({
 			name: 'Save',
 			bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
 			exec: function(editor) {
-				$("#pst-es").submit();
-			},
+				$(this).parent().submit();
+			}.bind(this),
 			readOnly: true // false if this command should not apply in readOnly mode
 		});
 	});
@@ -177,14 +177,23 @@ $(function() {
 	});
 	
 	if(!$("#phr-admin-page").val()) {
+
+		
 		var content = $("body").html();
 		$("body").html('<div id="phr-container">'+content+"</div>");
 
 		$.post(controller.adminuri+"/api/pst", { uri : window.location.pathname }, function(data) {
+
 			$("body").append(data.content);
 			
 			Phroses.setupButtons();
 			Phroses.createEditors();
+
+			// replace page styles
+			$.get("?mode=css", function(css) {
+				$("head").append("<style id=\"phroses-page-styles\">"+css+"</style>");
+				editors["css-editor"].setValue(css);
+			});
 
 			$("#pst-es").bind("keydown", function(e) {
 				if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
@@ -195,23 +204,31 @@ $(function() {
 			});
 		
 			$("#pst-es-title").change(function() { $("#pst-es").submit() });
+			$("#css-editor").on("keyup", function() { $("#phroses-page-styles").html(editors["css-editor"].getValue()); })
+			$("#pst-edit-trg").click(function() { 
+				$("body").toggleClass("editView"); 
+				setTimeout(function() {
+					editors["css-editor"].resize(true);
+				}, 1000);
+			});
 
-			/**
-			 * Editor Screen
-			 */
+			$(".mode").click(function() { $(this).parent().parent().attr("data-view", $(this).data("view") )});
+
 			Phroses.formify({
-				selector : "#pst-es",
+				selector: "#pst-edit",
 				collect: function() {
 					var data = $(this).serializeArray(), content = {};
-				
-					$("#pst-es .content").each(function() {
+
+					$(this).find(".content").each(function() {
 						if($(this).hasClass("editor")) content[$(this).data("id")] = editors[$(this).attr("id")].getValue();
 						else content[$(this).attr("id")] = $(this).val();
 					});
-					
+
 					data.push({name : "id", value : $("#pid").val() });
 					data.push({name : "content", value : JSON.stringify(content) });
+					data.push({ name: "css", value: editors["css-editor"].getValue() });
 					if($("#pst-es-type").val() === "redirect") data.push({name : "type", value : "redirect" });
+
 					return data;
 				},
 				success: function(pdata) {
@@ -287,14 +304,14 @@ $(function() {
 				selector:  "#pst-es-type",
 				action: "change",
 				collect: function() {
-					$("#pst-es-fields").slideUp();
+					$("#mode-content").slideUp();
 					return { type : $(this).val(), id : $("#pid").val() };
 				},
 				success: function(pdata) {
-					$("#pst-es-fields").html(pdata.typefields);
+					$("#mode-content").html(pdata.typefields);
 					Phroses.createEditors();
 					if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
-					$("#pst-es-fields").slideDown();
+					$("#mode-content").slideDown();
 					if(data.type !== "redirect") Phroses.displaySaved();
 				}
 			});
