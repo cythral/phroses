@@ -2,6 +2,11 @@
 
 ## v0.8.0
 ### New Features
+ - **Page CSS**: the ability to add custom css to specific pages has been added, and the editor has been completely redone to accommodate this. Page styles are reloaded on keyup, so that you can view your changes in realtime.
+### New Commands
+ - **version**: displays the current version of phroses that is in use
+ - **reset**: easily reset the database back to default
+ - **restore**: restores the database from input sql (pipe a backup created from mysqldump)
 ### Bug Fixes & Minor Changes
  - Refactored routing.  Introduced a Route and Cascade class to handle routing and cascading route rules
  - Refactored installation, installation functions have been moved to a class
