@@ -30,7 +30,7 @@ Phroses::$page = new Page([
     "dateModified" => null,
     "title" => null,
     "content" => null,
-    "visibility" => null
+    "public" => null
 ], "bloom");
 
 Phroses::$site->useDB = false;
