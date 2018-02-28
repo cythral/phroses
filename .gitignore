@@ -10,8 +10,6 @@ themes.tmp/
 /deps.json
 /.developer
 vendor/
-/composer.lock
-/src/composer.lock
 themes/untitled/
 uploads/
 tests/backup.sql
