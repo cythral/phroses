@@ -11,6 +11,7 @@ npm run build:js
 mkdir build
 cp -r src build/src
 cp composer.json build/src/composer.json
+cp composer.lock build/src/composer.lock
 cp .htaccess build/.htaccess
 cp README.md build/README.md
 cp LICENSE build/LICENSE
