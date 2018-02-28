@@ -1,3 +1,5 @@
+var $ = jQuery = require("jquery");
+
 jQuery.fn.shake = function(interval,distance,times){
    interval = typeof interval == "undefined" ? 100 : interval;
    distance = typeof distance == "undefined" ? 10 : distance;
@@ -12,7 +14,7 @@ jQuery.fn.shake = function(interval,distance,times){
 
 var errors = {
   "pw_length" : "Your password is too long, please keep it less than 50 characters."
-};
+}; 
 
 $(function() {
   $("#flow-db").submit(function(e) {

@@ -99,7 +99,6 @@ final class Theme extends Template {
 	 * Load assets from the loader, automatically pushes everything in the css and js directories.
 	 */
 	private function loadAssets(): void {
-		$this->push("scripts", [ "src" => "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js", "attrs" => "defer"]);
 		foreach($this->loader->getAssets("css") as $style) $this->push("stylesheets", [ "src" => "/{$style}" ]);
 		foreach($this->loader->getAssets("js") as $script) $this->push("scripts", [ "src" => "/{$script}", "attrs" => "defer"]);
 	}
@@ -112,7 +111,7 @@ final class Theme extends Template {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 			$this->push("stylesheets", [ "src" => Phroses::$site->adminURI."/assets/css/main.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
-			$this->push("scripts", [ "src" => Phroses::$site->adminURI."/assets/js/main".(inix::get("mode") == "production" ? ".min" : "").".js", "attrs" => 'defer data-adminuri="'.Phroses::$site->adminURI.'" id="phroses-script"' ]);
+			$this->push("scripts", [ "src" => Phroses::$site->adminURI."/assets/js/phroses.min.js", "attrs" => 'defer data-adminuri="'.Phroses::$site->adminURI.'" id="phroses-script"' ]);
 		}
 	}
 	

@@ -1,0 +1,39 @@
+{
+  "name": "phroses",
+  "version": "0.8.0",
+  "description": "a multi-site cms and dispatcher",
+  "browser": {
+    "phroses": "./src/views/assets/js-dev/phroses/main.js"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1"
+  },
+  "devDependencies": {
+    "browserify": "^16.1.0",
+    "concat": "^1.0.3",
+    "onchange": "^3.3.0",
+    "uglify-js": "^3.3.12"
+  },
+  "scripts": {
+    "browserify:vendor": "browserify > src/views/assets/js/vendor.js --require=jquery",
+    "browserify:client": "browserify src/views/assets/js-dev/main.js > src/views/assets/js/client.js --external=jQuery",
+    "concat:js": "concat -o src/views/assets/js/phroses.js src/views/assets/js/vendor.js src/views/assets/js/client.js",
+    "uglify:js": "uglifyjs -o src/views/assets/js/phroses.min.js src/views/assets/js/phroses.js",
+    "build:js": "npm run browserify:vendor && npm run browserify:client && npm run concat:js && npm run uglify:js",
+    "watch:js": "onchange 'src/views/assets/js-dev/**/*.js' -- npm run build:js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cythral/phroses.git"
+  },
+  "author": "cythral",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/cythral/phroses/issues"
+  },
+  "homepage": "https://github.com/cythral/phroses#readme"
+}

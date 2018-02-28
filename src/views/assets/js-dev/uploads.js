@@ -1,3 +1,6 @@
+var $ = require("jquery"),
+    Phroses = require("phroses");
+
 $(function() {
     $(document).on("click", ".upload", function() {
         var file = $(this).data("filename");
@@ -7,7 +10,7 @@ $(function() {
             $("#preview img").attr('src', "/uploads/"+file);
         } else {
             $("#preview img").attr("src", "https://www.adcosales.com/files/products/no-preview-available.jpg");
-        }
+        } 
 
         $("#seefull").attr("href", "/uploads/"+file);
         $("#preview").fadeIn();
@@ -18,7 +21,7 @@ $(function() {
         e.stopImmediatePropagation();
     });
 
-    Phroses.formify({
+    Phroses.utils.formify({
         selector: ".upload input",
         action: "change",
         collect: function() {
@@ -44,7 +47,7 @@ $(function() {
         }
     });
 
-    Phroses.formify({
+    Phroses.utils.formify({
         selector: ".upload-delete",
         action: "click",
         collect: function() {
@@ -82,13 +85,13 @@ $(function() {
         file = (typeof byclick === 'undefined') ? e.originalEvent.dataTransfer.files[0] : $("#file").prop("files")[0];
 
         if(file.size > $("#maxuplsize").val()) {
-            Phroses.genericError("That file is too large.  Please select a file less than " + ($("#maxuplsize").val() / 1048576) + "MB or increase php's max_upload_filesize");
+            Phroses.utils.genericError("That file is too large.  Please select a file less than " + ($("#maxuplsize").val() / 1048576) + "MB or increase php's max_upload_filesize");
             resetUplForm();
             return;
         }
 
         if(file.size > $("#maxformsize").val()) {
-            Phroses.genericError("That file is too large.  Please select a file less than " + ($("#maxformsize").val() / 1048576) + "MB or increase php's post_max_size");
+            Phroses.utils.genericError("That file is too large.  Please select a file less than " + ($("#maxformsize").val() / 1048576) + "MB or increase php's post_max_size");
             resetUplForm();
             return;
         }
@@ -151,7 +154,7 @@ $(function() {
 
                     }, 2000);
 
-                    Phroses.genericError(Phroses.errors.uploads[data.responseJSON.error] || data.responseJSON);
+                    Phroses.utils.genericError(Phroses.errors.uploads[data.responseJSON.error] || data.responseJSON);
                     $("#upload").one("submit", submit);
                 }
             });
