@@ -109,7 +109,7 @@ final class Theme extends Template {
 	private function loadSessionTools(): void {
 		if(isset($_SESSION['live']) && reqc\METHOD == "GET" && in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][404], Phroses::RESPONSES["PAGE"][301] ])) {
             $this->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-			$this->push("stylesheets", [ "src" => Phroses::$site->adminURI."/assets/css/main.css" ]);
+			$this->push("stylesheets", [ "src" => Phroses::$site->adminURI."/assets/css/phroses.css" ]);
 			$this->push("scripts", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js", "attrs" => "defer" ]);
 			$this->push("scripts", [ "src" => Phroses::$site->adminURI."/assets/js/phroses.min.js", "attrs" => 'defer data-adminuri="'.Phroses::$site->adminURI.'" id="phroses-script"' ]);
 		}

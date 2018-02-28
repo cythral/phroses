@@ -6,10 +6,6 @@
 
 include __DIR__."/src/functions.php"; 
 
-// this is done in travis but in case we are building without travis, compile less anyways
-exec("lessc --clean-css src/views/assets/less/main.less src/views/assets/css/main.css");
-exec("uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/views/assets/js/main.min.js");
-
 // package dependencies into the phar
 copy("composer.json", "src/composer.json"); 
 exec("cd src && composer update --no-dev"); 

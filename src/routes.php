@@ -88,7 +88,7 @@ self::addRoute(new class extends Route {
 		}
 
 		ob_start();
-		$page->theme->push("stylesheets", [ "src" => $site->adminURI."/assets/css/main.css" ]);
+		$page->theme->push("stylesheets", [ "src" => $site->adminURI."/assets/css/phroses.css" ]);
 		$page->theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
 		$page->theme->push("scripts", [ "src" => $site->adminURI."/assets/js/phroses.min.js", "attrs" => 'defer data-adminuri="'.$site->adminURI.'" id="phroses-script"' ]);
 

@@ -9,9 +9,7 @@ before_install:
   
 before_script: 
   - phpenv config-add php.ini
-  - npm install -g less@2.7.2
-  - npm install -g less-plugin-clean-css
-  - npm install -g uglify-js
+  - npm install
   - composer install
   - mv phroses.travis.conf phroses.conf
   - sudo mysql -e 'CREATE DATABASE phroses;'
@@ -26,9 +24,9 @@ script:
   - sudo mysql phroses < src/schema/install.sql
   - sudo mysql phroses -e "show tables"
   
-  - lessc --clean-css src/views/assets/less/main.less src/views/assets/css/main.css
-  - uglifyjs src/views/assets/js/main.js  --compress --mangle --output src/views/assets/js/main.min.js
+  - npm run build
   - rm -rf src/views/assets/less
+  - rm -rf src/views/assets/js-dev
 
   - phpunit
   - php build.php

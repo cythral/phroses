@@ -14,6 +14,9 @@
   "devDependencies": {
     "browserify": "^16.1.0",
     "concat": "^1.0.3",
+    "less": "^3.0.1",
+    "less-plugin-clean-css": "^1.5.1",
+    "npm-run-all": "^4.1.2",
     "onchange": "^3.3.0",
     "uglify-js": "^3.3.12"
   },
@@ -24,6 +27,10 @@
     "uglify:js": "uglifyjs -o src/views/assets/js/phroses.min.js src/views/assets/js/phroses.js",
     "build:js": "npm run browserify:vendor && npm run browserify:client && npm run concat:js && npm run uglify:js",
     "watch:js": "onchange 'src/views/assets/js-dev/**/*.js' -- npm run build:js",
+    "build:css": "lessc --clean-css src/views/assets/less/main.less src/views/assets/css/phroses.css",
+    "watch:css": "onchange 'src/views/assets/less/**/*.less' -- npm run build:css",
+    "watch": "npm-run-all --parallel watch:*",
+    "build": "npm run build:js && npm run build:css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
