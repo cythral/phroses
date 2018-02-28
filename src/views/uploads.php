@@ -29,7 +29,7 @@ handleMethod("post", function($out) use ($uploaddir) {
     $out->send(["type" => "success"], 200);
 });
 
-$page->theme->push("scripts", ["src" => $site->adminURI."/assets/js/uploads.js", "attrs" => "defer"]);
+//$page->theme->push("scripts", ["src" => $site->adminURI."/assets/js/uploads.js", "attrs" => "defer"]);
 
 $uploads = new Template(INCLUDES["TPL"]."/admin/uploads.tpl");
 $uploads->maxuplsize = parseSize(ini_get("upload_max_filesize"));

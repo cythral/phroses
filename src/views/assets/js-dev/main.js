@@ -321,3 +321,5 @@ if(!$("#phr-admin-page").val()) {
         }
     });
 }
+
+require("./uploads");
