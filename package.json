@@ -30,7 +30,7 @@
     "build:css": "lessc --clean-css src/views/assets/less/main.less src/views/assets/css/phroses.css",
     "watch:css": "onchange 'src/views/assets/less/**/*.less' -- npm run build:css",
     "watch": "npm-run-all --parallel watch:*",
-    "build": "npm run build:js && npm run build:css",
+    "build": "./scripts/build.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
