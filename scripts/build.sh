@@ -19,14 +19,28 @@ cp -r themes build/themes
 cp -r plugins build/plugins
 rm -rf build/themes/bloom2
 
-
 cd build/src
 composer update --no-dev
 
 cd ../../
 php scripts/phar.php
-cp build/phroses.phar phroses.phar
-rm -rf build
 
+# build the phroses.phar and phroses.tar.gz files
+cp build/phroses.phar phroses.phar 
+
+# cleanup
+rm -rf build
+rm -f phroses.tar
+
+echo -e "\e[42mBUILD COMPLETE\e[0m";
+
+if [[ -f ".developer" ]]; then
+    printf "Detected a .developer file.. do you want to remove it for testing? (Y/n): ";
+    read answer;
+
+    if [[ "${answer,,}" == "y" || "${answer,,}" == "" ]]; then
+        rm .developer
+    fi;
+fi;
 
 

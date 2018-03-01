@@ -82,7 +82,6 @@
     <div id="flow-success" class="screen">
       <h2 class="c">Success</h2>
     </div>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script><{var::script}></script>
+    <script data-mode="installer"><{var::script}></script>
   </body>
 </html>

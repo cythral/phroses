@@ -10365,10 +10365,70 @@ return jQuery;
 } );
 
 },{}],2:[function(require,module,exports){
-var 
-    controller,
+var $ = jQuery = require("jquery");
+
+jQuery.fn.shake = function(interval,distance,times){
+   interval = typeof interval == "undefined" ? 100 : interval;
+   distance = typeof distance == "undefined" ? 10 : distance;
+   times = typeof times == "undefined" ? 3 : times;
+   var jTarget = $(this);
+   jTarget.css('position','relative');
+   for(var iter=0;iter<(times+1);iter++){
+      jTarget.animate({ left: ((iter%2==0 ? distance : distance*-1))}, interval);
+   }
+   return jTarget.animate({ left: 0},interval);
+}
+
+var errors = {
+  "pw_length" : "Your password is too long, please keep it less than 50 characters."
+}; 
+
+$(function() {
+  $("#flow-db").submit(function(e) {
+    e.preventDefault();
+    var data = $(this).serializeArray();
+    $.ajax({url: "", method: "POST", data: data })
+    .done(function(d) {
+      $("#flow-db, #flow-site").animate({left:"-100%"});
+    }).fail(function(d) {
+      $("#flow-db").shake();
+      d = d.responseJSON;
+      if(d.error === "version") {
+        $("#flow-db-error-ver").html(d.minver);
+        $("#flow-db-error").fadeIn();
+      }
+    });
+  });
+  
+  $("#flow-site").submit(function(e) {
+    e.preventDefault();
+    var data = $(this).serializeArray();
+    $.ajax({url: "", method: "POST", data : data })
+    .done(function(d) {
+      $("#flow-success").fadeIn();
+      setTimeout(function() {
+        document.location = "/admin";
+      }, 4000);
+    }).fail(function(d) {
+      $(".ns-error").html(errors[d.responseJSON.error]);
+      $("#flow-site").shake();
+      $(".ns-error").fadeIn();
+      setTimeout(function() { $(".ns-error").fadeOut() }, 5000);
+    });
+  })
+});
+},{"jquery":1}],3:[function(require,module,exports){
+var mode = document.currentScript.getAttribute("data-mode") || "page";
+
+if(mode === "installer") require("./install");
+else {
+    require("./page");
+    require("./uploads");
+}
+},{"./install":2,"./page":4,"./uploads":9}],4:[function(require,module,exports){
+var jQuery = $ = require('jquery'),
     Phroses = require("phroses"),
-    $ = jQuery = require("jquery");
+    controller = {};
 
 jQuery.fn.shake = function(interval,distance,times){
     interval = typeof interval == "undefined" ? 100 : interval;
@@ -10381,10 +10441,10 @@ jQuery.fn.shake = function(interval,distance,times){
     }
     return jTarget.animate({ left: 0},interval);
 };
-  
+
 console.log("-== Phroses Initialized ==-");
 controller = new Phroses();
- 
+
 $(document).on("click", ".jlink", function() {
     document.location = $(this).data("href");
 });  
@@ -10688,9 +10748,7 @@ if(!$("#phr-admin-page").val()) {
         }
     });
 }
-
-require("./uploads");
-},{"./uploads":7,"jquery":1,"phroses":5}],3:[function(require,module,exports){
+},{"jquery":1,"phroses":7}],5:[function(require,module,exports){
 var 
     $ = require("jquery"),
     utils = require("./utils"),
@@ -10827,7 +10885,7 @@ editor.prototype.reloadStyles = function() {
         if(href.substring(0, 1) === "/" && href.substring(1, 2) !== "/") pass = true; // relative
         if(href.replace(/http(s)?\:/g, "").substring(0, origin.length) === origin) pass = true; // on the same domain
 
-        if(href !== document.querySelector("#phroses-script").getAttribute("data-adminuri")+"/assets/css/main.css" && pass) {
+        if(href !== document.querySelector("#phroses-script").getAttribute("data-adminuri")+"/assets/css/phroses.css" && pass) {
             
             $.get(href, function(body) {
                 $("head").append('<style class="phr-reloaded" data-href="'+href+'">'+body+'</style>');
@@ -10847,7 +10905,7 @@ editor.prototype.reloadStyles = function() {
 
 module.exports = editor;
 
-},{"./utils":6,"jquery":1}],4:[function(require,module,exports){
+},{"./utils":8,"jquery":1}],6:[function(require,module,exports){
 module.exports = {
     "write" : "Phroses encountered a problem writing and/or deleting files.  Please check filesystem permissions and try again.",
     "api" : "There was a problem accessing the api.  Please try again later",
@@ -10872,7 +10930,7 @@ module.exports = {
     }
 };
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var $ = require('jquery');
 
 function Phroses() {
@@ -10902,7 +10960,7 @@ Phroses.setupButtons = function() {
 
 module.exports = Phroses;
 
-},{"./editor":3,"./errors":4,"./utils":6,"jquery":1}],6:[function(require,module,exports){
+},{"./editor":5,"./errors":6,"./utils":8,"jquery":1}],8:[function(require,module,exports){
 var $ = require("jquery"), 
     errors = require("./errors"),
     utils = {};
@@ -10965,8 +11023,22 @@ utils.formify = function(options) {
     console.log("Formified element <"+options.selector+">");
 };
 
+utils.getParameters = function() {
+    var src = document.currentScript.getAttribute("src"),
+        qs = src.substring(src.indexOf("?") + 1),
+        params = [],
+        parts = qs.split("&");
+
+    for(var part in parts) {
+        part = parts[part];
+        params[part.substring(0, part.indexOf("="))] = part.substring(part.indexOf("=") + 1);
+    }
+
+    return params;
+}
+
 module.exports = utils; 
-},{"./errors":4,"jquery":1}],7:[function(require,module,exports){
+},{"./errors":6,"jquery":1}],9:[function(require,module,exports){
 var $ = require("jquery"),
     Phroses = require("phroses");
 
@@ -11136,4 +11208,4 @@ $("#upload #file").change(function() {
     $("#upload").trigger('drop', true);
 });
 
-},{"jquery":1,"phroses":5}]},{},[2]);
+},{"jquery":1,"phroses":7}]},{},[3]);

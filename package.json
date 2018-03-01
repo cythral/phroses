@@ -31,7 +31,8 @@
     "watch:css": "onchange 'src/views/assets/less/**/*.less' -- npm run build:css",
     "watch": "npm-run-all --parallel watch:*",
     "build": "./scripts/build.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev-setup": "./scripts/dev-setup.sh",
+    "test": "phpunit"
   },
   "repository": {
     "type": "git",

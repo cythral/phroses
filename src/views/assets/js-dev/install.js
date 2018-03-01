@@ -46,7 +46,7 @@ $(function() {
       $(".ns-error").html(errors[d.responseJSON.error]);
       $("#flow-site").shake();
       $(".ns-error").fadeIn();
-      setTimeout(() => $(".ns-error").fadeOut(), 5000);
+      setTimeout(function() { $(".ns-error").fadeOut() }, 5000);
     });
   })
 });

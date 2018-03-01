@@ -23,7 +23,7 @@ class Session implements SessionHandlerInterface {
     }
 
     public function open($a, $b) { 
-        return class_exists("\Phroses\DB"); 
+        return true; 
     }
 
     public function close() { 

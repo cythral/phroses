@@ -134,7 +134,7 @@ editor.prototype.reloadStyles = function() {
         if(href.substring(0, 1) === "/" && href.substring(1, 2) !== "/") pass = true; // relative
         if(href.replace(/http(s)?\:/g, "").substring(0, origin.length) === origin) pass = true; // on the same domain
 
-        if(href !== document.querySelector("#phroses-script").getAttribute("data-adminuri")+"/assets/css/main.css" && pass) {
+        if(href !== document.querySelector("#phroses-script").getAttribute("data-adminuri")+"/assets/css/phroses.css" && pass) {
             
             $.get(href, function(body) {
                 $("head").append('<style class="phr-reloaded" data-href="'+href+'">'+body+'</style>');

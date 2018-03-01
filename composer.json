@@ -22,6 +22,37 @@
         "zbateson/mail-mime-parser": "^0.4.8"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^7.0",
+        "koala-framework/composer-extra-assets": "^2.0"
+    },
+    "extra": {
+        "require-npm": {
+            "jquery": "^3.3.1"
+        },
+
+        "require-dev-npm": {
+            "browserify": "^16.1.0",
+            "concat": "^1.0.3",
+            "less": "^3.0.1",
+            "less-plugin-clean-css": "^1.5.1",
+            "npm-run-all": "^4.1.2",
+            "onchange": "^3.3.0",
+            "uglify-js": "^3.3.12"
+          }
+    },
+
+    "scripts": {
+        "browserify:vendor": "browserify > src/views/assets/js/vendor.js --require=jquery",
+        "browserify:client": "browserify src/views/assets/js-dev/main.js > src/views/assets/js/client.js --external=jQuery",
+        "concat:js": "concat -o src/views/assets/js/phroses.js src/views/assets/js/vendor.js src/views/assets/js/client.js",
+        "uglify:js": "uglifyjs -o src/views/assets/js/phroses.min.js src/views/assets/js/phroses.js",
+        "build:js": "composer run-script browserify:vendor && composer run-script browserify:client && composer run-script concat:js && composer run-script uglify:js",
+        "watch:js": "onchange 'src/views/assets/js-dev/**/*.js' -- composer run-script build:js",
+        "build:css": "lessc --clean-css src/views/assets/less/main.less src/views/assets/css/phroses.css",
+        "watch:css": "onchange 'src/views/assets/less/**/*.less' -- composer run-script build:css",
+        "watch": "./scripts/watch.sh",
+        "build": "./scripts/build.sh",
+        "dev-setup": "./scripts/dev-setup.sh",
+        "test": "phpunit"
     }
 }

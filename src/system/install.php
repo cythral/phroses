@@ -42,6 +42,6 @@ handleMethod("post", function($out) {
 
 
 $install = new Template(INCLUDES["TPL"]."/installer.tpl");
-$install->styles = file_get_contents(SRC."/views/assets/css/main.css");
-$install->script = file_get_contents(SRC."/views/assets/js/install.js");
+$install->styles = file_get_contents(SRC."/views/assets/css/phroses.css");
+$install->script = file_get_contents(SRC."/views/assets/js/phroses.min.js");
 echo $install;

@@ -60,4 +60,18 @@ utils.formify = function(options) {
     console.log("Formified element <"+options.selector+">");
 };
 
+utils.getParameters = function() {
+    var src = document.currentScript.getAttribute("src"),
+        qs = src.substring(src.indexOf("?") + 1),
+        params = [],
+        parts = qs.split("&");
+
+    for(var part in parts) {
+        part = parts[part];
+        params[part.substring(0, part.indexOf("="))] = part.substring(part.indexOf("=") + 1);
+    }
+
+    return params;
+}
+
 module.exports = utils; 

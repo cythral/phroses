@@ -14,3 +14,5 @@ themes/untitled/
 uploads/
 tests/backup.sql
 node_modules/
+.bowerrc
+bower.json
