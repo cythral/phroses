@@ -16,3 +16,5 @@ tests/backup.sql
 node_modules/
 .bowerrc
 bower.json
+package.json
+package-lock.json
