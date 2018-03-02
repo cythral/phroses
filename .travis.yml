@@ -46,7 +46,8 @@ after_success:
   - ./send.sh success
   - wget https://gist.githubusercontent.com/ddgenome/f3a60fe4c2af0cbe758556d982fbeea9/raw/1a661a20bd24e76d9179ac52ff4381393c739252/travis-ci-git-commit.bash
   - chmod +x travis-ci-git-commit.bash
-  - ./travis-ci-git-commit.bash travis-branch-commit
+  - source travis-ci-git-commit.bash
+  - travis-branch-commit
 
 after_failure:
   - wget https://raw.githubusercontent.com/snkrsnkampa/travis-ci-discord-webhook/master/send.sh
