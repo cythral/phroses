@@ -32,12 +32,4 @@ chmod 775 phroses.phar
 rm -rf build
 rm -f phroses.tar
 
-# make dist files for packagist
-rm -rf dist
-mkdir dist
-cp phroses.tar.gz dist/phroses.tar.gz
-cd dist
-tar -zxvf phroses.tar.gz
-rm phroses.tar.gz
-
 echo -e "\e[42mBUILD COMPLETE\e[0m";

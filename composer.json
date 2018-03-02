@@ -76,11 +76,12 @@
 
         "post-update-cmd": [
             "@merge-aliases"
+        ],
+
+        "post-create-project-cmd": [
+            "@build",
+            "rm -rf src vendor node_modules bower.json .bowerrc package.json phroses.tar.gz composer.lock composer-extra-assets.lock",
+            "mkdir uploads"
         ]
-
-    },
-
-    "archive": {
-        "exclude": ["/*", "!/dist/*"]
     }
 }
