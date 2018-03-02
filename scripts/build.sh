@@ -3,8 +3,10 @@ rm phroses.phar -f
 rm phroses.tar.gz -f
 rm phroses.tar -f
 
-composer run-script build:js
-composer run-script build:css
+if [[ $* != *--no-dev* ]]; then 
+    composer run build:js
+    composer run build:css
+fi;
 
 # copy build files and install dependencies
 mkdir build
