@@ -28,7 +28,7 @@ script:
   - composer run build
   - composer run test
 
-  - ./phroses.phar test
+  - php phroses.phar test
   
 deploy:
   provider: releases
