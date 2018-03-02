@@ -49,9 +49,8 @@ after_success:
   - cp phroses.tar.gz dist/phroses.tar.gz
   - git config --global user.email "travis@travis-ci.org"
   - git config --global user.name "Travis CI"
-  - git checkout -b ${TRAVIS_BRANCH}
   - git add dist/phroses.tar.gz
-  - git commit -m "BUILD $TRAVIS_BUILD_NUMBER"
+  - git commit --amend -m "BUILD $TRAVIS_BUILD_NUMBER" 
   - git remote add origin-pushable https://${GH_TOKEN}@github.com/cythral/phroses.git > /dev/null 2>&1
   - git push --quiet --set-upstream origin-pushable ${TRAVIS_BRANCH}
 
