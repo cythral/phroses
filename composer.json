@@ -2,11 +2,12 @@
     "name": "cythral/phroses",
     "description" : "A multi-site cms / content dispatcher",
     "license" : "GPL-3.0",
-    "type" : "package",
+    "type" : "project",
     "author" : {
         "name" : "Cythral",
         "email" : "talen@cythral.com"
     },
+    
     "require" : {
         "php" : ">=7.2",
         "ext-curl" : "*",
@@ -19,12 +20,22 @@
         "cythral/phyrex": "^0.1.0",
         "cythral/inix": "^0.1.1",
         "cythral/listen": "^0.1.0",
-        "zbateson/mail-mime-parser": "^0.4.8"
+        "zbateson/mail-mime-parser": "^0.4.8",
+        "composer-plugin-api": "^1.0"
     },
+
+    "autoload": {
+        "psr-4": {
+            "Phroses\\": "src/models/"
+        }
+    },
+
     "require-dev": {
         "phpunit/phpunit": "^7.0",
-        "koala-framework/composer-extra-assets": "^2.0"
+        "koala-framework/composer-extra-assets": "^2.0",
+        "composer/composer": "^1.3"
     },
+
     "extra": {
         "require-npm": {
             "jquery": "^3.3.1"
@@ -39,7 +50,9 @@
             "onchange": "^3.3.0",
             "uglify-js": "^3.3.12",
             "json": "^9.0.6"
-          }
+        },
+
+        "class" : "Phroses\\Composer\\PhrosesInstallerPlugin"
     },
 
     "scripts": {
@@ -54,7 +67,7 @@
         "watch": "./scripts/watch.sh",
         "build": "./scripts/build.sh",
         "dev-setup": "./scripts/dev-setup.sh",
-        "merge-aliases": "echo $(cat package.json .aliases.json | vendor/bin/json --merge) > package.json",
+        "merge-aliases": "echo $(cat package.json config/aliases.json | vendor/bin/json --merge) > package.json",
         "test": "phpunit",
 
         "post-install-cmd": [
@@ -65,5 +78,9 @@
             "@merge-aliases"
         ]
 
+    },
+
+    "archive": {
+        "exclude": ["/*", "!/dist/*"]
     }
 }

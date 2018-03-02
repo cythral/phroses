@@ -8,10 +8,11 @@ before_install:
   - sudo apt-get install -y -qq postfix
   
 before_script: 
-  - phpenv config-add php.ini
+  # setup config
+  - phpenv config-add config/php.ini
+  - mv config/phroses.conf phroses.conf
   - npm install -g bower
   - composer install
-  - mv phroses.travis.conf phroses.conf
   - sudo mysql -e 'CREATE DATABASE phroses;'
   
   # postfix
@@ -24,9 +25,10 @@ script:
   - sudo mysql phroses < src/schema/install.sql
   - sudo mysql phroses -e "show tables"
   
-  - composer run-script build
-  - phpunit
-  - php phroses.phar test
+  - composer run build
+  - composer run test
+
+  - ./phroses.phar test
   
 deploy:
   provider: releases
@@ -41,6 +43,10 @@ after_success:
   - wget https://raw.githubusercontent.com/snkrsnkampa/travis-ci-discord-webhook/master/send.sh
   - chmod +x send.sh
   - ./send.sh success
+  - wget https://gist.githubusercontent.com/ddgenome/f3a60fe4c2af0cbe758556d982fbeea9/raw/1a661a20bd24e76d9179ac52ff4381393c739252/travis-ci-git-commit.bash
+  - chmod -x travis-ci-git-commit.bash
+  - ./travis-ci-git-commit.bash
+  - travis-branch-commit();
 
 after_failure:
   - wget https://raw.githubusercontent.com/snkrsnkampa/travis-ci-discord-webhook/master/send.sh

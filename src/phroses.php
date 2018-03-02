@@ -12,8 +12,7 @@ namespace Phroses;
 include __DIR__."/constants.php";
 
 // setup autoloader, functions
-$loader = include ((INPHAR) ? SRC : ROOT) . "/vendor/autoload.php";
-$loader->addPsr4("Phroses\\", SRC."/models");
+include ((INPHAR) ? SRC : ROOT) . "/vendor/autoload.php";
 include SRC."/functions.php";
 
 

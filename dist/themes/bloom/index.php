@@ -1,0 +1,1 @@
+<?php // Placeholder for Bundled Bloom Theme
