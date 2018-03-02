@@ -18,3 +18,5 @@ node_modules/
 bower.json
 package.json
 package-lock.json
+send.sh
+travis-ci-git-commit.bash
