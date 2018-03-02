@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ec17c67f5ad496e4d1c0a8917191de58",
-    "content-hash": "caca97325d72876bcac8a2bc99567e09",
+    "hash": "8a4f4b0f7fa4d606f67dbf6cb33bd492",
+    "content-hash": "a2ac1def769dc97cc213ec8c81e06e78",
     "packages": [
         {
             "name": "cythral/inix",

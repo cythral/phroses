@@ -1,0 +1,5 @@
+{
+    "browser": {
+        "phroses": "./src/views/assets/js-dev/phroses/main.js"
+    }
+}

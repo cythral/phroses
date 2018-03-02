@@ -3,9 +3,8 @@ rm phroses.phar -f
 rm phroses.tar.gz -f
 rm phroses.tar -f
 
-npm install
-npm run build:css
-npm run build:js
+composer run-script build:js
+composer run-script build:css
 
 # copy build files and install dependencies
 mkdir build
@@ -20,27 +19,17 @@ cp -r plugins build/plugins
 rm -rf build/themes/bloom2
 
 cd build/src
-composer update --no-dev
+composer install --no-dev --no-scripts
 
 cd ../../
 php scripts/phar.php
 
 # build the phroses.phar and phroses.tar.gz files
 cp build/phroses.phar phroses.phar 
+chmod 775 phroses.phar
 
 # cleanup
 rm -rf build
 rm -f phroses.tar
 
 echo -e "\e[42mBUILD COMPLETE\e[0m";
-
-if [[ -f ".developer" ]]; then
-    printf "Detected a .developer file.. do you want to remove it for testing? (Y/n): ";
-    read answer;
-
-    if [[ "${answer,,}" == "y" || "${answer,,}" == "" ]]; then
-        rm .developer
-    fi;
-fi;
-
-

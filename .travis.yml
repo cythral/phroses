@@ -9,7 +9,7 @@ before_install:
   
 before_script: 
   - phpenv config-add php.ini
-  - npm install
+  - npm install -g bower
   - composer install
   - mv phroses.travis.conf phroses.conf
   - sudo mysql -e 'CREATE DATABASE phroses;'

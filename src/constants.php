@@ -6,7 +6,7 @@
 namespace Phroses;
 
 define("Phroses", true);
-define("Phroses\VERSION", "v0.8.0");
+define("Phroses\VERSION", "v0.8.3");
 define("Phroses\SRC", __DIR__); // location of the src folder
 define("Phroses\SCHEMAVER", 3); // database schema version
 define("Phroses\INPHAR", strpos(__DIR__, "phar://") !== false); // if in the packaged phar or not

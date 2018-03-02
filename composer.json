@@ -37,7 +37,8 @@
             "less-plugin-clean-css": "^1.5.1",
             "npm-run-all": "^4.1.2",
             "onchange": "^3.3.0",
-            "uglify-js": "^3.3.12"
+            "uglify-js": "^3.3.12",
+            "json": "^9.0.6"
           }
     },
 
@@ -53,6 +54,16 @@
         "watch": "./scripts/watch.sh",
         "build": "./scripts/build.sh",
         "dev-setup": "./scripts/dev-setup.sh",
-        "test": "phpunit"
+        "merge-aliases": "echo $(cat package.json .aliases.json | vendor/bin/json --merge) > package.json",
+        "test": "phpunit",
+
+        "post-install-cmd": [
+            "@merge-aliases"
+        ],
+
+        "post-update-cmd": [
+            "@merge-aliases"
+        ]
+
     }
 }
