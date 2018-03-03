@@ -306,7 +306,7 @@
                     "punycode": "1.4.1",
                     "querystring-es3": "0.2.1",
                     "read-only-stream": "2.0.0",
-                    "readable-stream": "2.3.4",
+                    "readable-stream": "2.3.5",
                     "resolve": "1.5.0",
                     "shasum": "1.0.2",
                     "shell-quote": "1.6.1",
@@ -547,7 +547,7 @@
                 "integrity": "sha512-gslSSJx03QKa59cIKqeJO9HQ/WZMotvYJCuaUULrLpjj8oG40kV2Z+gz82pVxlTkOADi4PJxQPPfhl1ELYrrXw==",
                 "requires": {
                     "inherits": "2.0.3",
-                    "readable-stream": "2.3.4",
+                    "readable-stream": "2.3.5",
                     "typedarray": "0.0.6"
                 }
             },
@@ -740,7 +740,7 @@
                 "resolved": "https://registry.npmjs.org/duplexer2/-/duplexer2-0.1.4.tgz",
                 "integrity": "sha1-ixLauHjA1p4+eJEFFmKjL8a93ME=",
                 "requires": {
-                    "readable-stream": "2.3.4"
+                    "readable-stream": "2.3.5"
                 }
             },
             "ecc-jsbn": {
@@ -2394,7 +2394,7 @@
                     "duplexer2": "0.1.4",
                     "inherits": "2.0.3",
                     "parents": "1.0.1",
-                    "readable-stream": "2.3.4",
+                    "readable-stream": "2.3.5",
                     "resolve": "1.5.0",
                     "stream-combiner2": "1.1.1",
                     "subarg": "1.0.0",
@@ -2727,7 +2727,7 @@
                 "resolved": "https://registry.npmjs.org/read-only-stream/-/read-only-stream-2.0.0.tgz",
                 "integrity": "sha1-JyT9aoET1zdkrCiNQ4YnDB2/F/A=",
                 "requires": {
-                    "readable-stream": "2.3.4"
+                    "readable-stream": "2.3.5"
                 }
             },
             "read-pkg": {
@@ -2741,9 +2741,9 @@
                 }
             },
             "readable-stream": {
-                "version": "2.3.4",
-                "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.4.tgz",
-                "integrity": "sha512-vuYxeWYM+fde14+rajzqgeohAI7YoJcHE7kXDAc4Nk0EbuKnJfqtY9YtRkLo/tqkuF7MsBQRhPnPeyjYITp3ZQ==",
+                "version": "2.3.5",
+                "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.5.tgz",
+                "integrity": "sha512-tK0yDhrkygt/knjowCUiWP9YdV7c5R+8cR0r/kt9ZhBU906Fs6RpQJCEilamRJj1Nx2rWI6LkW9gKqjTkshhEw==",
                 "requires": {
                     "core-util-is": "1.0.2",
                     "inherits": "2.0.3",
@@ -2761,7 +2761,7 @@
                 "requires": {
                     "graceful-fs": "4.1.11",
                     "minimatch": "3.0.4",
-                    "readable-stream": "2.3.4",
+                    "readable-stream": "2.3.5",
                     "set-immediate-shim": "1.0.1"
                 }
             },
@@ -2972,7 +2972,7 @@
                 "integrity": "sha1-ZiZu5fm9uZQKTkUUyvtDu3Hlyds=",
                 "requires": {
                     "inherits": "2.0.3",
-                    "readable-stream": "2.3.4"
+                    "readable-stream": "2.3.5"
                 }
             },
             "stream-combiner": {
@@ -2989,7 +2989,7 @@
                 "integrity": "sha1-+02KFCDqNidk4hrUeAOXvry0HL4=",
                 "requires": {
                     "duplexer2": "0.1.4",
-                    "readable-stream": "2.3.4"
+                    "readable-stream": "2.3.5"
                 }
             },
             "stream-http": {
@@ -2999,7 +2999,7 @@
                 "requires": {
                     "builtin-status-codes": "3.0.0",
                     "inherits": "2.0.3",
-                    "readable-stream": "2.3.4",
+                    "readable-stream": "2.3.5",
                     "to-arraybuffer": "1.0.1",
                     "xtend": "4.0.1"
                 }
@@ -3010,7 +3010,7 @@
                 "integrity": "sha1-G2O+Q4oTPktnHMGTUZdgAXWRDYM=",
                 "requires": {
                     "inherits": "2.0.3",
-                    "readable-stream": "2.3.4"
+                    "readable-stream": "2.3.5"
                 }
             },
             "string.prototype.padend": {
@@ -3076,7 +3076,7 @@
                 "resolved": "https://registry.npmjs.org/through2/-/through2-2.0.3.tgz",
                 "integrity": "sha1-AARWmzfHx0ujnEPzzteNGtlBQL4=",
                 "requires": {
-                    "readable-stream": "2.3.4",
+                    "readable-stream": "2.3.5",
                     "xtend": "4.0.1"
                 }
             },

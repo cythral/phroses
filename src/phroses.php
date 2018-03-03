@@ -12,9 +12,9 @@ namespace Phroses;
 include __DIR__."/constants.php";
 
 // setup autoloader, functions
-include ((INPHAR) ? SRC : ROOT) . "/vendor/autoload.php";
+$loader = include ((INPHAR) ? SRC : ROOT) . "/vendor/autoload.php";
+$loader->addPsr4("Phroses\\", SRC."/models"); // can't do this in composer.json because the location changes if in a phar
 include SRC."/functions.php";
-
 
 use \reqc;
 use \reqc\Output;
