@@ -50,9 +50,7 @@
             "onchange": "^3.3.0",
             "uglify-js": "^3.3.12",
             "json": "^9.0.6"
-        },
-
-        "class" : "Phroses\\Composer\\PhrosesInstallerPlugin"
+        }
     },
 
     "scripts": {
@@ -67,7 +65,7 @@
         "watch": "./scripts/watch.sh",
         "build": "./scripts/build.sh",
         "dev-setup": "./scripts/dev-setup.sh",
-        "merge-aliases": "echo $(cat package.json config/aliases.json | vendor/bin/json --merge) > package.json",
+        "merge-aliases": "echo $(cat package.json config/aliases.json | json --merge) > package.json",
         "test": "phpunit",
 
         "post-install-cmd": [
