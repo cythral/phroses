@@ -13,9 +13,9 @@ before_script:
   - mv config/phroses.conf phroses.conf
 
   # install dependencies
+  - export PATH=$PWD/vendor/bin:$(npm bin):$PATH
   - npm install -g bower
   - composer install
-  - export PATH=$PWD/vendor/bin:$(npm bin):$PATH
 
   # setup mysql
   - sudo mysql -e 'CREATE DATABASE phroses;'
