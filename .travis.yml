@@ -11,24 +11,27 @@ before_script:
   # setup config
   - phpenv config-add config/php.ini
   - mv config/phroses.conf phroses.conf
+
+  # install dependencies
   - npm install -g bower
   - composer install
+  - export PATH=$PWD/vendor/bin:$(npm bin):$PATH
+
+  # setup mysql
   - sudo mysql -e 'CREATE DATABASE phroses;'
+  - sudo mysql phroses < src/schema/install.sql
+  - sudo mysql phroses -e "show tables"
   
-  # postfix
+  # setup postfix
   - sudo service postfix stop
   - smtp-sink -d "%d.%H.%M.%S" localhost:2500 1000 &
   - echo -e '#!/usr/bin/env bash\nexit 0' | sudo tee /usr/sbin/sendmail
   - echo 'sendmail_path = "/usr/sbin/sendmail -t -i "' | sudo tee "/home/travis/.phpenv/versions/`php -i | grep "PHP Version" | head -n 1 | grep -o -P '\d+\.\d+\.\d+.*'`/etc/conf.d/sendmail.ini"
   
+
 script:
-  - sudo mysql phroses < src/schema/install.sql
-  - sudo mysql phroses -e "show tables"
-  - export PATH=$PWD/vendor/bin:$PATH
-  
   - composer run build
   - composer run test
-
   - php phroses.phar test
   
 deploy:
