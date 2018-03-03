@@ -80,7 +80,7 @@
 
         "post-create-project-cmd": [
             "mv dist/phroses.tar.gz /tmp/phroses.tar.gz",
-            "rm -rf \"${PWD}/*\"",
+            "rm -rf $PWD/*",
             "mv /tmp/phroses.tar.gz phroses.tar.gz",
             "tar -zxvf phroses.tar.gz"
         ]
