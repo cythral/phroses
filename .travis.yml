@@ -50,6 +50,7 @@ after_success:
   - git config --global user.email "travis@travis-ci.org"
   - git config --global user.name "Travis CI"
   - git checkout ${TRAVIS_BRANCH}
+  - git pull
   - git add dist/phroses.tar.gz
   - git commit --amend -m "BUILD $TRAVIS_BUILD_NUMBER" 
   - git remote add origin-pushable https://${GH_TOKEN}@github.com/cythral/phroses.git > /dev/null 2>&1
