@@ -186,7 +186,7 @@ if(!$("#phr-admin-page").val()) {
             
             setTimeout(function() {
                 location.reload();
-            }, 2000);
+            }, 2000); 
         }
     });
 

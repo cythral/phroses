@@ -5,5 +5,3 @@ else {
     require("./page");
     require("./uploads");
 }
-
-console.log('v0.8.1234');

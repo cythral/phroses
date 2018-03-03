@@ -1,0 +1,26 @@
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> ./scripts/watch.sh '2'
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> onchange 'src/views/assets/js-dev/**/*.js' 'src/views/assets/js-dev/*.js' -- composer run build:js
+> onchange 'src/views/assets/less/**/*.less' 'src/views/assets/less/*.less' -- composer run-script build:css
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> composer run-script browserify:vendor && composer run-script browserify:client && composer run concat:js && composer run-script uglify:js
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> browserify > src/views/assets/js/vendor.js --require=jquery
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> browserify src/views/assets/js-dev/main.js > src/views/assets/js/client.js --external=jQuery
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> concat -o src/views/assets/js/phroses.js src/views/assets/js/vendor.js src/views/assets/js/client.js
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> uglifyjs -o src/views/assets/js/phroses.min.js src/views/assets/js/phroses.js
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> composer run-script browserify:vendor && composer run-script browserify:client && composer run concat:js && composer run-script uglify:js
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> browserify > src/views/assets/js/vendor.js --require=jquery
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> browserify src/views/assets/js-dev/main.js > src/views/assets/js/client.js --external=jQuery
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> concat -o src/views/assets/js/phroses.js src/views/assets/js/vendor.js src/views/assets/js/client.js
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+> uglifyjs -o src/views/assets/js/phroses.min.js src/views/assets/js/phroses.js

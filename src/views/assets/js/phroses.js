@@ -20793,8 +20793,6 @@ else {
     require("./page");
     require("./uploads");
 }
-
-console.log('v0.8.1234');
 },{"./install":2,"./page":4,"./uploads":9}],4:[function(require,module,exports){
 var jQuery = $ = require('jquery'),
     Phroses = require("phroses"),
@@ -20984,7 +20982,7 @@ if(!$("#phr-admin-page").val()) {
             
             setTimeout(function() {
                 location.reload();
-            }, 2000);
+            }, 2000); 
         }
     });
 
