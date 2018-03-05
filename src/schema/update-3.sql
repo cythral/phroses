@@ -3,8 +3,4 @@ ALTER TABLE `sites` ADD (
     `maintenance` BOOLEAN DEFAULT 0 NOT NULL
 );
 
-ALTER TABLE `pages` ADD (
-    `css` LONGTEXT NULL
-);
-
 UPDATE `options` SET `value`='3' WHERE `key`='schemaver';

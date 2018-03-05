@@ -20792,7 +20792,7 @@ if(mode === "installer") require("./install");
 else {
     require("./page");
     require("./uploads");
-}
+} 
 },{"./install":2,"./page":4,"./uploads":9}],4:[function(require,module,exports){
 var jQuery = $ = require('jquery'),
     Phroses = require("phroses"),

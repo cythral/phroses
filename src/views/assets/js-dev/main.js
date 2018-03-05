@@ -4,4 +4,4 @@ if(mode === "installer") require("./install");
 else {
     require("./page");
     require("./uploads");
-}
+} 

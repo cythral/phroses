@@ -8,7 +8,7 @@ namespace Phroses;
 define("Phroses", true);
 define("Phroses\VERSION", "v0.8.0-dev");
 define("Phroses\SRC", __DIR__); // location of the src folder
-define("Phroses\SCHEMAVER", 3); // database schema version
+define("Phroses\SCHEMAVER", 4); // database schema version
 define("Phroses\INPHAR", strpos(__DIR__, "phar://") !== false); // if in the packaged phar or not
 define("Phroses\ROOT", (INPHAR) ? str_replace("phar://", "", dirname(SRC)) : dirname(SRC)); // where phroses is installed
 define("Phroses\DEPS", [

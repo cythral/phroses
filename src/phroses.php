@@ -38,6 +38,7 @@ abstract class Phroses {
 	static private $commands = [];
 	static private $cascadeRules = [];
 	static private $cascade;
+	static private $configFileLoaded = false;
 
 	static public $page;
 	static public $site;
@@ -94,11 +95,11 @@ abstract class Phroses {
 		self::$out = new Output();
 		
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
-		if(!Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs")) return;
+		self::$configFileLoaded = Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
 		Events::attach("modeset", [ (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
 
 		// page or asset
-		if(TYPE != TYPES["CLI"]) {
+		if(TYPE != TYPES["CLI"] && self::$configFileLoaded) {
 			self::$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
 
 			Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
@@ -172,7 +173,10 @@ abstract class Phroses {
 
 		// if no configuration file found, run installer
 		if(!inix::load($configFile)) {
-			include SRC."/system/install.php";
+			if(TYPE == TYPES["HTTP"]) {
+				include SRC."/system/install.php";
+			}
+			
 			return false;
 		}
 

@@ -11,6 +11,11 @@ use \ZBateson\MailMimeParser\MailMimeParser;
  * Turns application-wide maintenance mode off and on
  */
 self::addCmd("maintenance", function($args, $flags) {
+	if(!self::$configFileLoaded) {
+		echo "Config file not present, please complete the installation of Phroses before proceeding.".PHP_EOL;
+		exit(1);
+	}
+
 	if(isset($args["mode"])) {
 		self::setMaintenance([ "on" => self::MM_ON, "off" => self::MM_OFF ][strtolower($args["mode"])]);
 	}
@@ -20,6 +25,11 @@ self::addCmd("maintenance", function($args, $flags) {
  * Updates phroses' database schema
  */
 self::addCmd("update", function($args, $flags) {
+	if(!self::$configFileLoaded) {
+		echo "Config file not present, please complete the installation of Phroses before proceeding.".PHP_EOL;
+		exit(1);
+	}
+
 	DB::update();
 });
 
@@ -51,6 +61,11 @@ self::addCmd("test", function() {
  * Resets the database
  */
 self::addCmd("reset", function() {
+	if(!self::$configFileLoaded) {
+		echo "Config file not present, please complete the installation of Phroses before proceeding.".PHP_EOL;
+		exit(1);
+	}
+
 	$answer = strtolower(ask("Are you sure?  Doing this will reset the database, all data will be lost (Y/n): "));
 		
 	if(in_array($answer, ['y', ''])) {
@@ -63,6 +78,11 @@ self::addCmd("reset", function() {
  * Restores the database from a backup.  A sql file should be piped to the script
  */
 self::addCmd("restore", function() {
+	if(!self::$configFileLoaded) {
+		echo "Config file not present, please complete the installation of Phroses before proceeding.".PHP_EOL;
+		exit(1);
+	}
+
 	if(!@DB::unpreparedQuery(file_get_contents("php://stdin"))) {
 		echo "There was an error restoring the database.".PHP_EOL;
 		exit(1);
