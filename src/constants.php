@@ -16,6 +16,7 @@ define("Phroses\DEPS", [
 	"MYSQL" => "5.6.0",
 	"EXTS" => [ "pdo_mysql", "json", "dom", "session", "date", "curl" ]
 ]);
+
 define("Phroses\INCLUDES", [ // location of various files that are included
 	"THEMES" => ROOT."/themes",
 	"MODELS" => SRC."/models/classes",
