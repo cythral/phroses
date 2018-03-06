@@ -18,7 +18,7 @@ self::addCmd(new class extends Command {
 		$this->requireConfigFile();
 
 		if(isset($args["mode"])) {
-			self::setMaintenance([ "on" => self::MM_ON, "off" => self::MM_OFF ][strtolower($args["mode"])]);
+			Phroses::setMaintenance([ "on" => self::MM_ON, "off" => self::MM_OFF ][strtolower($args["mode"])]);
 		}
 	}
 });
@@ -78,7 +78,10 @@ self::addCmd(new class extends Command {
 		$answer = strtolower($this->read("Are you sure?  Doing this will reset the database, all data will be lost (Y/n): "));
 			
 		if(in_array($answer, ['y', ''])) {
-			DB::unpreparedQuery(file_get_contents(SRC."/schema/install.sql"));
+			$tpl = new Template(SRC."/schema/install.sql");
+			$tpl->schemaver = SCHEMAVER;
+
+			DB::unpreparedQuery($tpl);
 			println("The database has been successfully reset.");
 		}
 	}
@@ -93,7 +96,7 @@ self::addCmd(new class extends Command {
 	public function execute(array $args, array $flags) {
 		$this->requireConfigFile();
 
-		if(!@DB::unpreparedQuery(file_get_contents("php://stdin"))) {
+		if(!@DB::unpreparedQuery(stream_get_contents($this->stream))) {
 			$this->error("There was an error restoring the database.");
 		}
 
@@ -101,10 +104,17 @@ self::addCmd(new class extends Command {
 	}
 });
 
+/**
+ * Displays the current version of Phroses
+ */
 self::addCmd(new class extends Command {
 	public $name = "version";
 	public function execute(array $args, array $flags) {
-		echo VERSION.PHP_EOL;
+		$out = "Phroses ".VERSION;
+		if(defined("Phroses\BUILD_TIMESTAMP")) $out .= " (built: ".date('F j, Y @ H:i:s e', BUILD_TIMESTAMP).")";
+		$out .= " created by Cythral";
+
+		println($out);
 	}
 });
 

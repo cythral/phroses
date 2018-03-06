@@ -5,8 +5,9 @@ include ROOT."/src/functions.php";
 
 $p = new Phar(ROOT.'/build/phroses.phar', 0, 'phroses'); 
 $p->startBuffering(); 
-$p->buildFromDirectory(ROOT."/build/src/"); 
-$p->setStub('#!/usr/bin/php'.PHP_EOL.'<?php @ob_end_clean(); Phar::mapPhar("phroses"); include "phar://phroses/phroses.php"; __HALT_COMPILER();');
+$p->buildFromDirectory(ROOT."/build/src/");
+$time = time();
+$p->setStub('#!/usr/bin/php'.PHP_EOL.'<?php @ob_end_clean(); Phar::mapPhar("phroses"); define("Phroses\BUILD_TIMESTAMP", '.$time.'); include "phar://phroses/phroses.php"; __HALT_COMPILER();');
 $p->stopBuffering(); 
 
 Phroses\rrmdir(ROOT."/build/src");
