@@ -19,7 +19,7 @@ CREATE TABLE `sites` (
   `adminUsername` varchar(50) NOT NULL,
   `adminPassword` char(60) NOT NULL,
   `adminURI` varchar(800) DEFAULT '/admin' NOT NULL,
-  `adminIP` varchar(200) NOT NULL,
+  `adminIP` varchar(200) DEFAULT '*' NOT NULL,
   `maintenance` BOOLEAN DEFAULT 0 NOT NULL
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 

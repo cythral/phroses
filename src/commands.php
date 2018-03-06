@@ -5,6 +5,7 @@
 
 namespace Phroses;
 
+use \listen\Events;
 use \ZBateson\MailMimeParser\MailMimeParser;
 
 /**
@@ -42,7 +43,7 @@ self::addCmd(new class extends Command {
 	public $name = "email";
 
 	public function execute(array $args, array $flags) {
-		$data = file_get_contents("php://stdin");
+		$data = file_get_contents($this->stream);
 		$email = (new MailMimeParser())->parse((string) $data);
 
 		Events::trigger("email", [
