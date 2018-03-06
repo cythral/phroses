@@ -38,8 +38,9 @@ abstract class Phroses {
 	static private $commands = [];
 	static private $cascadeRules = [];
 	static private $cascade;
-	static private $configFileLoaded = false;
 
+
+	static public $configFileLoaded = false;
 	static public $page;
 	static public $site;
 
@@ -97,12 +98,11 @@ abstract class Phroses {
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		self::$configFileLoaded = Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
 		Events::attach("modeset", [ (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
+		Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 
 		// page or asset
 		if(TYPE != TYPES["CLI"] && self::$configFileLoaded) {
 			self::$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
-
-			Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
@@ -190,9 +190,12 @@ abstract class Phroses {
 		set_exception_handler(function(\Throwable $e) {
 			if($e instanceof \Phroses\Exceptions\ExitException) exit($e->code ?? 0);
 			else {
-				$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
-				$out->message = $e->getMessage();
-				echo $out;
+				if(TYPE == TYPES["HTTP"]) {
+					$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
+					$out->message = $e->getMessage();
+					echo $out;
+
+				} else println($out);
 			}
 		});
 	}
@@ -203,7 +206,7 @@ abstract class Phroses {
 	 * @param bool $showNewSite whether or not to show the form to create a new site
 	 */
 	static public function loadSiteInfo(bool $showNewSite) {
-		$info = DB::query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `sites`.`maintenance`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified`, `page`.`css` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
+		$info = DB::query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `sites`.`adminIP`, `sites`.`maintenance`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified`, `page`.`css` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
 			PATH,
 			BASEURL
 		]);
@@ -227,6 +230,7 @@ abstract class Phroses {
 			"adminURI" => $info->adminURI ?? "/admin",
 			"adminUsername" => $info->adminUsername,
 			"adminPassword" => $info->adminPassword,
+			"adminIP" => $info->adminIP,
 			"maintenance" => (bool)$info->maintenance
 		]);
 		
@@ -320,7 +324,7 @@ abstract class Phroses {
 			}
 		}
 
-		if(isset(self::$commands[$cmd])) self::$commands[$cmd]($args, $flags);
+		if(isset(self::$commands[$cmd])) self::$commands[$cmd]->execute($args, $flags);
 	}
 	
 	/**
@@ -330,8 +334,8 @@ abstract class Phroses {
 	 * @param string $cmd the name of the command
 	 * @param callable $handler the command handler
 	 */
-	static public function addCmd(string $cmd, callable $handler) {
-		self::$commands[$cmd] = $handler;
+	static public function addCmd(Command $command) {
+		self::$commands[$command->name] = $command;
 	}
 	
 	/**

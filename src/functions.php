@@ -216,31 +216,6 @@ function stripPhyrexFields(string $input): string {
     return preg_replace("/<{([a-z]+)(::((?!}>).)*)?}>/is", "", $input);
 }
 
-
-/**
- * Command line utility for asking a question and returning the response
- */
-function ask(string $output, ?array $valid = ['y','n',''], bool $addeol = false): string {
-    $done = false;
-
-    while(!$done) {
-        echo $output;
-        if($addeol) echo PHP_EOL;
-        $answer = strtolower(trim(fgets(STDIN)));
-        
-        if($valid) {
-            if(!in_array($answer, $valid)) {
-                echo "Invalid option '$answer'".PHP_EOL;
-                continue;
-            }
-        }
-        
-        break;
-    }
-
-    return $answer;
-}
-
 /**
  * Utility for checking to see if a string starts with another string
  * 
@@ -250,4 +225,11 @@ function ask(string $output, ?array $valid = ['y','n',''], bool $addeol = false)
  */
 function stringStartsWith(string $string, ?string $start): bool {
     return $start != null && substr($string, 0, strlen($start)) == $start;
+}
+
+/**
+ * Prints a string with a newline character at the end
+ */
+function println(string $string) {
+    echo $string.PHP_EOL;
 }
