@@ -43,14 +43,14 @@ self::addCmd(new class extends Command {
 	public $name = "email";
 
 	public function execute(array $args, array $flags) {
-		$data = file_get_contents($this->stream);
+		$data = stream_get_contents($this->stream);
 		$email = (new MailMimeParser())->parse((string) $data);
 
 		Events::trigger("email", [
 			$email->getHeaderValue('from'),
 			$email->getHeaderValue('to'),
 			$email->getHeaderValue('subject'),
-			$email->getTextContent() || $email->getHtmlContent()
+			$email->getTextContent() ?? $email->getHtmlContent()
 		]);
 	}
 });

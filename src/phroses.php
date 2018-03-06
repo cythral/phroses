@@ -195,7 +195,7 @@ abstract class Phroses {
 					$out->message = $e->getMessage();
 					echo $out;
 
-				} else println($out);
+				} else println($e->getMessage());
 			}
 		});
 	}
