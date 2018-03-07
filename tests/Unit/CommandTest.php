@@ -20,7 +20,7 @@ class CommandTest extends TestCase {
 
         (new class extends Command {
 
-            public function execute(array $args, array $flags) {
+            public function execute() {
                 $this->error("test");
             }
 
@@ -36,7 +36,7 @@ class CommandTest extends TestCase {
         
         $input = (new class extends Command {
 
-            public function execute(array $args, array $flags) {
+            public function execute() {
                 $this->stream = fopen("data:text/plain,".urlencode("test"), "r");
 
                 return $this->read("yes/no", null);
@@ -56,7 +56,7 @@ class CommandTest extends TestCase {
 
         $input = (new class extends Command {
 
-            public function execute(array $args, array $flags) {
+            public function execute() {
                 $this->stream = fopen("data:text/plain,".urlencode("a\ny"), "r");
                 return $this->read('Y/n');
             }

@@ -102,8 +102,11 @@ class Site {
      * @param int id the site id to generate an object for
      * @return Site a site object created based on data pulled from the db about the site id given
      */
-    static public function generate(int $id): ?Site {
-        $siteInfo = DB::query("SELECT * FROM `sites` WHERE `id`=?", [ $id ], PDO::FETCH_ASSOC)[0] ?? null;
+    static public function generate($id): ?Site {
+        $column = "url";
+        if(is_numeric($id)) $column = "id";
+
+        $siteInfo = DB::query("SELECT * FROM `sites` WHERE `{$column}`=?", [ $id ], PDO::FETCH_ASSOC)[0] ?? null;
         return ($siteInfo) ? new Site($siteInfo) : null;
     }
 

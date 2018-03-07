@@ -5,8 +5,11 @@
 
 namespace Phroses;
 
+use \PDO;
+use \phyrex\Template;
 use \listen\Events;
 use \ZBateson\MailMimeParser\MailMimeParser;
+use \Phroses\Exceptions\ExitException;
 
 /**
  * Turns application-wide maintenance mode off and on
@@ -14,12 +17,53 @@ use \ZBateson\MailMimeParser\MailMimeParser;
 self::addCmd(new class extends Command {
 	public $name = "maintenance";
 	
-	public function execute(array $args, array $flags) {
+	public function execute(?string $mode = null) {
 		$this->requireConfigFile();
 
-		if(isset($args["mode"])) {
-			Phroses::setMaintenance([ "on" => self::MM_ON, "off" => self::MM_OFF ][strtolower($args["mode"])]);
+		if($mode) {
+
+			if(isset($this->flags["site"])) {
+
+				if(!($site = Site::generate($this->flags["site"]))) {
+					$this->error("Could not find that site");
+				}
+
+				$site->maintenance = [ "on" => 1, "off" => 0 ][$mode];
+				println("Turned maintenance mode for ".$this->flags["site"]." {$mode}");
+				throw new ExitException(0);
+
+			} else {
+				
+				Phroses::setMaintenance([ "on" => Phroses::MM_ON, "off" => Phroses::MM_OFF ][strtolower($mode)]);
+				println("Turned global maintenance mode ".$mode);
+				throw new ExitException(0);
+			}
+
 		}
+
+		/** DISPLAY */
+		$sites = DB::query("SELECT `url`, `maintenance` FROM `sites`", [], PDO::FETCH_ASSOC);
+		
+		$minwidthURL = max(array_map(function($val) { return strlen($val); }, array_column($sites, "url")));
+		$minwidthMaintenance = 3;
+
+		echo PHP_EOL;
+		$mask = "| %-{$minwidthURL}s | %{$minwidthMaintenance}s |\n";
+		$top = sprintf($mask, "URL", "on");
+		
+		for($i = 1; $i < strlen($top); $i++) echo "-";
+		echo PHP_EOL.$top;
+		for($i = 1; $i < strlen($top); $i++) echo "-";
+		echo PHP_EOL;
+		
+		foreach($sites as $site) {
+			printf($mask, $site["url"], [ 0 => "no", 1 => "yes" ][$site["maintenance"]]);
+		}
+
+		for($i = 1; $i < strlen($top); $i++) { echo "-"; }
+		echo PHP_EOL;
+
+		println(PHP_EOL."Global maintenance mode is ".((file_exists(ROOT."/.maintenance")) ? "on" : "off").PHP_EOL);
 	}
 });
 
@@ -29,7 +73,7 @@ self::addCmd(new class extends Command {
 self::addCmd(new class extends Command {
 	public $name = "update";
 
-	public function execute(array $args, array $flags) {
+	public function execute() {
 		$this->requireConfigFile();
 		DB::update();
 	}
@@ -42,7 +86,7 @@ self::addCmd(new class extends Command {
 self::addCmd(new class extends Command {
 	public $name = "email";
 
-	public function execute(array $args, array $flags) {
+	public function execute() {
 		$data = stream_get_contents($this->stream);
 		$email = (new MailMimeParser())->parse((string) $data);
 
@@ -61,7 +105,7 @@ self::addCmd(new class extends Command {
 self::addCmd(new class extends Command {
 	public $name = "test";
 
-	public function execute(array $args, array $flags) {
+	public function execute() {
 		// will do more here later
 		echo "TEST OK";
 	}
@@ -73,7 +117,7 @@ self::addCmd(new class extends Command {
 self::addCmd(new class extends Command {
 	public $name = "reset";
 
-	public function execute(array $args, array $flags) {
+	public function execute() {
 		$this->requireConfigFile();
 		$answer = strtolower($this->read("Are you sure?  Doing this will reset the database, all data will be lost (Y/n): "));
 			
@@ -81,7 +125,10 @@ self::addCmd(new class extends Command {
 			$tpl = new Template(SRC."/schema/install.sql");
 			$tpl->schemaver = SCHEMAVER;
 
-			DB::unpreparedQuery($tpl);
+			if(!@DB::unpreparedQuery($tpl)) {
+				$this->error("There was an error resetting the database.");
+			}
+
 			println("The database has been successfully reset.");
 		}
 	}
@@ -93,7 +140,7 @@ self::addCmd(new class extends Command {
 self::addCmd(new class extends Command {
 	public $name = "restore";
 
-	public function execute(array $args, array $flags) {
+	public function execute() {
 		$this->requireConfigFile();
 
 		if(!@DB::unpreparedQuery(stream_get_contents($this->stream))) {
@@ -109,13 +156,15 @@ self::addCmd(new class extends Command {
  */
 self::addCmd(new class extends Command {
 	public $name = "version";
-	public function execute(array $args, array $flags) {
+
+	public function execute() {
 		$out = "Phroses ".VERSION;
 		if(defined("Phroses\BUILD_TIMESTAMP")) $out .= " (built: ".date('F j, Y @ H:i:s e', BUILD_TIMESTAMP).")";
 		$out .= " created by Cythral";
 
 		println($out);
 	}
+
 });
 
 return self::$commands; // return a list of commands for the listen event

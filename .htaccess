@@ -1,22 +1,26 @@
-php_value short_open_tag 1
-php_value display_errors 1
-php_value expose_php 0
-php_value error_reporting 6143
+<IfModule header>
+    header unset x-powered-by
+</IfModule>
 
-header unset x-powered-by
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteBase /
+    DirectorySlash off # needed for uris like /uploads to work when notrailingslashes = true
 
-RewriteEngine on
-RewriteBase /
-DirectorySlash off # needed for uris like /uploads to work when notrailingslashes = true
+    # Maintenance Mode -- 
+    RewriteCond %{DOCUMENT_ROOT}/.maintenance -f  
+    RewriteRule ^(.*)$ .maintenance [L]
 
-# Maintenance Mode -- 
-RewriteCond %{DOCUMENT_ROOT}/.maintenance -f  
-RewriteRule ^(.*)$ .maintenance [L]
+    # Developers Mode --
+    RewriteCond %{DOCUMENT_ROOT}/.developer -f
+    RewriteCond %{DOCUMENT_ROOT}/src/phroses.php -f
+    RewriteRule ^(.*)$ src/phroses.php [L] 
 
-# Developers Mode --
-RewriteCond %{DOCUMENT_ROOT}/.developer -f
-RewriteCond %{DOCUMENT_ROOT}/src/phroses.php -f
-RewriteRule ^(.*)$ src/phroses.php [L] 
+    # Production --
+    RewriteRule ^(.*)$ phroses.phar [L]
+</IfModule>
 
-# Production --
-RewriteRule ^(.*)$ phroses.phar [L]
+<IfModule !mod_rewrite.c>
+    DirectoryIndex phroses.phar?error=rewrite
+    ErrorDocument 404 /phroses.phar?error=rewrite
+</IfModule>

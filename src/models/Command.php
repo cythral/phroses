@@ -15,14 +15,14 @@ abstract class Command {
     /** @var resource $stream the stream resource to use for i/o */
     protected $stream = STDIN;
 
+    public $flags = [];
+
     /**
      * Executes the command
      * 
-     * @param array $args an array of arguments
-     * @param array $flags an array of --flags
      * @return mixed can be anything, up to the definer
      */
-    abstract public function execute(array $args, array $flags);
+    public function execute() {}
 
     /**
      * Reads command line input.  Also provides a way to accept only certain answers

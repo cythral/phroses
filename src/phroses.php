@@ -180,6 +180,11 @@ abstract class Phroses {
 			return false;
 		}
 
+		if(safeArrayValEquals($_REQUEST, "error", "rewrite")) {
+			self::$out->setCode(500);
+			die((string) new Template(INCLUDES["TPL"]."/errors/rewrite.tpl"));
+		}
+
 		return true;
 	}
 
@@ -316,15 +321,17 @@ abstract class Phroses {
 		$flags = [];
 
 		foreach($cliArgs as $part) {
-			if(substr($part, 0, 2) == "--") $flags[] = $part;
-			else {
-				$subparts = explode("=", $part);
-				if(count($subparts) > 1) $args[$subparts[0]] = $subparts[1];
-				else $args[$subparts[0]] = true;
-			}
+			if(substr($part, 0, 2) == "--") {
+				$val = true;
+				if(strpos($part, "=") !== false) $val = substr(strstr($part, "="), 1);
+				$flags[substr(strstr($part, "=", true), 2)] = $val;
+			} else $args[] = $part;
 		}
 
-		if(isset(self::$commands[$cmd])) self::$commands[$cmd]->execute($args, $flags);
+		if(isset(self::$commands[$cmd])) {
+			self::$commands[$cmd]->flags = $flags;
+			self::$commands[$cmd]->execute(...$args);
+		}
 	}
 	
 	/**
