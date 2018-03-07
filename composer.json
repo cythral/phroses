@@ -65,19 +65,10 @@
             "php tests/teardown.php"
         ],
 
-        "post-install-cmd": [
-            "@merge-aliases"
-        ],
+        "post-install-cmd": "@merge-aliases",
 
-        "post-update-cmd": [
-            "@merge-aliases"
-        ],
+        "post-update-cmd": "@merge-aliases",
 
-        "post-create-project-cmd": [
-            "mv dist/phroses.tar.gz /tmp/phroses.tar.gz",
-            "rm -rf $PWD/*",
-            "mv /tmp/phroses.tar.gz phroses.tar.gz",
-            "tar -zxvf phroses.tar.gz"
-        ]
+        "post-create-project-cmd": "./scripts/project.sh"
     }
 }
