@@ -1,16 +1,38 @@
+DROP TABLE IF EXISTS `options`;
+DROP TABLE IF EXISTS `pages`;
+DROP TABLE IF EXISTS `sites`;
+DROP TABLE IF EXISTS `sessions`;
+
+
 /******************************************
 OPTIONS TABLE
 *****************************************************/
-DROP TABLE IF EXISTS `options`;
+
 CREATE TABLE `options` (
   `key` varchar(50) NOT NULL PRIMARY KEY,
   `value` text NOT NULL  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /******************************************
+SITES TABLE
+*****************************************************/
+
+CREATE TABLE `sites` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `url` varchar(255) NOT NULL UNIQUE,
+  `theme` varchar(300) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `adminUsername` varchar(50) NOT NULL,
+  `adminPassword` char(60) NOT NULL,
+  `adminURI` varchar(800) DEFAULT '/admin' NOT NULL,
+  `adminIP` varchar(200) DEFAULT '*' NOT NULL,
+  `maintenance` BOOLEAN DEFAULT 0 NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+/******************************************
 PAGES TABLE
 *****************************************************/
-DROP TABLE IF EXISTS `pages`;
+
 CREATE TABLE `pages` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `siteID` bigint(20) unsigned NOT NULL,
@@ -32,26 +54,8 @@ CREATE TABLE `pages` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /******************************************
-SITES TABLE
-*****************************************************/
-DROP TABLE IF EXISTS `sites`;
-CREATE TABLE `sites` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `url` varchar(255) NOT NULL UNIQUE,
-  `theme` varchar(300) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `adminUsername` varchar(50) NOT NULL,
-  `adminPassword` char(60) NOT NULL,
-  `adminURI` varchar(800) DEFAULT '/admin' NOT NULL,
-  `adminIP` varchar(200) DEFAULT '*' NOT NULL,
-  `maintenance` BOOLEAN DEFAULT 0 NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-
-/******************************************
 SESSION TABLE
 *****************************************************/
-DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
   `id` VARCHAR(255) NOT NULL PRIMARY KEY,
   `data` longtext NOT NULL,
