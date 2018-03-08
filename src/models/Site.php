@@ -106,7 +106,7 @@ class Site {
         $column = "url";
         if(is_numeric($id)) $column = "id";
 
-        $siteInfo = DB::query("SELECT * FROM `sites` WHERE `{$column}`=?", [ $id ], PDO::FETCH_ASSOC)[0] ?? null;
+        $siteInfo = @DB::query("SELECT * FROM `sites` WHERE `{$column}`=?", [ $id ], PDO::FETCH_ASSOC)[0] ?? null;
         return ($siteInfo) ? new Site($siteInfo) : null;
     }
 

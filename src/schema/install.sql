@@ -13,7 +13,7 @@ SITES TABLE
 DROP TABLE IF EXISTS `sites`;
 CREATE TABLE `sites` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `url` varchar(1000) NOT NULL UNIQUE,
+  `url` varchar(255) NOT NULL UNIQUE,
   `theme` varchar(300) NOT NULL,
   `name` varchar(100) NOT NULL,
   `adminUsername` varchar(50) NOT NULL,
