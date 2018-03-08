@@ -8,6 +8,30 @@ CREATE TABLE `options` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /******************************************
+PAGES TABLE
+*****************************************************/
+DROP TABLE IF EXISTS `pages`;
+CREATE TABLE `pages` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `siteID` bigint(20) unsigned NOT NULL,
+  `dateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dateModified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `views` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `type` varchar(200) NOT NULL DEFAULT 'page',
+  `title` varchar(2000) NOT NULL,
+  `uri` varchar(255) NOT NULL,
+  `content` LONGTEXT NOT NULL,
+  `public` BOOLEAN DEFAULT TRUE NOT NULL,
+  `css` LONGTEXT NULL,
+
+  CONSTRAINT `pagesite_un` UNIQUE (`siteID`, `uri`),  
+  CONSTRAINT `pages_siteID_fk` 
+    FOREIGN KEY (`siteID`) REFERENCES `sites` (`id`)
+    ON DELETE CASCADE
+ 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+/******************************************
 SITES TABLE
 *****************************************************/
 DROP TABLE IF EXISTS `sites`;
@@ -23,37 +47,13 @@ CREATE TABLE `sites` (
   `maintenance` BOOLEAN DEFAULT 0 NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-/******************************************
-PAGES TABLE
-*****************************************************/
-DROP TABLE IF EXISTS `pages`;
-CREATE TABLE `pages` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `siteID` bigint(20) unsigned NOT NULL,
-  `dateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `dateModified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `views` bigint(20) unsigned NOT NULL DEFAULT 0,
-  `type` varchar(200) NOT NULL DEFAULT 'page',
-  `title` varchar(2000) NOT NULL,
-  `uri` varchar(800) NOT NULL,
-  `content` LONGTEXT NOT NULL,
-  `public` BOOLEAN DEFAULT TRUE NOT NULL,
-  `css` LONGTEXT NULL,
-
-  CONSTRAINT `pagesite_un` UNIQUE (`siteID`, `uri`),  
-  CONSTRAINT `pages_siteID_fk` 
-    FOREIGN KEY (`siteID`) REFERENCES `sites` (`id`)
-    ON DELETE CASCADE
- 
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 
 /******************************************
 SESSION TABLE
 *****************************************************/
 DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
-  `id` varchar(600) NOT NULL PRIMARY KEY,
+  `id` VARCHAR(255) NOT NULL PRIMARY KEY,
   `data` longtext NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

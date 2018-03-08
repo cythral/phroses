@@ -28,7 +28,8 @@ class ThemeTest extends TestCase {
      */
     public function testList() {
         DummyLoader::$list = [];
-        $this->assertArrayEquals(["bloom", "bloom2"], Theme::list());
+        $this->assertTrue(array_search("bloom", Theme::list()) !== false);
+        $this->assertTrue(array_search("bloom2", Theme::list()) !== false);
     }
 
     /**

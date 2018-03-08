@@ -106,7 +106,8 @@ class FolderLoaderTest extends TestCase {
     }
 
     public function testList() {
-        $this->assertArrayEquals(["bloom","bloom2"], FolderLoader::list());
+        $this->assertTrue(array_search("bloom", FolderLoader::list()) !== false);
+        $this->assertTrue(array_search("bloom2", FolderLoader::list()) !== false);
     }
 
     public function existsProvider() {
