@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS `options`;
 CREATE TABLE `options` (
   `key` varchar(50) NOT NULL PRIMARY KEY,
   `value` text NOT NULL  
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /******************************************
 SITES TABLE
@@ -21,7 +21,7 @@ CREATE TABLE `sites` (
   `adminURI` varchar(800) DEFAULT '/admin' NOT NULL,
   `adminIP` varchar(200) DEFAULT '*' NOT NULL,
   `maintenance` BOOLEAN DEFAULT 0 NOT NULL
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /******************************************
 PAGES TABLE
@@ -45,7 +45,7 @@ CREATE TABLE `pages` (
     FOREIGN KEY (`siteID`) REFERENCES `sites` (`id`)
     ON DELETE CASCADE
  
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 /******************************************
@@ -56,7 +56,7 @@ CREATE TABLE `sessions` (
   `id` varchar(600) NOT NULL PRIMARY KEY,
   `data` longtext NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /** SET DATABASE SCHEMA VERSION **/
 INSERT INTO `options` (`key`, `value`) VALUES (
