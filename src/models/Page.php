@@ -15,14 +15,11 @@ use \PDO;
 
 use const \reqc\{ MIME_TYPES };
 
-class Page {
-    private $data;
+class Page extends DataClass {
+    protected $tableName = "pages";
     private $oh;
-    
     public $theme;
-    public $useDB = true;
 
-    use \Phroses\Traits\UnpackOptions;
     const REQUIRED_OPTIONS = [
         "id",
         "type",
@@ -41,55 +38,23 @@ class Page {
      * @param array $options an array containing page data (see self::REQUIRED_OPTIONS for the required keys)
      * @param string $theme the name of the theme to use for displaying the page.  Defaults to the default theme name
      */
-    public function __construct(array $options, string $theme = Theme::DEFAULT) {
-        $options = array_change_key_case($options);
-        $this->unpackOptions($options, $this->data);
-
-        $this->data = $options;
+    public function __construct(array $options, string $theme = Theme::DEFAULT, $db = "Phroses\DB") {
+        parent::__construct($options, $db);
         $this->oh = new Output();
         $this->theme = new Theme($theme, $this->type);
     }
 
-    /**
-     * Getter, gets a page data variable
-     */
-    public function __get($key) {
-        if(!array_key_exists($key, $this->data)) {
-            $this->data[$key] = DB::query("SELECT `$key` FROM `pages` WHERE `id`=:id", [ ":id" => $this->id ])[0]->{$key};
-        }
-
-        return $this->data[$key] ?? null;
+    private function setType(string $type) {
+        $this->theme->setType($type, true);
+        return $type;
     }
 
-    /**
-     * Setter, sets a page data variable.  Updates the database
-     * if the page id is not empty.
-     */
-    public function __set($key, $val) {
-        if($this->id && $this->useDB) DB::query("UPDATE `pages` SET `$key`=? WHERE `id`=?", [$val, $this->id]);
-        
-        if($key == "type") $this->theme->setType($val, true);
-        if($key == "content") {
-            if(is_string($val)) $val = json_decode($val, true);
-            $this->theme->setContent($val);
-        }
-
-        $this->data[$key] = $val;
-        return true;
+    private function setContent($val) {
+        if(is_string($val)) $val = json_decode($val, true);
+        $this->theme->setContent($val);
+        return $val;
     }
 
-    /**
-     * Gets all data about a page
-     * 
-     * @return array $data an array of page data
-     */
-    public function getData(): array {
-        return $this->data;
-    }
-
-    public function getCSS(): ?string {
-        return DB::query("SELECT `css` FROM `pages` WHERE `id`=?", [ $this->id ])[0];
-    }
     /**
      * Sets the page's theme
      * 
@@ -120,15 +85,6 @@ class Page {
         }
     }
 
-    /**
-     * Deletes a page if the id is not empty
-     * 
-     * @return bool true on success, false on failure
-     */
-    public function delete(): bool {
-        if(!($this->id && $this->useDB)) return false;
-        return DB::affected("DELETE FROM `pages` WHERE `id`=:id", [ ":id" => $this->id ]) > 0;
-    }
 
     /**
      * Creates a page if it does not exist

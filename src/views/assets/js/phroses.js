@@ -21043,7 +21043,7 @@ if(!$("#phr-admin-page").val()) {
     Phroses.utils.formify({
         selector : "#phroses_site_creds",
         success : function() {
-            Phroses.displaySaved();
+            Phroses.utils.displaySaved();
             $("#phroses_site_creds input:not([name='username'])").val('');
         },
         failure: function(data) {

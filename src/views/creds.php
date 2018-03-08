@@ -1,11 +1,11 @@
 <?php
 
 use \Phroses\Phroses;
-use phyrex\Template;
-use Phroses\DB;
-use inix\Config as inix;
-use function Phroses\{ handleMethod, mapError };
-use const Phroses\{ SITE, INCLUDES };
+use \phyrex\Template;
+use \Phroses\DB;
+use \inix\Config as inix;
+use function \Phroses\{ handleMethod, mapError };
+use const \Phroses\{ SITE, INCLUDES };
 
 handleMethod("post", function($out) use (&$site) {
     

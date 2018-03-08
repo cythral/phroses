@@ -7,11 +7,9 @@ namespace Phroses;
 use \PDO;
 use \inix\Config as inix;
 
-class Site {
-    private $data = [];
-    public $useDB = true;
-
-    use \Phroses\Traits\UnpackOptions;
+class Site extends DataClass {
+    protected $tableName = "sites";
+    
     const REQUIRED_OPTIONS = [
         "id",
         "name",
@@ -23,49 +21,8 @@ class Site {
         "maintenance"
     ];
 
-    /**
-     * Creates a site object
-     * 
-     * @param array $data the site data to use
-     */
-    public function __construct(array $data) {
-        $this->unpackOptions($data, $this->data);
-    }
-
-    /**
-     * Getter for the data property
-     * 
-     * @return array $data all site data
-     */
-    public function getData(): array {
-        return $this->data;
-    }
-
-    /**
-     * Getter for site data fields
-     */
-    public function __get($key) {
-        return $this->data[$key] ?? null;
-    }
-
-    /**
-     * Setter for site data fields
-     */
-    public function __set($key, $val) {
-        if($key == "adminPassword") $val = password_hash(inix::get("pepper").$val, PASSWORD_DEFAULT);
-        if($this->id && $this->useDB) DB::query("UPDATE `sites` SET `$key`=? WHERE `id`=?", [ $val, $this->id ]);
-
-        $this->data[$key] = $val;
-    }
-
-    /**
-     * Deletes the site
-     *
-     * @return boolean true on success and false on failure
-     */
-    public function delete(): bool {
-        if(!($this->id && $this->useDB)) return false;
-        return DB::affected("DELETE FROM `sites` WHERE `id`=:id", [ ":id" => $this->id ]) > 0;
+    public function setAdminPassword($password) {
+        return password_hash(inix::get("pepper").$password, PASSWORD_DEFAULT);
     }
 
     /**

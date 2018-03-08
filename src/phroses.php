@@ -98,7 +98,7 @@ abstract class Phroses {
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		self::$configFileLoaded = Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
 		Events::attach("modeset", [ (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
-		Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
+		// /Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 
 		// page or asset
 		if(TYPE != TYPES["CLI"] && self::$configFileLoaded) {
