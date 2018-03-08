@@ -21,7 +21,8 @@
         "cythral/inix": "^0.1.1",
         "cythral/listen": "^0.1.0",
         "zbateson/mail-mime-parser": "^0.4.8",
-        "composer-plugin-api": "^1.0"
+        "composer-plugin-api": "^1.0",
+        "phplucidframe/console-table": "^1.2"
     },
 
     "require-dev": {

@@ -311,22 +311,14 @@ abstract class Phroses {
 	 */
 	static public function executeCommand(array $cliArgs) {
 		array_shift($cliArgs); // remove filename
+		
 		if(count($cliArgs) == 0) {
-			echo "no command given";
-			exit(1);
+			println("no command given");
+			throw new ExitException(1);
 		}
 
 		$cmd = array_shift($cliArgs);
-		$args = [];
-		$flags = [];
-
-		foreach($cliArgs as $part) {
-			if(substr($part, 0, 2) == "--") {
-				$val = true;
-				if(strpos($part, "=") !== false) $val = substr(strstr($part, "="), 1);
-				$flags[substr(strstr($part, "=", true), 2)] = $val;
-			} else $args[] = $part;
-		}
+		[ "args" => $args, "flags" => $flags] = parseCliArgs($cliArgs);
 
 		if(isset(self::$commands[$cmd])) {
 			self::$commands[$cmd]->flags = $flags;

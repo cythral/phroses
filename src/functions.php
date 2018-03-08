@@ -233,3 +233,23 @@ function stringStartsWith(string $string, ?string $start): bool {
 function println(string $string) {
     echo $string.PHP_EOL;
 }
+
+/**
+ * Takes an array of arguments/flags and parses them into two arrays,
+ * args and flags.  Flags are parsed into flag => value.  If no value was
+ * specified it will default to true.
+ */
+function parseCliArgs(array $argsArray) {
+    $flags = [];
+    $args = [];
+
+    foreach($argsArray as $part) {
+        if(substr($part, 0, 2) == "--") {
+            $val = true;
+            if(strpos($part, "=") !== false) $val = substr(strstr($part, "="), 1);
+            $flags[substr(strstr($part, "=", true), 2)] = $val;
+        } else $args[] = $part;
+    }
+
+    return [ "args" => $args, "flags" => $flags ];
+}
