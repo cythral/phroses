@@ -1,6 +1,6 @@
 <?php
 
-namespace Phroses\Testing\Integration;
+namespace Phroses\Testing\Theme;
 
 use \Phroses\Testing\TestCase;
 use \Phroses\Theme\Loaders\FolderLoader;

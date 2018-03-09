@@ -23,7 +23,8 @@ define("Phroses\INCLUDES", [ // location of various files that are included
 	"VIEWS" => SRC."/views",
 	"TPL" => SRC."/templates",
 	"PLUGINS" => ROOT."/plugins",
-	"UPLOADS" => ROOT."/uploads"
+	"UPLOADS" => ROOT."/uploads",
+	"TESTS" => ROOT."/tests"
 ]);
 
 define("Phroses\IMPORTANT_FILES", [ // important files to backup during upgrades

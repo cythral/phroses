@@ -61,15 +61,9 @@
         "build": "./scripts/build.sh",
         "dev-setup": "./scripts/dev-setup.sh",
         "merge-aliases": "echo $(cat package.json config/aliases.json | json --merge) > package.json",
-        "test": [
-            "phpunit -v",
-            "php tests/teardown.php"
-        ],
-
+        "test": "phpunit -v",
         "post-install-cmd": "@merge-aliases",
-
         "post-update-cmd": "@merge-aliases",
-
         "post-create-project-cmd": "./scripts/project.sh"
     }
 }

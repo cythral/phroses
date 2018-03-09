@@ -1,12 +1,12 @@
 <?php
+
+namespace Phroses\Testing;
+
+use \Phroses\Email;
+
 /**
  * @covers \Phroses\Email
  */
-
-
-use \Phroses\Testing\TestCase;
-use \Phroses\Email;
-
 class EmailTest extends TestCase {
 
     /**

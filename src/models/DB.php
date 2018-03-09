@@ -24,7 +24,7 @@ abstract class DB {
 	static public function setup() {
 		if(self::$setup) return; // only run once
 
-		$conf = inix::get("database");
+		$conf = (defined("Phroses\TESTING") && inix::get("test-database")) ? inix::get("test-database") : inix::get("database");
 		self::$db = new PDO("mysql:host=".$conf["host"].";dbname=".$conf["name"], $conf["user"], $conf["password"]);
 
 		$versions = self::$db->query("select version() AS `dbver`, `value` AS `sver` FROM `options` WHERE `key`='schemaver'")->fetchAll(PDO::FETCH_OBJ)[0];
@@ -53,6 +53,18 @@ abstract class DB {
 	 */
 	static public function query(string $query, array $values, int $fetchStyle = PDO::FETCH_OBJ): array {		
 		return self::prepare($query, $values)->fetchAll($fetchStyle);
+	}
+
+	/**
+	 * Fetches a column from the query
+	 * 
+	 * @param string $query the sql query to execute
+	 * @param array $values an array of values to bind
+	 * @param int $column the column to fetch
+	 * @return mixed the value of the colum
+	 */
+	static public function column(string $query, array $values, int $column = 0) {
+		return self::prepare($query, $values)->fetchColumn($column);
 	}
 
 	/**
@@ -106,8 +118,6 @@ abstract class DB {
 			self::unpreparedQuery(file_get_contents(SRC."/schema/update-".++self::$schemaVersion.".sql"));
 		}
 	}
-
-	
 }
 
-DB::setup(); // setup immediately
+DB::setup();

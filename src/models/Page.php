@@ -16,10 +16,16 @@ use \PDO;
 use const \reqc\{ MIME_TYPES };
 
 class Page extends DataClass {
-    protected $tableName = "pages";
+    /** @var string the name of the table in the database this class corresponds to */
+    static protected $tableName = "pages";
+
+    /** @var \reqc\Output the output handler */
     private $oh;
+
+    /** @var \Phroses\Theme the theme to use for displaying the page */
     public $theme;
 
+    /** @var array required options to be passed to the constructor */
     const REQUIRED_OPTIONS = [
         "id",
         "type",
@@ -44,12 +50,24 @@ class Page extends DataClass {
         $this->theme = new Theme($theme, $this->type);
     }
 
-    private function setType(string $type) {
+    /**
+     * Setter for type, reloads the theme with the new type
+     * 
+     * @param string $type the new type to use
+     * @return string the new type
+     */
+    private function setType(string $type): string {
         $this->theme->setType($type, true);
         return $type;
     }
 
-    private function setContent($val) {
+    /**
+     * Setter for content, reloads the theme with new content
+     * 
+     * @param string|array $val the new content to use
+     * @return array the new content
+     */
+    private function setContent($val): array {
         if(is_string($val)) $val = json_decode($val, true);
         $this->theme->setContent($val);
         return $val;
@@ -70,8 +88,9 @@ class Page extends DataClass {
      * content is displayed on the page.
      * 
      * @param array $content an array of content variables
+     * @return void
      */
-    public function display(?array $content = null) {
+    public function display(?array $content = null): void {
         ob_start("ob_gzhandler");
         $this->oh->setContentType(MIME_TYPES["HTML"]); 
 
@@ -85,7 +104,6 @@ class Page extends DataClass {
         }
     }
 
-
     /**
      * Creates a page if it does not exist
      * 
@@ -98,15 +116,16 @@ class Page extends DataClass {
      * @return Page the created page
      */
     static public function create(string $path, string $title, string $type, string $content = "{}", int $siteId, string $theme = Theme::DEFAULT): Page {
-        DB::query("INSERT INTO `pages` (`uri`,`title`,`type`,`content`, `siteID`,`dateCreated`) VALUES (?, ?, ?, ?, ?, NOW())", [
-            $path,
-            $title,
-            $type,
-            $content,
-            $siteId
-        ]);
+        $page = new Page([
+            "id" => null,
+            "uri" => $path,
+            "title" => $title,
+            "type" => $type,
+            "content" => $content,
+            "siteID" => $siteId
+        ], $theme);
 
-        return self::generate(DB::lastID(), $theme);
+        return ($page->persist() && $page->exists()) ? $page : null;
     }
 
     /**
@@ -117,7 +136,6 @@ class Page extends DataClass {
      * @return Page|null the page object that was created or null if it doesn't exist.
      */
     static public function generate(int $id, string $theme = Theme::DEFAULT): ?Page {
-        $pageData = DB::query("SELECT * FROM `pages` WHERE `id`=?", [ $id ], PDO::FETCH_ASSOC)[0] ?? null;
-        return ($pageData) ? new Page($pageData, $theme) : null;
+       return self::lookup($id, "id", [ $theme ]);
     }
 }

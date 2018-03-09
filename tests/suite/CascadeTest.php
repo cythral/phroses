@@ -1,12 +1,13 @@
 <?php
-/**
- * Unit testing for the Cascade class
- * @covers \Phroses\Cascade
- */
+
 
 use Phroses\Cascade;
 use Phroses\Testing\TestCase;
 
+/**
+ * Unit testing for the Cascade class
+ * @covers \Phroses\Cascade
+ */
 class CascadeTest extends TestCase {
     
     /**

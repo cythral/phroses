@@ -8,7 +8,7 @@ use \PDO;
 use \inix\Config as inix;
 
 class Site extends DataClass {
-    protected $tableName = "sites";
+    static protected $tableName = "sites";
     
     const REQUIRED_OPTIONS = [
         "id",
@@ -35,36 +35,34 @@ class Site extends DataClass {
      * @param string $adminUsername the username that is used to login to the dashboard
      * @param string $adminPassword the password that is used to login to the dashboard
      * @param bool $maintenance whether or not to put it into maintenance mode (defaults to false)
-     * @return Site the created site
+     * @return Site the created site or null on failure
      */
     static public function create(string $name, string $url, string $theme, string $adminUri, string $adminUsername, string $adminPassword, bool $maintenance = false): ?Site {
-        $adminPassword = password_hash(inix::get("pepper").$adminPassword, PASSWORD_DEFAULT);
-
-        DB::query("INSERT INTO `sites` (`name`, `url`, `theme`, `adminURI`, `adminUsername`, `adminPassword`, `maintenance`) VALUES (?, ?, ?, ?, ?, ?, ?)", [
-            $name,
-            $url,
-            $theme,
-            $adminUri, 
-            $adminUsername,
-            $adminPassword,
-            (int)$maintenance
+        $site = new Site([
+            "id" => null,
+            "name" => $name,
+            "url" => $url,
+            "theme" => $theme,
+            "adminUri" => $adminUri,
+            "adminUsername" => $adminUsername,
+            "adminPassword" => password_hash(inix::get("pepper").$adminPassword, PASSWORD_DEFAULT),
+            "maintenance" => (int)$maintenance
         ]);
 
-        return self::generate(DB::lastID());
+        return ($site->persist() && $site->exists()) ? $site : null;
     }
 
     /**
-     * Generates a site object based on id
+     * Generates a site object based on lookup key
      * 
-     * @param int id the site id to generate an object for
+     * @param int|string $lookup the site id or url to generate an object for
      * @return Site a site object created based on data pulled from the db about the site id given
      */
-    static public function generate($id): ?Site {
+    static public function generate($lookup): ?Site {
         $column = "url";
-        if(is_numeric($id)) $column = "id";
+        if(is_numeric($lookup)) $column = "id";
 
-        $siteInfo = @DB::query("SELECT * FROM `sites` WHERE `{$column}`=?", [ $id ], PDO::FETCH_ASSOC)[0] ?? null;
-        return ($siteInfo) ? new Site($siteInfo) : null;
+       return self::lookup($lookup, $column);
     }
 
     /**
@@ -72,12 +70,12 @@ class Site extends DataClass {
      * 
      * @return array an array containing items that are id => url
      */
-    static public function list(): array {
+    static public function list($db = self::DEFAULT_DB): array {
         return array_map(
             function($val) { 
                 return $val[0]; 
             }, 
-            DB::query("SELECT `id`,`url` FROM `sites`", [], PDO::FETCH_COLUMN|PDO::FETCH_GROUP)
+            $db::query("SELECT `id`,`url` FROM `sites`", [], PDO::FETCH_COLUMN|PDO::FETCH_GROUP)
         );
     }
 }

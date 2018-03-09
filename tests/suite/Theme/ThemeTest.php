@@ -1,13 +1,6 @@
 <?php
 
-/**
- * This test case tests various functions of the theme class, using
- * the bloom theme in particular.
- * 
- * @covers Phroses\Theme\Theme
- */
-
-namespace Phroses\Testing\Integration;
+namespace Phroses\Testing\Theme;
 
 use \Phroses\Testing\TestCase;
 use \Phroses\Theme\Theme;
@@ -19,6 +12,12 @@ use \Phroses\Exceptions\ExitException;
 use function \Phroses\{ getIncludeOutput, getTagContents, trueArrayKeys, stripPhyrexFields };
 use const \Phroses\{ INCLUDES };
 
+/**
+ * This test case tests various functions of the theme class, using
+ * the bloom theme in particular.
+ * 
+ * @covers Phroses\Theme\Theme
+ */
 class ThemeTest extends TestCase {
 
     /**

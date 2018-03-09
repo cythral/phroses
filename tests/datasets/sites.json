@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "url": "phroses.dev",
+        "theme": "bloom",
+        "name": "phroses",
+        "adminURI": "/admin",
+        "adminUsername": "root",
+        "adminPassword": "{password}",
+        "maintenance" : 0
+    }
+]

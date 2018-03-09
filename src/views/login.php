@@ -11,7 +11,7 @@ if($_SESSION) $out->redirect("/admin");
 
 handleMethod("POST", function($out) use (&$site) {
     // generate pepper if its not there
-    if(inix::get("pepper") == null) {
+    if(!inix::get("pepper")) {
         inix::set("pepper", bin2hex(openssl_random_pseudo_bytes(10)));
     }
 

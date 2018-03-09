@@ -1,13 +1,13 @@
 <?php
-/**
- * @covers \Phroses\Command
- */
 
 namespace Phroses\Testing;
 
 use \Phroses\Command;
 use \Phroses\Exceptions\ExitException;
 
+/**
+ * @covers \Phroses\Command
+ */
 class CommandTest extends TestCase {
 
     /**
@@ -48,7 +48,7 @@ class CommandTest extends TestCase {
     }
 
     /**
-     * Tests read while setting valid options
+     * Tests read while setting valid options.  Simulates entering 'a' and then 'y'
      * @covers \Phroses\Command::read
      */
     public function testReadWithValid() {

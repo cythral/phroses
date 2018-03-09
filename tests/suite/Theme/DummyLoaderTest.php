@@ -1,6 +1,8 @@
 <?php
 
-use \PHPUnit\Framework\TestCase;
+namespace Phroses\Testing\Theme;
+
+use \Phroses\Testing\TestCase;
 use \Phroses\Theme\Loaders\DummyLoader;
 
 class DummyLoaderTest extends TestCase {
