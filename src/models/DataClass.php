@@ -36,8 +36,11 @@ abstract class DataClass {
      * @return mixed the value of the property/column
      */
     public function __get(string $key) {
-        $table = get_called_class()::$tableName;
+        if(method_exists($this, "get{$key}")) {
+            return $this->{"get{$key}"}();
+        }
 
+        $table = get_called_class()::$tableName;
         return $this->data[$key] ?? 
             ($this->data[$key] = $this->db::query("SELECT `{$key}` FROM `{$table}` WHERE `id`=:id", [ ":id" => $this->data["id"] ])[0]->{$key} ?? null);
     }

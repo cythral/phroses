@@ -25,6 +25,15 @@ class Site extends DataClass {
         return password_hash(inix::get("pepper").$password, PASSWORD_DEFAULT);
     }
 
+    protected function getPages(): array {
+        $pages = $this->db::query("SELECT * FROM `pages` WHERE `siteID`=:id", [ ":id" => $this->id ], PDO::FETCH_ASSOC);
+        return array_map((function($pagedata) { return new Page($pagedata); })->bindTo($this), $pages);
+    }
+
+    protected function setPages() {
+        throw new \Exception("Pages is a readonly property");
+    }
+
     /**
      * Validates a user provided username and password against the sites login info
      * 

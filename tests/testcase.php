@@ -9,6 +9,16 @@ class TestCase extends \PHPUnit\Framework\TestCase {
         $this->assertEquals($expected, $actual, "\$canonicalize = true", $delta = 0.0, $maxDepth = 10, $canonicalize = true);
     }
 
+    public function assertArrayType(array $array, $type) {
+        $consistent = true;
+    
+        foreach($array as $key => $value) {
+            if(!($value instanceof $type)) $consistent = false;
+        }
+
+        $this->assertTrue($consistent);
+    }
+
     protected function getDatabase() {
         return include \Phroses\INCLUDES["TESTS"]."/database.php";
     }

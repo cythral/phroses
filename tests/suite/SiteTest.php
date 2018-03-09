@@ -2,8 +2,10 @@
 
 namespace Phroses\Testing;
 
+use \Phroses\Page;
 use \Phroses\Site;
 use \inix\Config as inix;
+
 
 /**
  * @covers \Phroses\Site
@@ -18,7 +20,9 @@ class SiteTest extends TestCase {
         $dataset = file_get_contents(\Phroses\INCLUDES["TESTS"]."/datasets/sites.json");
         $dataset = str_replace("{password}", inix::get("test-password.hash"), $dataset);
         $this->dataset = json_decode($dataset);
+
         $this->insertDataset("sites", $this->dataset);
+        $this->insertDataset("pages", json_decode(file_get_contents(\Phroses\INCLUDES["TESTS"]."/datasets/pages.json")));
     }
 
     /**
@@ -109,6 +113,7 @@ class SiteTest extends TestCase {
      * Login should work good with username and password from the dataset
      * 
      * @depends testGenerateValidId
+     * @covers \Phroses\Site::login
      */
     public function testLoginSuccess() {
         $site = Site::generate(1);
@@ -122,6 +127,7 @@ class SiteTest extends TestCase {
      * Login should fail, bad password given
      * 
      * @depends testGenerateValidId
+     * @covers \Phroses\Site::login
      */
     public function testLoginFailure() {
         $site = Site::generate(1);
@@ -129,5 +135,28 @@ class SiteTest extends TestCase {
         $password = "thisisabadpassword1234";
 
         $this->assertFalse($site->login($username, $password));
+    }
+
+    /**
+     * The getter for the pages property should return an array
+     * of only \Phroses\Page objects
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getPages
+     */
+    public function testGetPagesReturnValue() {
+        $this->assertArrayType(Site::generate(1)->pages, Page::class);
+    }
+
+    /**
+     * The setter for the pages property should always throw an exception,
+     * pages is readonly
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::setPages
+     */
+    public function testSetPagesException() {
+        $this->expectException(\Exception::class);
+        Site::generate(1)->pages = [];
     }
 }
