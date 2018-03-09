@@ -26,7 +26,7 @@ handleMethod("post", function($out) {
         $installer->installSchema(SRC."/schema/install.sql", SCHEMAVER);
         $installer->setupConfFile(SRC."/phroses.conf", ROOT."/phroses.conf", [
             "mode" => (INPHAR) ? "production" : "development",
-            "pepper" => bin2hex(openssl_random_pseudo_bytes(10))
+            "pepper" => bin2hex(random_bytes(10))
         ]);
 
         $out->send(["type" => "success"], 200);

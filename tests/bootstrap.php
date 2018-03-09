@@ -12,7 +12,8 @@ include SRC."/functions.php";
 
 use inix\Config as inix;
 inix::load(ROOT."/phroses.conf");
-@inix::set("test-password", password_hash(inix::get("pepper").bin2hex(openssl_random_pseudo_bytes(12)), PASSWORD_DEFAULT));
+@inix::set("test-password.text", bin2hex(random_bytes(12)));
+@inix::set("test-password.hash", password_hash(inix::get("pepper").inix::get("test-password.text"), PASSWORD_DEFAULT));
 
 // include testcase
 include INCLUDES["TESTS"]."/testcase.php";

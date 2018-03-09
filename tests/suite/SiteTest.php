@@ -16,7 +16,7 @@ class SiteTest extends TestCase {
     public function setUp() {
         $this->db = $this->getDatabase();
         $dataset = file_get_contents(\Phroses\INCLUDES["TESTS"]."/datasets/sites.json");
-        $dataset = str_replace("{password}", inix::get("test-password"), $dataset);
+        $dataset = str_replace("{password}", inix::get("test-password.hash"), $dataset);
         $this->dataset = json_decode($dataset);
         $this->insertDataset("sites", $this->dataset);
     }
@@ -103,5 +103,31 @@ class SiteTest extends TestCase {
      */
     public function testList() {
         $this->assertEquals([ 1 => "phroses.dev" ], Site::list());
+    }
+
+    /**
+     * Login should work good with username and password from the dataset
+     * 
+     * @depends testGenerateValidId
+     */
+    public function testLoginSuccess() {
+        $site = Site::generate(1);
+        $username = $this->dataset[0]->adminUsername;
+        $password = inix::get("test-password.text");
+
+        $this->assertTrue($site->login($username, $password));
+    }
+
+    /**
+     * Login should fail, bad password given
+     * 
+     * @depends testGenerateValidId
+     */
+    public function testLoginFailure() {
+        $site = Site::generate(1);
+        $username = $this->dataset[0]->adminUsername;
+        $password = "thisisabadpassword1234";
+
+        $this->assertFalse($site->login($username, $password));
     }
 }

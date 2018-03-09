@@ -10,23 +10,12 @@ use const \Phroses\{ SITE, INCLUDES };
 if($_SESSION) $out->redirect("/admin");
 
 handleMethod("POST", function($out) use (&$site) {
-    // generate pepper if its not there
-    if(!inix::get("pepper")) {
-        inix::set("pepper", bin2hex(openssl_random_pseudo_bytes(10)));
+    if(!$site->login($_POST["username"], $_POST["password"])) {
+        $out->send(["type" => "error"], 401);
     }
 
-    if(password_verify($_POST["password"], $site->adminPassword)) {
-        DB::Query("UPDATE `sites` SET `adminPassword`=? WHERE `id`=?", [ password_hash(inix::get("pepper").$_POST["password"], PASSWORD_DEFAULT), $site->id ]);
-        $_SESSION["live"] = "true";
-        $out->send(["type" => "success"], 200);
-
-    } else if(password_verify(inix::get("pepper").$_POST["password"], $site->adminPassword) && $_POST["username"] == $site->adminUsername) {
-        $_SESSION["live"] = "true";
-        $out->send(["type" => "success"], 200);
-    }
-
-    $out->send(["type" => "error"], 401);
-
+    $_SESSION["live"] = "true";
+    $out->send(["type" => "success"], 200);
 });
 
 

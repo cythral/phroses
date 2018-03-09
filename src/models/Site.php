@@ -21,8 +21,27 @@ class Site extends DataClass {
         "maintenance"
     ];
 
-    public function setAdminPassword($password) {
+    protected function setAdminPassword($password) {
         return password_hash(inix::get("pepper").$password, PASSWORD_DEFAULT);
+    }
+
+    /**
+     * Validates a user provided username and password against the sites login info
+     * 
+     * @param string $username the username to check
+     * @param string $password the password to check
+     * @return bool true if username / password combo is ok, false if not
+     */
+    public function login(string $username, string $password): bool {
+        if($username == $this->adminUsername && password_verify(inix::get("pepper").$password, $this->adminPassword)) {
+            if(password_needs_rehash($this->adminPassword, PASSWORD_DEFAULT)) {
+                $this->adminPassword = $password;
+            }
+            
+            return true;
+        }
+
+        return false;
     }
 
     /**
