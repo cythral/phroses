@@ -54,16 +54,16 @@ after_success:
   # push dist file
   - mkdir -p dist
   - cp phroses.tar.gz dist/phroses.tar.gz
-  - git config --global user.email "travis@travis-ci.org"
-  - git config --global user.name "Travis CI"
-  - git remote add origin-pushable https://${GH_TOKEN}@github.com/cythral/phroses.git > /dev/null 2>&1
-  - git checkout ${TRAVIS_BRANCH}
-  - git pull origin-pushable
-  - git lfs install
-  - git lfs track "*.tar.gz"
-  - git add dist/phroses.tar.gz
-  - git commit -m "BUILD $TRAVIS_BUILD_NUMBER [skip ci]" 
-  - git push --quiet --set-upstream origin-pushable ${TRAVIS_BRANCH}
+  - sudo git config --global user.email "travis@travis-ci.org"
+  - sudo git config --global user.name "Travis CI"
+  - sudo git remote add origin-pushable https://${GH_TOKEN}@github.com/cythral/phroses.git > /dev/null 2>&1
+  - sudo git checkout ${TRAVIS_BRANCH}
+  - sudo git pull origin-pushable
+  - sudo git lfs install
+  - sudo git lfs track "*.tar.gz"
+  - sudo git add dist/phroses.tar.gz
+  - sudo git commit -m "BUILD $TRAVIS_BUILD_NUMBER [skip ci]" 
+  - sudo git push --quiet --set-upstream origin-pushable ${TRAVIS_BRANCH}
 
 
 after_failure:
