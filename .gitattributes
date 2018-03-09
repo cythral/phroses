@@ -4,3 +4,4 @@ config export-ignore
 .gitignore export-ignore
 .gitattributes export-ignore
 phpunit.xml export-ignore
+*.tar.gz filter=lfs diff=lfs merge=lfs -text
