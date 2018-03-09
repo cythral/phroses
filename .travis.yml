@@ -6,9 +6,6 @@ php:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq postfix
-
-  - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-  - sudo apt-get install git-lfs
   
 before_script: 
   # setup config
@@ -50,20 +47,6 @@ after_success:
   - wget https://raw.githubusercontent.com/snkrsnkampa/travis-ci-discord-webhook/master/send.sh
   - chmod +x send.sh
   - ./send.sh success
-
-  # push dist file
-  - mkdir -p dist
-  - cp phroses.tar.gz dist/phroses.tar.gz
-  - sudo git config --global user.email "travis@travis-ci.org"
-  - sudo git config --global user.name "Travis CI"
-  - sudo git remote add origin-pushable https://${GH_TOKEN}@github.com/cythral/phroses.git > /dev/null 2>&1
-  - sudo git checkout ${TRAVIS_BRANCH}
-  - sudo git pull origin-pushable
-  - sudo git lfs install
-  - sudo git lfs track "*.tar.gz"
-  - sudo git add dist/phroses.tar.gz
-  - sudo git commit -m "BUILD $TRAVIS_BUILD_NUMBER [skip ci]" 
-  - sudo git push --quiet --set-upstream origin-pushable ${TRAVIS_BRANCH}
 
 
 after_failure:
