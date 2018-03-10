@@ -6,25 +6,27 @@ use Phroses\DB;
 use const Phroses\{ SITE, INCLUDES };
 use const reqc\{ BASEURL };
 
-$q = DB::query("SELECT * FROM `pages` WHERE `siteID`=?", [ $site->id ]);
+$pageslist = $site->pages;
 
-$pages = new Template(INCLUDES["TPL"]."/admin/pages.tpl");
+$pagesview = new Template(INCLUDES["TPL"]."/admin/pages.tpl");
 
-if(count($q) == 0) $pages->empty = "<em>No pages for ".BASEURL."</em>";
+if(count($pageslist) == 0) {
+    $pagesview->empty = "<em>No pages for ".BASEURL."</em>";
+}
 
-foreach($q as $p) {
+foreach($pageslist as $item) {
     ob_start();
     
     foreach($page->theme->GetTypes() as $type) {
-        ?><option <?= ($type == "redirect") ? "disabled" : ""; ?> <?= ($type == $p->type) ? "selected" : ""; ?>><?= $type; ?></option><?
+        ?><option <?= ($type == "redirect") ? "disabled" : ""; ?> <?= ($type == $item->type) ? "selected" : ""; ?>><?= $type; ?></option><?php
     } 
     
-    $pages->push("pages", [ 
-        "uri" => $p->uri, 
-        "id" => $p->id, 
-        "title" => $p->title,
+    $pagesview->push("pages", [ 
+        "uri" => $item->uri, 
+        "id" => $item->id, 
+        "title" => $item->title,
         "types" => trim(ob_get_clean())
     ]);
 }
 
-echo $pages;
+echo $pagesview;

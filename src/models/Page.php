@@ -56,7 +56,7 @@ class Page extends DataClass {
      * @param string $type the new type to use
      * @return string the new type
      */
-    private function setType(string $type): string {
+    protected function setType(string $type): string {
         $this->theme->setType($type, true);
         return $type;
     }
@@ -67,10 +67,11 @@ class Page extends DataClass {
      * @param string|array $val the new content to use
      * @return array the new content
      */
-    private function setContent($val): array {
+    protected function setContent($val): string {
+        $original = $val;
         if(is_string($val)) $val = json_decode($val, true);
         $this->theme->setContent($val);
-        return $val;
+        return $original;
     }
 
     /**
