@@ -9,11 +9,11 @@ use \PDO;
 
 abstract class DataClass {
     protected $db;
-    protected $data = [];
 
     static protected $tableName;
     public const DEFAULT_DB = "\Phroses\DB";
     
+    use \Phroses\Traits\Properties;
     use \Phroses\Traits\UnpackOptions;
     
     /**
@@ -25,7 +25,7 @@ abstract class DataClass {
      */
     public function __construct(array $data, $db = self::DEFAULT_DB) {
         $data = array_change_key_case($data);
-        $this->unpackOptions($data, $this->data);
+        $this->unpackOptions($data, $this->properties);
         $this->db = $db;
     }
 
@@ -35,14 +35,9 @@ abstract class DataClass {
      * @param string $key the property/column to get
      * @return mixed the value of the property/column
      */
-    public function __get(string $key) {
-        if(method_exists($this, "get{$key}") && (new \ReflectionMethod($this, "get{$key}"))->isProtected()) {
-            return $this->{"get{$key}"}();
-        }
-
+    public function _get(string $key) {
         $table = get_called_class()::$tableName;
-        return $this->data[$key] ?? 
-            ($this->data[$key] = $this->db::query("SELECT `{$key}` FROM `{$table}` WHERE `id`=:id", [ ":id" => $this->data["id"] ])[0]->{$key} ?? null);
+        return ($this->properties[$key] = $this->db::query("SELECT `{$key}` FROM `{$table}` WHERE `id`=:id", [ ":id" => $this->properties["id"] ])[0]->{$key} ?? null);
     }
 
     /**
@@ -52,15 +47,9 @@ abstract class DataClass {
      * @param mixed $val the value to set the property/column to
      * @return void
      */
-    public function __set(string $key, $val): void {
-        if(method_exists($this, "set{$key}") && (new \ReflectionMethod($this, "set{$key}"))->isProtected()) {
-            $val = $this->{"set{$key}"}($val);
-            if(!$val) return;
-        }
-        
+    public function _set(string $key, $val): void {
         $table = get_called_class()::$tableName;
         $this->db::query("UPDATE `{$table}` SET `{$key}`=:val WHERE `id`=:id", [ ":val" => $val, ":id" => $this->id ]);
-        $this->data[$key] = $val;
     }
 
     /**
@@ -69,7 +58,7 @@ abstract class DataClass {
      * @return array the data object containing properties/columns
      */
     public function getData(): array {
-        return $this->data;
+        return $this->properties;
     }
 
     /**
@@ -93,9 +82,9 @@ abstract class DataClass {
 
             $query = "INSERT INTO `{$table}` ({columns}) VALUES ({values})";
             $values = [];
-            unset($this->data["id"]);
+            unset($this->properties["id"]);
 
-            foreach($this->data as $key => $val) {
+            foreach($this->properties as $key => $val) {
                 $query = str_replace("{columns}", "`{$key}`,{columns}", $query);
                 $query = str_replace("{values}", ":{$key},{values}", $query);
                 $values[":{$key}"] = $val;
@@ -103,7 +92,7 @@ abstract class DataClass {
 
             $query = str_replace([",{columns}", ",{values}"], "", $query);
             $this->db::query($query, $values);
-            return ($this->data["id"] = $this->db::lastID());
+            return ($this->properties["id"] = $this->db::lastID());
         }
 
         return true;

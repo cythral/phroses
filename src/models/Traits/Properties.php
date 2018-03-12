@@ -3,7 +3,7 @@
 namespace Phroses\Traits;
 
 trait Properties {
-    private $properties = [];
+    protected $properties = [];
 
     /**
      * Getter 
@@ -15,8 +15,8 @@ trait Properties {
         if(method_exists($this, "get{$key}") && (new \ReflectionMethod($this, "get{$key}"))->isProtected()) {
             return $this->{"get{$key}"}();
         }
-
-        return $this->properties[$key] ?? null;
+        
+        return $this->properties[$key] ?? ((method_exists($this, "_get")) ? $this->_get($key) : null);
     }
 
     /**
@@ -32,6 +32,7 @@ trait Properties {
             if(!$val) return;
         }
 
+        if(method_exists($this, "_set")) $this->_set($key, $val);
         $this->properties[$key] = $val;
     }
 }
