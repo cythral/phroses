@@ -88,9 +88,9 @@ self::addRoute(new class extends Route {
 		}
 
 		ob_start();
-		$page->theme->push("stylesheets", [ "src" => $site->adminURI."/assets/css/phroses.css" ]);
+		$page->theme->push("stylesheets", [ "src" => "{$site->adminURI}/assets/css/phroses.css" ]);
 		$page->theme->push("stylesheets", [ "src" => "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" ]);
-		$page->theme->push("scripts", [ "src" => $site->adminURI."/assets/js/phroses.min.js", "attrs" => 'defer data-adminuri="'.$site->adminURI.'" id="phroses-script"' ]);
+		$page->theme->push("scripts", [ "src" => "{$site->adminURI}/assets/js/phroses.min.js", "attrs" => "defer data-adminuri=\"{$site->adminURI}\" id=\"phroses-script\"" ]);
 
 		if(!$_SESSION) {
 			$out->setCode(401);
@@ -104,13 +104,14 @@ self::addRoute(new class extends Route {
 				echo $dashbar;
 			}
 
-			if(file_exists($file = INCLUDES["VIEWS"].$path."/index.php")) include $file;
-			else if(file_exists($file = INCLUDES["VIEWS"].$path.'.php')) include $file;
+			if(file_exists($file = INCLUDES["VIEWS"]."{$path}/index.php")) include $file;
+			else if(file_exists($file = INCLUDES["VIEWS"]."{$path}.php")) include $file;
 			else echo new Template(INCLUDES["TPL"]."/errors/404.tpl");
 		}
 
 		if($page->theme->hasType("admin")) $page->theme->setType("admin", true);
 		else $page->theme->setType("page", true);
+		
 		$content = new Template(INCLUDES["TPL"]."/admin.tpl");
 		$content->content = trim(ob_get_clean());
 
@@ -241,6 +242,7 @@ self::addRoute(new class extends Route {
 		mapError("bad_value", !$page->theme->hasType($_REQUEST["type"]), [ "field" => "type" ]);
 
 		$page = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", $site->id, $site->theme);
+		mapError("create_fail", !$page);
 
 		$out->send([ 
 			"type" => "success",
@@ -267,38 +269,30 @@ self::addRoute(new class extends Route {
 		mapError("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
 		mapError("no_change", allKeysDontExist(["type", "uri", "title", "content", "public", "css"], $_REQUEST));
 		mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
+		mapError("resource_exists", isset($_REQUEST["uri"]) && $site->hasPage($_REQUEST["uri"]));
+		
+		// if requesting a page type to change to redirect with no destination specified, just send the typefields
+		if(safeArrayValEquals($_REQUEST, "type", "redirect") && (!isset($_REQUEST["content"]) || 
+			(isset($_REQUEST["content"]) && !isset(json_decode($_REQUEST["content"])->destination)))) {
 
-		if(isset($_REQUEST["uri"])) {
-			$count = DB::query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `siteID`=? AND `uri`=?", [ $site->id, $_REQUEST["uri"]])[0]->count ?? 0;
-			mapError("resource_exists", $count > 0);
+			$out->send(["type" => "success", "typefields" => $page->theme->getEditorFields("redirect") ], 200);
 		}
 
-		// do NOT update the database if the request is to change the page to a redirect and there is no content specifying the destination.
-		// if the page is a type redirect and there is no destination, an error will be displayed which we should be trying to avoid
-		if(!(safeArrayValEquals($_REQUEST, "type", "redirect") && (!isset($_REQUEST["content"]) || 
-			(isset($_REQUEST["content"]) && !isset(json_decode($_REQUEST["content"])->destination))))) {
-				
-			if(isset($_REQUEST["title"])) $page->title = $_REQUEST["title"];
-			if(isset($_REQUEST["uri"])) $page->uri = urldecode($_REQUEST["uri"]);
-			if(isset($_REQUEST["public"])) $page->public = $_REQUEST["public"];
-			if(isset($_REQUEST["css"])) $page->css = urldecode($_REQUEST["css"]);
+		if(isset($_REQUEST["title"])) $page->title = $_REQUEST["title"];
+		if(isset($_REQUEST["uri"])) $page->uri = urldecode($_REQUEST["uri"]);
+		if(isset($_REQUEST["public"])) $page->public = $_REQUEST["public"];
+		if(isset($_REQUEST["css"])) $page->css = urldecode($_REQUEST["css"]);
+		if(isset($_REQUEST["content"])) $page->content = htmlspecialchars_decode($_REQUEST["content"]);
 
-			if(isset($_REQUEST["content"])) {
-				$page->content = htmlspecialchars_decode($_REQUEST["content"]);
-			}
-
-			if(isset($_REQUEST["type"])) {
-				$page->type = urldecode($_REQUEST["type"]);
-				if($_REQUEST["type"] != "redirect") $page->content = "{}";
-			} 
+		if(isset($_REQUEST["type"])) {
+			$page->type = urldecode($_REQUEST["type"]);
+			if($_REQUEST["type"] != "redirect") $page->content = "{}";
 		}
 
 		$output = [ "type" => "success" ];
 		if(!isset($_REQUEST["nocontent"])) $output["content"] = $page->theme->getBody();
 		if(isset($_REQUEST["type"])) $output["typefields"] = $page->theme->getEditorFields($_REQUEST["type"]);
 
-		// if we are changing to type redirect or the page is a redirect, there is no content
-		if($page->type == "redirect" || (isset($_REQUEST["type"]) && $_REQUEST["type"] == "redirect")) unset($output["content"]);
 		$out->send($output, 200);
 	}
 });
@@ -316,8 +310,7 @@ self::addRoute(new class extends Route {
 		
 		mapError("access_denied", !$_SESSION, null, 401);
 		mapError("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
-
-		$page->delete();
+		mapError("delete_failed", !$page->delete());
 		$out->send(["type" => "success"], 200);
 	}
 });
@@ -331,15 +324,15 @@ self::addRoute(new class extends Route {
 	public $response = Phroses::RESPONSES["UPLOAD"];
 	
 	public function follow(&$page, &$site, &$out) {
-		readfileCached(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8));
+		(new Upload($site, substr(PATH, 8)))->display();
 	}
 
 	public function rules(&$page, &$site, &$cascade) {
 		return [ 
-			2 => function() { 
+			2 => function() use (&$site) { 
 				return (
 					stringStartsWith(PATH, "/uploads") && 
-					file_exists(INCLUDES["UPLOADS"]."/".BASEURL."/".substr(PATH, 8)) && 
+					(new Upload($site, substr(PATH, 8)))->exists() && 
 					trim(PATH, "/") != "uploads"
 				); 
 			}

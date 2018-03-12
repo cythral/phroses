@@ -1,29 +1,42 @@
 <?php
 
 use Phroses\Phroses;
+use Phroses\Upload;
 use phyrex\Template;
+use Phroses\Exceptions\UploadException;
 use function Phroses\{ handleMethod, parseSize, mapError };
 use const Phroses\{ INCLUDES, SITE };
 
 $uploaddir = INCLUDES["UPLOADS"]."/".reqc\BASEURL."/";
 
-handleMethod("post", function($out) use ($uploaddir) {
+handleMethod("post", function($out) use ($uploaddir, &$site) {
     
     if($_POST['action'] == "rename") {
-        mapError("resource_exists", file_exists($uploaddir.$_POST["to"]));
-        mapError("failed_rename", !@rename($uploaddir.$_POST["filename"], $uploaddir.$_POST["to"]));
+        $upload = new Upload($site, $_POST["from"]);
+
+        try {
+            if(!$upload->rename($_POST["to"])) throw new UploadException("failed_rename");
+        } catch(UploadException $e) {
+            $out->send(["type" => "error", "error" => $e->getMessage() ], 400);
+        }
     }
 
     if($_POST["action"] == "delete") {
-       mapError("failed_delete", !@unlink($uploaddir.$_POST["filename"]));
+        $upload = new Upload($site, $_POST["filename"]);
+
+        try {
+            if(!$upload->delete()) throw new UploadException("failed_delete");
+        } catch(UploadException $e) {
+            $out->send(["type" => "error", "error" => $e->getMessage() ], 400);
+        }
     }
 
     if($_POST["action"] == "new") {
-        mapError("topupldir_notfound", !file_exists(INCLUDES["UPLOADS"]) && !@mkdir(INCLUDES["UPLOADS"]));
-        mapError("siteupldir_notfound", !file_exists($uploaddir) && !@mkdir($uploaddir));
-        mapError("resource_exists", file_exists($uploaddir.$_POST["filename"]));
-        mapError("large_file", in_array($_FILES["file"]["error"], [ UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE ]));
-        mapError("failed_upl", !move_uploaded_file($_FILES["file"]["tmp_name"], $uploaddir.$_POST["filename"]));
+        try {
+            Upload::create($site, $_POST["filename"], $_FILES["file"]);
+        } catch(UploadException $e) {
+            $out->send(["type" => "error", "error" => $e->getMessage()], 400);
+        }
     }
 
     $out->send(["type" => "success"], 200);

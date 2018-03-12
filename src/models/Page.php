@@ -19,11 +19,8 @@ class Page extends DataClass {
     /** @var string the name of the table in the database this class corresponds to */
     static protected $tableName = "pages";
 
-    /** @var \reqc\Output the output handler */
-    private $oh;
-
-    /** @var \Phroses\Theme the theme to use for displaying the page */
-    public $theme;
+    /** @var Theme the theme to use for displaying the page */
+    protected $_theme;
 
     /** @var array required options to be passed to the constructor */
     const REQUIRED_OPTIONS = [
@@ -44,10 +41,10 @@ class Page extends DataClass {
      * @param array $options an array containing page data (see self::REQUIRED_OPTIONS for the required keys)
      * @param string $theme the name of the theme to use for displaying the page.  Defaults to the default theme name
      */
-    public function __construct(array $options, ?string $theme = null, $db = "Phroses\DB") {
+    public function __construct(array $options, ?string $theme = null, $db = "\Phroses\DB") {
         parent::__construct($options, $db);
-        $this->oh = new Output();
-        if($theme) $this->theme = new Theme($theme, $this->type);
+        
+        if($theme) $this->theme = $theme;
     }
 
     /**
@@ -57,7 +54,7 @@ class Page extends DataClass {
      * @return string the new type
      */
     protected function setType(string $type): string {
-        $this->theme->setType($type, true);
+        if($this->theme) $this->theme->setType($type, true);
         return $type;
     }
 
@@ -80,8 +77,17 @@ class Page extends DataClass {
      * @param string $theme the name of the theme to set it to
      * @return void
      */
-    public function setTheme(string $theme): void {
-        $this->theme = new Theme($theme, $this->type);
+    protected function setTheme(string $theme): void {
+        $this->_theme = new Theme($theme, $this->type);
+    }
+
+    /**
+     * Gets the current theme in use
+     * 
+     * @return Theme|null the theme in use or null if not set
+     */
+    protected function getTheme(): ?Theme {
+        return $this->_theme ?? null;
     }
 
     /**
@@ -92,8 +98,10 @@ class Page extends DataClass {
      * @return void
      */
     public function display(?array $content = null): void {
+        if(!$this->theme) throw new \Exception("The \$theme property has not been set, cannot display the page.");
+        
         ob_start("ob_gzhandler");
-        $this->oh->setContentType(MIME_TYPES["HTML"]); 
+        (new Output)->setContentType(MIME_TYPES["HTML"]); 
 
         $this->theme->title = $this->title;
         $this->theme->setContent($content ?? $this->content);

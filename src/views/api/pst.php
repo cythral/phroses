@@ -10,15 +10,14 @@ use const Phroses\{ INCLUDES, SITE };
 handleMethod("post", function($out) use (&$site) {
     ob_end_clean();
 
+    $page = $site->getPage($_REQUEST["uri"]);
     $theme = new Theme($site->theme, "page");
 
     $pst = new Template(INCLUDES["TPL"]."/pst.tpl");
     $pst->uri = $_REQUEST["uri"];
+    
 
-    $info = DB::query("SELECT `title`, `content`, `public`, `type`, `id` FROM `pages` WHERE `uri`=? AND `siteID`=?", [ $_REQUEST["uri"], $site->id ]);
-    $page = $info[0] ?? null;
-
-    if(count($info) == 0) {
+    if(!$page) {
         $pst->pst_type = "new";
         $pst->fields = "";
         $pst->visibility = "checked";
@@ -33,7 +32,7 @@ handleMethod("post", function($out) use (&$site) {
         $pst->visibility = $page->public ? "checked" : "";
     }
 
-    foreach($theme->getTypes() as $type2) $pst->push("types", ["type" => $type2, "checked" => ($page && $page->type == $type2) ? "selected" : "" ]);
+    foreach($theme->getTypes() as $type) $pst->push("types", ["type" => $type, "checked" => ($page && $page->type == $type) ? "selected" : "" ]);
     $out->send(["type" => "success", "content" => (string) $pst ], 200);
 });
 

@@ -8,8 +8,10 @@ use \PDO;
 use \inix\Config as inix;
 
 class Site extends DataClass {
+    /** @var string the name of the table this class corresponds to in the database */
     static protected $tableName = "sites";
     
+    /** @var array an array of required options that must be passed to the constructor */
     const REQUIRED_OPTIONS = [
         "id",
         "name",
@@ -21,17 +23,56 @@ class Site extends DataClass {
         "maintenance"
     ];
 
-    protected function setAdminPassword($password) {
+    /**
+     * Setter for the adminPassword property, automatically hashes the password
+     * 
+     * @param string $password the password to set it to
+     * @return string a hash of the password
+     */
+    protected function setAdminPassword(string $password): string {
         return password_hash(inix::get("pepper").$password, PASSWORD_DEFAULT);
     }
 
+    /**
+     * Get all pages on a site
+     * 
+     * @return array an array of pages indexed by uri
+     */
     protected function getPages(): array {
         $pages = $this->db::query("SELECT * FROM `pages` WHERE `siteID`=:id", [ ":id" => $this->id ], PDO::FETCH_ASSOC);
-        return array_map((function($pagedata) { return new Page($pagedata); })->bindTo($this), $pages);
+        
+        return array_combine(
+            array_map(function($pagedata) { return $pagedata["uri"]; }, $pages),
+            array_map((function($pagedata) { return new Page($pagedata); })->bindTo($this), $pages)
+        );
     }
 
+    /**
+     * Prevent setting of the pages property
+     */
     protected function setPages() {
         throw new \Exception("Pages is a readonly property");
+    }
+    
+    /**
+     * Retrieve single page based on uri
+     * 
+     * @param string $uri the uri of the page to select
+     * @return Page|null the retrieved page object or null if not found.
+     */
+    public function getPage(string $uri): ?Page {
+        $query = $this->db::query("SELECT * FROM `pages` WHERE `siteId`=:id AND `uri`=:uri", [ ":id" => $this->id, ":uri" => $uri ], PDO::FETCH_ASSOC);
+        return isset($query[0]) ? new Page($query[0]) : null;
+    }
+
+    /**
+     * Checks to see if a page exists in the site
+     * 
+     * @param string $uri the uri of the page to check for
+     * @return bool true if the page exists and false if not
+     */
+    public function hasPage(string $uri): bool {
+        return $this->getPage($uri) != null;
     }
 
     /**
@@ -46,10 +87,8 @@ class Site extends DataClass {
             if(password_needs_rehash($this->adminPassword, PASSWORD_DEFAULT)) {
                 $this->adminPassword = $password;
             }
-            
             return true;
         }
-
         return false;
     }
 

@@ -149,6 +149,21 @@ class SiteTest extends TestCase {
     }
 
     /**
+     * The array returned by the pages property should have keys equal to
+     * their respective page's uri
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getPages
+     */
+    public function testGetPagesKeys() {
+        $pages = Site::generate(1)->pages;
+
+        foreach($pages as $uri => $page) {
+            $this->assertEquals($page->uri, $uri);
+        }
+    }
+
+    /**
      * The setter for the pages property should always throw an exception,
      * pages is readonly
      * 
@@ -158,5 +173,45 @@ class SiteTest extends TestCase {
     public function testSetPagesException() {
         $this->expectException(\Exception::class);
         Site::generate(1)->pages = [];
+    }
+
+    /**
+     * getPage should return a valid page instance if the page exists
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getPage
+     */
+    public function testGetPageReturnInstance() {
+        $this->assertInstanceOf(Page::class, Site::generate(1)->getPage("/"));
+    }
+
+    /**
+     * getPage should return null if the selected page does not exist
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getPage
+     */
+    public function testGetPageReturnNull() {
+        $this->assertNull(Site::generate(1)->getPage("/nonexistent"));
+    }
+
+    /**
+     * hasPage should return true if the selected page exists
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::hasPage
+     */
+    public function testHasPageTrue() {
+        $this->assertTrue(Site::generate(1)->hasPage("/"));
+    }
+
+    /**
+     * hasPage should return false if the selected page does not exist
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::hasPage
+     */
+    public function testHasPageFalse() {
+        $this->assertFalse(Site::generate(1)->hasPage("/nonexistent"));
     }
 }

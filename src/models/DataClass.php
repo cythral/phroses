@@ -36,7 +36,7 @@ abstract class DataClass {
      * @return mixed the value of the property/column
      */
     public function __get(string $key) {
-        if(method_exists($this, "get{$key}")) {
+        if(method_exists($this, "get{$key}") && (new \ReflectionMethod($this, "get{$key}"))->isProtected()) {
             return $this->{"get{$key}"}();
         }
 
@@ -53,12 +53,13 @@ abstract class DataClass {
      * @return void
      */
     public function __set(string $key, $val): void {
-        if(method_exists($this, "set{$key}")) {
+        if(method_exists($this, "set{$key}") && (new \ReflectionMethod($this, "set{$key}"))->isProtected()) {
             $val = $this->{"set{$key}"}($val);
+            if(!$val) return;
         }
         
         $table = get_called_class()::$tableName;
-        $this->db::query("UPDATE `{$table}` SET `{$key}`=:val", [ ":val" => $val ]);
+        $this->db::query("UPDATE `{$table}` SET `{$key}`=:val WHERE `id`=:id", [ ":val" => $val, ":id" => $this->id ]);
         $this->data[$key] = $val;
     }
 
@@ -102,7 +103,7 @@ abstract class DataClass {
 
             $query = str_replace([",{columns}", ",{values}"], "", $query);
             $this->db::query($query, $values);
-            return ($this->id = $this->db::lastID());
+            return ($this->data["id"] = $this->db::lastID());
         }
 
         return true;
@@ -116,7 +117,7 @@ abstract class DataClass {
     public function delete(): bool {
         if(!$this->id) return false;
         $table = get_called_class()::$tableName;
-        return $this->db::affected("DELETE FROM `".self::$tableName."` WHERE `id`=:id", [ ":id" => $this->id ]) > 0;
+        return $this->db::affected("DELETE FROM `{$table}` WHERE `id`=:id", [ ":id" => $this->id ]) > 0;
     }
 
     /**

@@ -7,7 +7,6 @@ use const Phroses\{ SITE, INCLUDES };
 use const reqc\{ BASEURL };
 
 $pageslist = $site->pages;
-
 $pagesview = new Template(INCLUDES["TPL"]."/admin/pages.tpl");
 
 if(count($pageslist) == 0) {
@@ -17,8 +16,8 @@ if(count($pageslist) == 0) {
 foreach($pageslist as $item) {
     ob_start();
     
-    foreach($page->theme->GetTypes() as $type) {
-        ?><option <?= ($type == "redirect") ? "disabled" : ""; ?> <?= ($type == $item->type) ? "selected" : ""; ?>><?= $type; ?></option><?php
+    foreach($page->theme->getTypes() as $type) {
+        echo "<option ".(($type == "redirect") ? "disabled" : "").(($type == $item->type) ? "selected" : "").">{$type}</option>";
     } 
     
     $pagesview->push("pages", [ 

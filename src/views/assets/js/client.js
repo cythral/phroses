@@ -10509,15 +10509,15 @@ if(!$("#phr-admin-page").val()) {
                 element: "#pst",
                 class : "new"
             },
-            success: function(pdata) {
-                pdata = JSON.parse(pdata);
+            success: function(data) {
                 var title = $("#pst-ns [name=title]").val();
-                $("#pid").val(pdata.id);
+
+                $("#pid").val(data.id);
                 $("#pst").removeClass("new");
                 $("#pst").addClass("existing");
-                $("#phr-container").html(pdata.content);
-                $("#mode-content").html(pdata.typefields);
-                console.log(pdata.typefields);
+                $("#phr-container").html(data.content);
+                $("#mode-content").html(data.typefields);
+                
                 $("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
                 $("#pst-es-type").val($("#pst-ns select").val());
                 editor.aceify();
@@ -10528,12 +10528,7 @@ if(!$("#phr-admin-page").val()) {
                 });
             }
         });
-    
-        /**
-         * Type changer on the edit screen
-         */
-        
-    
+
         /**
          * Public / Private Switcher
          */
