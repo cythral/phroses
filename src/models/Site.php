@@ -34,6 +34,24 @@ class Site extends DataClass {
     }
 
     /**
+     * Getter for the uploads property, returns an array of uploads
+     * 
+     * @return array an array of uploads
+     */
+    protected function getUploads(): array {
+        return Upload::list($this);
+    }
+
+    /**
+     * Uploads is readonly, throw an exception if trying to set it.
+     * 
+     * @return void
+     */
+    protected function setUploads(): void {
+        throw new \Exception("Uploads is a readonly property");
+    }
+
+    /**
      * Get all pages on a site
      * 
      * @return array an array of pages indexed by uri
@@ -49,8 +67,10 @@ class Site extends DataClass {
 
     /**
      * Prevent setting of the pages property
+     * 
+     * @return void
      */
-    protected function setPages() {
+    protected function setPages(): void {
         throw new \Exception("Pages is a readonly property");
     }
     

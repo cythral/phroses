@@ -14,6 +14,7 @@ class UploadTest extends TestCase {
      * setUp fixture, creates upload directories and files for testing
      */
     public function setUp() {
+        if(file_exists(ROOT."/uploads")) shell_exec("rm -rf ".ROOT."/uploads");
         mkdir(ROOT."/uploads");
         mkdir(ROOT."/uploads/localhost");
         touch(ROOT."/uploads/localhost/test.png");
@@ -118,5 +119,14 @@ class UploadTest extends TestCase {
         ];
 
         $this->assertInstanceOf(Upload::class, Upload::create($this->site, "new.png", $from, true));
+    }
+
+    /**
+     * List should return an array of uploads
+     * 
+     * @covers \Phroses\Upload::list
+     */
+    public function testList() {
+        $this->assertArrayType(Upload::list($this->site), Upload::class);
     }
 }

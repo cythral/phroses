@@ -5,11 +5,16 @@ namespace Phroses;
 use \Phroses\Exceptions\UploadException;
 
 class Upload {
+    /** @var string the site that hosts the upload */
     private $site;
-    private $name;
 
+    /** @var string the name of the upload */
+    private $_name;
+
+    /** @var string root directory for uploads */
     const ROOT = INCLUDES["UPLOADS"];
 
+    // use dynamic properties
     use \Phroses\Traits\Properties;
 
     /**
@@ -21,7 +26,7 @@ class Upload {
      */
     public function __construct(Site $site, string $name) {
         $this->site = $site;
-        $this->name = $name;
+        $this->_name = $name;
     }
 
     /**
@@ -54,7 +59,7 @@ class Upload {
         }
         
         if(@rename($this->path, dirname($this->path)."/{$name}")) {
-            $this->name = $name;
+            $this->_name = $name;
             return true;
         }
 
@@ -81,6 +86,25 @@ class Upload {
      */
     protected function getPath(): string {
         return self::ROOT."/{$this->site->url}/{$this->name}";
+    }
+
+    /**
+     * Setter for the name property, same as doing Upload::rename
+     * 
+     * @param string $value the name to set the upload to
+     * @return void
+     */
+    protected function setName(string $value): void {
+        $this->rename($value);
+    }
+
+    /**
+     * Getter for the name property
+     * 
+     * @return string the name of the upload
+     */
+    protected function getName(): string {
+        return $this->_name;
     }
 
     /**
@@ -114,5 +138,15 @@ class Upload {
         } 
 
         return new self($site, $name);
+    }
+
+    /**
+     * Returns a list of uploads in a site
+     * 
+     * @param Site $site the site to list uploads for
+     * @return array an array of upload objects
+     */
+    static public function list(Site $site): array {
+        return array_map(function($value) use ($site) { return new Upload($site, basename($value)); }, glob(self::ROOT."/{$site->url}/*"));
     }
 }

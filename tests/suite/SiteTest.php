@@ -214,4 +214,15 @@ class SiteTest extends TestCase {
     public function testHasPageFalse() {
         $this->assertFalse(Site::generate(1)->hasPage("/nonexistent"));
     }
+
+    /**
+     * The uploads property should be the equivalent of calling
+     * Upload::list, which returns an array of upload objects
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getUploads
+     */
+    public function testGetUploads() {
+        $this->assertArrayType(Site::generate(1)->uploads, Upload::class);
+    }
 }
