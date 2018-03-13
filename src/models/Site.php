@@ -6,6 +6,7 @@ namespace Phroses;
 
 use \PDO;
 use \inix\Config as inix;
+use \Phroses\Exceptions\ReadOnlyException;
 
 class Site extends DataClass {
     /** @var string the name of the table this class corresponds to in the database */
@@ -48,7 +49,7 @@ class Site extends DataClass {
      * @return void
      */
     protected function setUploads(): void {
-        throw new \Exception("Uploads is a readonly property");
+        throw new ReadOnlyException("uploads");
     }
 
     /**
@@ -71,7 +72,7 @@ class Site extends DataClass {
      * @return void
      */
     protected function setPages(): void {
-        throw new \Exception("Pages is a readonly property");
+        throw new ReadOnlyException("pages");
     }
     
     /**

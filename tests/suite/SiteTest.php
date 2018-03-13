@@ -5,7 +5,7 @@ namespace Phroses\Testing;
 use \Phroses\Page;
 use \Phroses\Site;
 use \inix\Config as inix;
-
+use \Phroses\Exceptions\ReadOnlyException;
 
 /**
  * @covers \Phroses\Site
@@ -171,7 +171,7 @@ class SiteTest extends TestCase {
      * @covers \Phroses\Site::setPages
      */
     public function testSetPagesException() {
-        $this->expectException(\Exception::class);
+        $this->expectException(ReadOnlyException::class);
         Site::generate(1)->pages = [];
     }
 
@@ -224,5 +224,16 @@ class SiteTest extends TestCase {
      */
     public function testGetUploads() {
         $this->assertArrayType(Site::generate(1)->uploads, Upload::class);
+    }
+
+    /**
+     * Setting the uploads property should throw an exception
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::setUploads
+     */
+    public function testSetUploadsException() {
+        $this->expectException(ReadOnlyException::class);
+        Site::generate(1)->uploads = [];
     }
 }
