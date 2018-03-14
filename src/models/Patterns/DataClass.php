@@ -64,7 +64,6 @@ abstract class DataClass {
      * @return void
      */
     public function _set(string $key, $val): void {
-        $table = static::$tableName;
         if(array_search(strtolower($key), static::$readOnlyProperties ?? []) !== false) throw new ReadOnlyException($key);
 
         (new UpdateQuery)
@@ -89,8 +88,6 @@ abstract class DataClass {
      * @return bool true if the id exists in the database and false if not
      */
     public function exists(): bool {
-        $table = static::$tableName;
-
         return ($this->id) ? 
             ((new SelectQuery)
                 ->setTable(static::$tableName)
@@ -122,7 +119,6 @@ abstract class DataClass {
      */
     public function delete(): bool {
         if(!$this->id) return false;
-        $table = static::$tableName;
         
         return ((new DeleteQuery)
             ->setTable(static::$tableName)
@@ -142,7 +138,6 @@ abstract class DataClass {
      */
     static public function lookup($val, string $column = "id", array $args = [], $db = null): ?self {
         $db = $db ?? Database::getInstance();
-        $table = static::$tableName;
 
         $info = (new SelectQuery)
             ->setTable(static::$tableName)
