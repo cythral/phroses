@@ -10,9 +10,7 @@ namespace Phroses;
 use \PDO;
 use \Phroses\Exceptions\ReadOnlyException;
 use \Phroses\Database\Database;
-use \Phroses\Database\Queries\InsertQuery;
-use \Phroses\Database\Queries\SelectQuery;
-use \Phroses\Database\Queries\DeleteQuery;
+use \Phroses\Database\Queries\{ InsertQuery, SelectQuery, DeleteQuery, UpdateQuery };
 
 abstract class DataClass {
     protected $db;
@@ -69,13 +67,11 @@ abstract class DataClass {
         $table = static::$tableName;
         if(array_search(strtolower($key), static::$readOnlyProperties ?? []) !== false) throw new ReadOnlyException($key);
 
-        $this->db->prepare(
-            "UPDATE `{$table}` SET `{$key}`=:val WHERE `id`=:id", 
-            [ 
-                ":val" => $val, 
-                ":id" => $this->id 
-            ]
-        );
+        (new UpdateQuery)
+            ->setTable(static::$tableName)
+            ->addColumns([ $key => ":val" ])
+            ->addWhere("id", "=", ":id")
+            ->execute([ ":val" => $val, ":id" => $this->id ]);
     }
 
     /**
