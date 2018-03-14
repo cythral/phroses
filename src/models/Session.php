@@ -3,9 +3,16 @@
 namespace Phroses;
 
 use \SessionHandlerInterface;
+use \Phroses\Database\Database;
+use \Phroses\Database\Builders\{ SelectBuilder, ReplaceBuilder, DeleteBuilder };
 
 class Session implements SessionHandlerInterface {
     static private $run = false;
+    private $db;
+
+    public function __construct($db = null) {
+        $this->db = $db ?? Database::getInstance();
+    }
 
     static public function start() {
         if(self::$run) return;
@@ -30,24 +37,34 @@ class Session implements SessionHandlerInterface {
         return true; 
     }
 
-    public function read($id) {
-        $data = DB::query("SELECT `data` FROM `sessions` WHERE `id`=?", [ $id ]);
-        return ($data) ? $data[0]->data : '';
+    public function read($id): string {
+        return ((new SelectBuilder)
+            ->setTable("sessions")
+            ->addColumns([ "data" ])
+            ->addWhere("id", "=", ":id")
+            ->execute([ ":id" => $id ])
+            ->fetchColumn()) ?? "";
     }
 
-    public function write($id, $data) {
-        DB::query("REPLACE INTO `sessions` (`id`, `data`) VALUES (?, ?)", [ $id, $data ]);
+    public function write($id, $data): bool {
+        $this->db->replace("sessions", [ "id" => $id, "data" => $data ]);
         return true;
     }
 
     public function gc($max) {
-        DB::query("DELETE FROM `sessions` WHERE TIMESTAMPDIFF(second, `date`, NOW()) > $max");
+        (new DeleteBuilder)
+            ->setTable("sessions")
+            ->addWhere("TIMESTAMPDIFF(second, `date`, NOW())", ">", ":max")
+            ->execute([ ":max" => $max ]);
         return true;
     }
 
     public function destroy($id) {
-        DB::query("DELETE FROM `sessions` WHERE `id`=?", [ $id ]);
-        return true;
+        return ((new DeleteBuilder)
+            ->setTable("sessions")
+            ->addWhere("id", "=", ":id")
+            ->execute([ ":id" => $id ])
+            ->rowCount() > 0);
     }
 }
 

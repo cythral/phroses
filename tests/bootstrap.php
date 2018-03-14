@@ -18,6 +18,9 @@ inix::load(ROOT."/phroses.conf");
 // include testcase
 include INCLUDES["TESTS"]."/testcase.php";
 
+$conf = inix::get("test-database") ?? inix::get("database");
+$db = \Phroses\Database\Database::getInstance($conf["host"], $conf["name"], $conf["user"], $conf["password"]);
+
 // setup mock phroses object
 abstract class Phroses { static public $page; static public $site; }
 Phroses::$page = new Page([ "id" => null, "type" => "page", "content" => null, "datecreated" => null, "datemodified" => null, "title" => null, "views" => 1, "public" => true ]);

@@ -6,11 +6,20 @@ namespace Phroses;
 
 use \PDO;
 use \inix\Config as inix;
+use \Phroses\Database\Database;
+use \Phroses\Database\Builders\SelectBuilder;
 use \Phroses\Exceptions\ReadOnlyException;
 
 class Site extends DataClass {
     /** @var string the name of the table this class corresponds to in the database */
     static protected $tableName = "sites";
+
+    static protected $readOnlyProperties = [
+        "views",
+        "pagecount",
+        "uploads",
+        "pages"
+    ];
     
     /** @var array an array of required options that must be passed to the constructor */
     const REQUIRED_OPTIONS = [
@@ -44,21 +53,17 @@ class Site extends DataClass {
     }
 
     /**
-     * Uploads is readonly, throw an exception if trying to set it.
-     * 
-     * @return void
-     */
-    protected function setUploads(): void {
-        throw new ReadOnlyException("uploads");
-    }
-
-    /**
      * Get all pages on a site
      * 
      * @return array an array of pages indexed by uri
      */
     protected function getPages(): array {
-        $pages = $this->db::query("SELECT * FROM `pages` WHERE `siteID`=:id", [ ":id" => $this->id ], PDO::FETCH_ASSOC);
+        $pages = (new SelectBuilder)
+            ->setTable("pages")
+            ->addColumns(["*"])
+            ->addWhere("siteID", "=", ":id")
+            ->execute([ ":id" => $this->id ])
+            ->fetchAll(PDO::FETCH_ASSOC);
         
         return array_combine(
             array_map(function($pagedata) { return $pagedata["uri"]; }, $pages),
@@ -67,22 +72,20 @@ class Site extends DataClass {
     }
 
     /**
-     * Prevent setting of the pages property
-     * 
-     * @return void
-     */
-    protected function setPages(): void {
-        throw new ReadOnlyException("pages");
-    }
-    
-    /**
      * Retrieve single page based on uri
      * 
      * @param string $uri the uri of the page to select
      * @return Page|null the retrieved page object or null if not found.
      */
     public function getPage(string $uri): ?Page {
-        $query = $this->db::query("SELECT * FROM `pages` WHERE `siteId`=:id AND `uri`=:uri", [ ":id" => $this->id, ":uri" => $uri ], PDO::FETCH_ASSOC);
+        $query = (new SelectBuilder)
+            ->setTable("pages")
+            ->addColumns(["*"])
+            ->addWhere("id", "=", ":id")
+            ->addWhere("uri", "=", ":uri")
+            ->execute([ ":id" => $this->id, ":uri" => $uri ])
+            ->fetchAll(PDO::FETCH_ASSOC);
+
         return isset($query[0]) ? new Page($query[0]) : null;
     }
 
@@ -96,6 +99,32 @@ class Site extends DataClass {
         return $this->getPage($uri) != null;
     }
 
+    /**
+     * Getter for total view count
+     * 
+     * @return int the total number of views the site has gotten
+     */
+    protected function getViews(): int {
+        return (new SelectBuilder)
+            ->setTable("pages")
+            ->addColumns([ "SUM(`views`)" ])
+            ->addWhere("siteID", "=", ":id")
+            ->execute([ ":id" => $this->id ])
+            ->fetchColumn() ?? 0;
+    }
+
+    /**
+     * Getter for site page count (this is faster than count($site->pages))
+     */
+    protected function getPageCount(): int {
+        return (new SelectBuilder)
+            ->setTable("pages")
+            ->addColumns([ "COUNT(`id`)"])
+            ->addWhere("siteID", "=", ":id")
+            ->execute([ ":id" => $this->id ])
+            ->fetchColumn();
+    }
+    
     /**
      * Validates a user provided username and password against the sites login info
      * 
@@ -158,12 +187,18 @@ class Site extends DataClass {
      * 
      * @return array an array containing items that are id => url
      */
-    static public function list($db = self::DEFAULT_DB): array {
+    static public function list(): array {
         return array_map(
+            
             function($val) { 
                 return $val[0]; 
             }, 
-            $db::query("SELECT `id`,`url` FROM `sites`", [], PDO::FETCH_COLUMN|PDO::FETCH_GROUP)
+            
+            ((new SelectBuilder)
+                ->setTable(static::$tableName)
+                ->addColumns(["id", "url"])
+                ->execute()
+                ->fetchAll(PDO::FETCH_COLUMN|PDO::FETCH_GROUP))
         );
     }
 }

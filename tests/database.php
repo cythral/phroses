@@ -1,6 +1,7 @@
 <?php
 
 use inix\Config as inix;
+use \Phroses\Database\Database;
 
 // get configuration
 $conf = inix::get("test-database") ?? inix::get("database");

@@ -236,4 +236,46 @@ class SiteTest extends TestCase {
         $this->expectException(ReadOnlyException::class);
         Site::generate(1)->uploads = [];
     }
+
+    /**
+     * Getting the views property should return the total amount of views
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getViews
+     */
+    public function testGetViews() {
+        $this->assertEquals(2, Site::generate(1)->views);
+    }
+
+
+    /**
+     * Setting the views property should throw a readonlyexception
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::setViews
+     */
+    public function testSetViews() {
+        $this->expectException(ReadOnlyException::class);
+        Site::generate(1)->views = 5;
+    }
+
+    /**
+     * Getting the pageCount property should return the total amount of pages
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getPageCount
+     */
+    public function testGetPageCount() {
+        $this->assertEquals(1, Site::generate(1)->pageCount);
+    }
+
+    /**
+     * Setting the pageCount property should throw an exception
+     * 
+     * @depends testGenerateValidId
+     */
+    public function testSetPageCount() {
+        $this->expectException(ReadOnlyException::class);
+        Site::generate(1)->pageCount = 5;
+    }
 }

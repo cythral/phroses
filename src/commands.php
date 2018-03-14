@@ -68,7 +68,10 @@ self::addCmd(new class extends Command {
 
 	public function execute() {
 		$this->requireConfigFile();
-		DB::update();
+		
+		if(!$this->db->updateSchema()) {
+			$this->error("An error occurred when trying to update the database schema");
+		}
 	}
 });
 
@@ -115,10 +118,7 @@ self::addCmd(new class extends Command {
 		$answer = strtolower($this->read("Are you sure?  Doing this will reset the database, all data will be lost (Y/n): "));
 			
 		if(in_array($answer, ['y', ''])) {
-			$tpl = new Template(SRC."/schema/install.sql");
-			$tpl->schemaver = SCHEMAVER;
-
-			if(!@DB::unpreparedQuery($tpl)) {
+			if(!$this->db->installSchema()) {
 				$this->error("There was an error resetting the database.");
 			}
 
@@ -136,7 +136,7 @@ self::addCmd(new class extends Command {
 	public function execute() {
 		$this->requireConfigFile();
 
-		if(!@DB::unpreparedQuery(stream_get_contents($this->stream))) {
+		if($this->db->getHandle()->query(stream_get_contents($this->stream)) === false) {
 			$this->error("There was an error restoring the database.");
 		}
 

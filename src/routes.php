@@ -27,18 +27,18 @@ self::addRoute(new class extends Route {
 	public $response = Phroses::RESPONSES["PAGE"][200];
 
 	public function follow(&$page, &$site, &$out) {
-		
 		if(safeArrayValEquals($_GET, "mode", "json")) {
 			$out = new JSONServer();
 			$out->send($page->getData(), 200);
+			
 		}
 
 		if(safeArrayValEquals($_GET, "mode", "css")) {
 			$out->setContentType(reqc\MIME_TYPES["CSS"]);
+			$page->views--;
 			die($page->css);
 		}
 
-		
 		if($page->css != null) $page->theme->push("stylesheets", [ "src" => "?mode=css"] );
 		$page->display();
 	}

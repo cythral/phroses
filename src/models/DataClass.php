@@ -1,20 +1,29 @@
 <?php
 /**
  * Class for representing a row from a database, like a Site or Page for example.
- * Provides methods for retrieving and persisting changes to data
+ * Provides methods for retrieving and persisting changes to data.
+ * 
+ * This acts like a generic Data Access Object
  */
 namespace Phroses;
 
 use \PDO;
+use \Phroses\Exceptions\ReadOnlyException;
+use \Phroses\Database\Database;
+use \Phroses\Database\Builders\InsertBuilder;
+use \Phroses\Database\Builders\SelectBuilder;
+use \Phroses\Database\Builders\DeleteBuilder;
 
 abstract class DataClass {
     protected $db;
 
     static protected $tableName;
-    public const DEFAULT_DB = "\Phroses\DB";
+    static protected $virtualProperties = [];
     
     use \Phroses\Traits\Properties;
     use \Phroses\Traits\UnpackOptions;
+
+    const DEFAULT_DB = "\Phroses\DB";
     
     /**
      * Constructor 
@@ -23,10 +32,10 @@ abstract class DataClass {
      * @param mixed $db the database class to use
      * @return void
      */
-    public function __construct(array $data, $db = self::DEFAULT_DB) {
+    public function __construct(array $data, $db = null) {
         $data = array_change_key_case($data);
         $this->unpackOptions($data, $this->properties);
-        $this->db = $db;
+        $this->db = $db ?? Database::getInstance();
     }
 
     /**
@@ -36,8 +45,17 @@ abstract class DataClass {
      * @return mixed the value of the property/column
      */
     public function _get(string $key) {
-        $table = get_called_class()::$tableName;
-        return ($this->properties[$key] = $this->db::query("SELECT `{$key}` FROM `{$table}` WHERE `id`=:id", [ ":id" => $this->properties["id"] ])[0]->{$key} ?? null);
+        $table = static::$tableName;
+
+        return 
+            ($this->properties[$key] = (
+                (new SelectBuilder)
+                    ->setTable(static::$tableName)
+                    ->addColumns([ $key ])
+                    ->addWhere("id", "=", ":id")
+                    ->execute([ ":id" => $this->properties["id"] ])
+                    ->fetchColumn()
+             ) ?? null);
     }
 
     /**
@@ -48,8 +66,16 @@ abstract class DataClass {
      * @return void
      */
     public function _set(string $key, $val): void {
-        $table = get_called_class()::$tableName;
-        $this->db::query("UPDATE `{$table}` SET `{$key}`=:val WHERE `id`=:id", [ ":val" => $val, ":id" => $this->id ]);
+        $table = static::$tableName;
+        if(array_search(strtolower($key), static::$readOnlyProperties ?? []) !== false) throw new ReadOnlyException($key);
+
+        $this->db->prepare(
+            "UPDATE `{$table}` SET `{$key}`=:val WHERE `id`=:id", 
+            [ 
+                ":val" => $val, 
+                ":id" => $this->id 
+            ]
+        );
     }
 
     /**
@@ -67,8 +93,15 @@ abstract class DataClass {
      * @return bool true if the id exists in the database and false if not
      */
     public function exists(): bool {
-        $table = get_called_class()::$tableName;
-        return ($this->id) ? $this->db::column("SELECT count(`id`) FROM `{$table}` WHERE `id`=:id", [ ":id" => $this->id ]) > 0 : false;
+        $table = static::$tableName;
+
+        return ($this->id) ? 
+            ((new SelectBuilder)
+                ->setTable(static::$tableName)
+                ->addColumns([ "count(`id`)" ])
+                ->addWhere("id", "=", ":id")
+                ->execute([ ":id" => $this->id ])
+                ->fetchColumn(0) > 0) : false;
     }
 
     /**
@@ -78,21 +111,9 @@ abstract class DataClass {
      */
     public function persist(): bool {
         if(!$this->exists()) {
-            $table = get_called_class()::$tableName;
-
-            $query = "INSERT INTO `{$table}` ({columns}) VALUES ({values})";
-            $values = [];
             unset($this->properties["id"]);
-
-            foreach($this->properties as $key => $val) {
-                $query = str_replace("{columns}", "`{$key}`,{columns}", $query);
-                $query = str_replace("{values}", ":{$key},{values}", $query);
-                $values[":{$key}"] = $val;
-            }
-
-            $query = str_replace([",{columns}", ",{values}"], "", $query);
-            $this->db::query($query, $values);
-            return ($this->properties["id"] = $this->db::lastID());
+            $this->db->insert(static::$tableName, $this->properties);
+            return ($this->properties["id"] = $this->db->lastID());
         }
 
         return true;
@@ -105,8 +126,13 @@ abstract class DataClass {
      */
     public function delete(): bool {
         if(!$this->id) return false;
-        $table = get_called_class()::$tableName;
-        return $this->db::affected("DELETE FROM `{$table}` WHERE `id`=:id", [ ":id" => $this->id ]) > 0;
+        $table = static::$tableName;
+        
+        return ((new DeleteBuilder)
+            ->setTable(static::$tableName)
+            ->addWhere("id", "=", ":id")
+            ->execute([ ":id" => $this->id ])
+            ->rowCount() > 0);
     }
 
     /**
@@ -118,11 +144,17 @@ abstract class DataClass {
      * @param array $args an array of extra args to be passed to the created dataclass
      * @param mixed $db the database class to use
      */
-    static public function lookup($val, string $column = "id", array $args = [], $db = self::DEFAULT_DB): ?self {
-        $class = get_called_class();
-        $table = $class::$tableName;
-        $info = $db::query("SELECT * FROM `{$table}` WHERE `{$column}`=:{$column}", [ ":{$column}" => $val ], PDO::FETCH_ASSOC)[0] ?? null;
+    static public function lookup($val, string $column = "id", array $args = [], $db = null): ?self {
+        $db = $db ?? Database::getInstance();
+        $table = static::$tableName;
 
-        return ($info) ? new $class($info, ...$args) : null;
+        $info = (new SelectBuilder)
+            ->setTable(static::$tableName)
+            ->addColumns(["*"])
+            ->addWhere($column, "=", ":{$column}")
+            ->execute([ ":{$column}" => $val ])
+            ->fetchAll(PDO::FETCH_ASSOC);
+
+        return (isset($info[0])) ? new static($info[0], ...$args) : null;
     }
 }

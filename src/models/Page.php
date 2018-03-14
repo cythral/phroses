@@ -41,7 +41,7 @@ class Page extends DataClass {
      * @param array $options an array containing page data (see self::REQUIRED_OPTIONS for the required keys)
      * @param string $theme the name of the theme to use for displaying the page.  Defaults to the default theme name
      */
-    public function __construct(array $options, ?string $theme = null, $db = "\Phroses\DB") {
+    public function __construct(array $options, ?string $theme = null, $db = null) {
         parent::__construct($options, $db);
         
         if($theme) $this->theme = $theme;

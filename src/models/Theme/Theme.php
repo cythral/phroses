@@ -15,6 +15,8 @@ use \reqc;
 use \inix\Config as inix;
 use \phyrex\Template as Template;
 use \Phroses\Phroses;
+use \Phroses\Database\Database;
+use \Phroses\Database\Builders\SelectBuilder;
 use const \Phroses\{ SITE, INCLUDES };
 use const \reqc\{ VARS };
 use function \Phroses\{ getTagContents };
@@ -66,6 +68,7 @@ final class Theme extends Template {
 		parent::__construct("");
 		$this->name = strtolower($name);
 		$this->content = $content ?? Phroses::$page->content ?? [];
+		$this->db = Database::getInstance();
 		$this->setupLoader($loader);
 		
         
@@ -326,7 +329,7 @@ Theme::$filters["include"] = function($file) {
 };
 
 Theme::$filters["content"] = function($key, $fieldtype) {
-	$content = $this->content;
+	$content = !is_array($this->content) ? json_decode($this->content, true) : $this->content;
 	if($this->useReqcVars) $content = json_decode(VARS["content"] ?? "{}", true);
 	
 	if(array_key_exists($key, $content ?? [])) echo $content[$key];
@@ -335,8 +338,16 @@ Theme::$filters["content"] = function($key, $fieldtype) {
 
 Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertype = "ASC") {
 	if(!in_array(strtoupper($ordertype), ["ASC", "DESC"])) return;
-	
-    $tlist = DB::query("SELECT * FROM `pages` WHERE `siteID`=? AND `type`=? ORDER BY `{$orderby}` {$ordertype}", [ Phroses::$site->id, $type ]);
+
+	$tlist = (new SelectBuilder)
+		->setTable("pages")
+		->addColumns(["*"])
+		->addWhere("siteID", "=", ":id")
+		->addWhere("type", "=", ":type")
+		->orderBy($orderby, $ordertype)
+		->execute([ ":id" => Phroses::$site->id, ":type" => $type ])
+		->fetchAll();
+    
     foreach($tlist as $page) {
         $out = $field;
         

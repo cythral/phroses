@@ -2,7 +2,7 @@
 
 use \Phroses\Phroses;
 use phyrex\Template;
-use \Phroses\{ DB, Theme\Theme };
+use \Phroses\Theme\Theme;
 use function Phroses\{ HandleMethod, mapError };
 use const \Phroses\{ SITE, INCLUDES };
 use const \reqc\{ HOST };
@@ -16,8 +16,7 @@ handleMethod("POST", function($out) use (&$site) {
     if(!empty($_POST["uri"])) {
         $_POST["uri"] = "/".trim($_POST["uri"], "/");
 
-        $count = DB::query("SELECT COUNT(*) AS `count` FROM `pages` WHERE `uri`=? AND `siteID`=?", [ $_POST["uri"], $site->id ])[0]->count ?? 0;
-        mapError("resource_exists", $count != 0);
+        mapError("resource_exists", $site->hasPage($_POST["uri"]));
         mapError("bad_uri", $_POST['uri'] == "/");
 
         $site->adminURI = $_POST["uri"];
@@ -30,14 +29,11 @@ handleMethod("POST", function($out) use (&$site) {
     $out->send(["type" => "success"], 200);
 });
 
-
-$vars = DB::query("SELECT SUM(`views`) AS viewcount, COUNT(`id`) AS pagecount FROM `pages` WHERE `siteID`=?", [ $site->id ])[0];
-
 $index = new Template(INCLUDES["TPL"]."/admin/index.tpl");
-$index->pagecount = ($vars->pagecount > 999) ? "999+" : $vars->pagecount;
-$index->fullpagecount = $vars->pagecount;
-$index->viewcount = (($views = ($vars->viewcount ?? 0)) > 999) ? "999+" : $views;
-$index->fullviewcount = $vars->viewcount;
+$index->pagecount = ($site->pageCount > 999) ? "999+" : $site->pageCount;
+$index->fullpagecount = $site->pageCount;
+$index->viewcount = ($site->views > 999) ? "999+" : $site->views;
+$index->fullviewcount = $site->views;
 $index->adminuri = $site->adminURI;
 $index->host = HOST;
 

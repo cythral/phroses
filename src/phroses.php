@@ -16,11 +16,13 @@ $loader = include ((INPHAR) ? SRC : ROOT) . "/vendor/autoload.php";
 $loader->addPsr4("Phroses\\", SRC."/models"); // can't do this in composer.json because the location changes if in a phar
 include SRC."/functions.php";
 
+use \PDO;
 use \reqc;
 use \reqc\Output;
 use \listen\Events;
 use \phyrex\Template;
 use \Phroses\Theme\Theme;
+use \Phroses\Database\Database;
 use \inix\Config as inix;
 
 // request variables
@@ -38,6 +40,7 @@ abstract class Phroses {
 	static private $commands = [];
 	static private $cascadeRules = [];
 	static private $cascade;
+	static private $db;
 
 
 	static public $configFileLoaded = false;
@@ -93,12 +96,14 @@ abstract class Phroses {
 	 * which call other methods in the class.
 	 */
 	static public function start() {
-		self::$out = new Output();
-		
+		self::$out = new Output;
+
+		Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		self::$configFileLoaded = Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
 		Events::attach("modeset", [ (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
-		// /Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
+		Events::attach("dbsetup", [], "\Phroses\Phroses::setupDatabase");
+		
 
 		// page or asset
 		if(TYPE != TYPES["CLI"] && self::$configFileLoaded) {
@@ -152,6 +157,16 @@ abstract class Phroses {
 		}
 		
 		return true;
+	}
+
+	/**
+	 * Sets up the database
+	 * 
+	 * @return void
+	 */
+	static public function setupDatabase(): void {
+		$conf = (defined("Phroses\TESTING") && inix::get("test-database")) ? inix::get("test-database") : inix::get("database");
+		self::$db = Database::getInstance($conf["host"], $conf["name"], $conf["user"], $conf["password"]);
 	}
 	
 	/**
@@ -211,21 +226,23 @@ abstract class Phroses {
 	 * @param bool $showNewSite whether or not to show the form to create a new site
 	 */
 	static public function loadSiteInfo(bool $showNewSite) {
-		$info = DB::query("SELECT `sites`.`id`, `sites`.`theme`, `sites`.`name`, `sites`.`adminUsername`, `sites`.`adminPassword`, `sites`.`adminURI`, `sites`.`adminIP`, `sites`.`maintenance`, `page`.`title`, `page`.`content`, (@pageid:=`page`.`id`) AS `pageID`, `page`.`type`, `page`.`views`, `page`.`public`, `page`.`dateCreated`, `page`.`dateModified`, `page`.`css` FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=? WHERE `sites`.`url`=?; UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pageid;", [
-			PATH,
-			BASEURL
-		]);
+		$url = BASEURL;
+		$path = PATH;
+
+		$query = self::$db->getHandle()->prepare("CALL `viewPage`(?,?)");
+		$query->bindValue(1, BASEURL);
+		$query->bindValue(2, PATH);
+		$query->execute();
+		$info = $query->fetchAll(PDO::FETCH_OBJ)[0] ?? null;
 		
 		// if site doesn't exist, create a new one (script ends here)
-		if(count($info) == 0) {
+		if(!$info) {
 			if($showNewSite) include "system/newsite.php";
 			else {
 				self::$out->setCode(404);
 				die(new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
 			}
 		}
-
-		$info = $info[0];
 
 		self::$site = new Site([
 			"id" => $info->id,

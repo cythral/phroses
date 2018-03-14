@@ -22,3 +22,19 @@ ALTER TABLE `sessions` ENGINE=InnoDB;
 ALTER TABLE `pages` ENGINE=InnoDB;
 ALTER TABLE `sites` ENGINE=InnoDB;
 
+DELIMITER $$
+CREATE DEFINER=`root`@`%` PROCEDURE `viewPage`(IN `url` VARCHAR(255) CHARSET utf8, IN `path` VARCHAR(255) CHARSET utf8)
+    SQL SECURITY INVOKER
+BEGIN 
+
+SELECT 
+	`page`.*, 
+	`sites`.*, 
+    (@pid:=`page`.`id`) AS `pageID`, 
+    (`page`.`views` + 1) AS `views`
+   	FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=path  WHERE `sites`.`url`=url;
+
+UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pid;
+
+END$$
+DELIMITER ;

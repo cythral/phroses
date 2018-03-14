@@ -5,6 +5,7 @@
  */
 namespace Phroses;
 
+use \Phroses\Database\Database;
 use \Phroses\Exceptions\ExitException;
 
 abstract class Command {
@@ -15,7 +16,12 @@ abstract class Command {
     /** @var resource $stream the stream resource to use for i/o */
     protected $stream = STDIN;
 
+    /** @var array an array of command flags and their values */
     public $flags = [];
+
+    public function __construct(?Database $db = null) {
+        $this->db = $db ?? Database::getInstance();
+    }
 
     /**
      * Executes the command
