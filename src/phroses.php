@@ -42,7 +42,6 @@ abstract class Phroses {
 	static private $cascade;
 	static private $db;
 
-
 	static public $configFileLoaded = false;
 	static public $page;
 	static public $site;
@@ -102,8 +101,10 @@ abstract class Phroses {
 		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
 		self::$configFileLoaded = Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
 		Events::attach("modeset", [ (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
-		Events::attach("dbsetup", [], "\Phroses\Phroses::setupDatabase");
-		
+
+		// setup database
+		$dbconfig = ((defined("Phroses\TESTING") && inix::get("test-database")) ? inix::get("test-database") : inix::get("database"));
+		Events::attach("dbsetup", [ $dbconfig["host"], $dbconfig["name"], $dbconfig["user"], $dbconfig["password"] ], "\Phroses\Phroses::setupDatabase");
 
 		// page or asset
 		if(TYPE != TYPES["CLI"] && self::$configFileLoaded) {
@@ -164,9 +165,8 @@ abstract class Phroses {
 	 * 
 	 * @return void
 	 */
-	static public function setupDatabase(): void {
-		$conf = (defined("Phroses\TESTING") && inix::get("test-database")) ? inix::get("test-database") : inix::get("database");
-		self::$db = Database::getInstance($conf["host"], $conf["name"], $conf["user"], $conf["password"]);
+	static public function setupDatabase(string $host, string $name, string $user, string $password): void {
+		self::$db = Database::getInstance($host, $name, $user, $password);
 	}
 	
 	/**
@@ -253,7 +253,7 @@ abstract class Phroses {
 		self::$page = new Page([
 			"id" => $info->pageID,
 			"type" => $info->type ?? "page",
-			"views" => $info->views + 1,
+			"views" => $info->views,
 			"dateCreated" => $info->dateCreated,
 			"dateModified" => $info->dateModified,
 			"title" => $info->title,
