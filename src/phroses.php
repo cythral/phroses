@@ -226,14 +226,8 @@ abstract class Phroses {
 	 * @param bool $showNewSite whether or not to show the form to create a new site
 	 */
 	static public function loadSiteInfo(bool $showNewSite) {
-		$url = BASEURL;
-		$path = PATH;
-
-		$query = self::$db->getHandle()->prepare("CALL `viewPage`(?,?)");
-		$query->bindValue(1, BASEURL);
-		$query->bindValue(2, PATH);
-		$query->execute();
-		$info = $query->fetchAll(PDO::FETCH_OBJ)[0] ?? null;
+		$query = self::$db->fetch("CALL `viewPage`(?,?)", [ BASEURL, PATH ]);
+		$info = $query[0] ?? null;
 		
 		// if site doesn't exist, create a new one (script ends here)
 		if(!$info) {
