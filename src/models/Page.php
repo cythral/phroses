@@ -7,6 +7,7 @@
 namespace Phroses;
 
 use \Phroses\Phroses;
+use \Phroses\Patterns\DataClass;
 use \Phroses\Theme\Theme;
 use \Exception;
 use \reqc\Output;

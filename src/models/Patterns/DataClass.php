@@ -1,11 +1,11 @@
 <?php
 /**
  * Class for representing a row from a database, like a Site or Page for example.
- * Provides methods for retrieving and persisting changes to data.
+ * Provides methods for retrieving and persisting changes to data that is stored elsewhere
  * 
- * This acts like a generic Data Access Object
+ * This is essentially my own take on a Data Access Object
  */
-namespace Phroses;
+namespace Phroses\Patterns;
 
 use \PDO;
 use \Phroses\Exceptions\ReadOnlyException;

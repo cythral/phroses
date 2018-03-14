@@ -6,6 +6,7 @@ namespace Phroses;
 
 use \PDO;
 use \inix\Config as inix;
+use \Phroses\Patterns\DataClass;
 use \Phroses\Database\Database;
 use \Phroses\Database\Queries\SelectQuery;
 use \Phroses\Exceptions\ReadOnlyException;
