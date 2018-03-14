@@ -21429,11 +21429,13 @@ Phroses.utils.formify({
     selector: ".upload input",
     action: "change",
     collect: function() {
-        return { action : "rename", filename : $(this).parent().data("filename"), to : $(this).val() };
+        return { to : $(this).val() };
     },
     success: function() {
         var upel = $(this).parent();
+        var val = $(this).val();
         upel.data("filename", $(this).val());
+        $(this).parent().find("[data-url]").data("url", "/uploads/"+$(this).val());
 
         upel.addClass("saved");
         setTimeout(function() {
@@ -21447,16 +21449,13 @@ Phroses.utils.formify({
         upel.addClass("error");
         setTimeout(function() {
             upel.removeClass("error");
-        }.bind(this), 1000);
+        }.bind(this), 1000); 
     }
 });
 
 Phroses.utils.formify({
     selector: ".upload-delete",
     action: "click",
-    collect: function() {
-        return { action: "delete", filename: $(this).parent().parent().data("filename") };
-    },
     success: function() {
         $(this).parent().parent().slideUp(); 
     }
@@ -21511,12 +21510,10 @@ $("#upload:not(.active)").on("drop", function(e, byclick) {
         $("#upload .phr-progress").fadeIn();
 
         var data = new FormData(), filename = $("[name='filename']").val();
-        data.append("filename", filename);
         data.append("file", file);
-        data.append("action", "new");
         
         $.ajax({
-            url : "",
+            url : "/uploads/"+filename,
             data : data,
             method : "post",
             processData : false,
@@ -21539,7 +21536,7 @@ $("#upload:not(.active)").on("drop", function(e, byclick) {
 
                 setTimeout(resetUplForm, 2000);
 
-                $(".admin-page.uploads ul").append('<li class="upload" data-filename="'+filename+'"><input value="'+filename+'" data-method="post"><div class="upload-icons"><a href="/uploads/'+filename+'" class="fa fa-link"></a><a href="#" class="fa fa-search-plus"></a><a href="#" class="fa fa-times upload-delete" data-method="post"></a></div></li>');
+                $(".admin-page.uploads ul").append('<li class="upload" data-filename="'+filename+'"><input value="'+filename+'" data-method="patch" data-url="/uploads/'+filename+'"><div class="upload-icons"><a href="/uploads/'+filename+'" class="fa fa-link"></a><a href="#" class="fa fa-search-plus"></a><a href="#" class="fa fa-times upload-delete" data-method="delete" data-url="/uploads/'+filename+'"></a></div></li>');
 
             },
             error: function(data) {

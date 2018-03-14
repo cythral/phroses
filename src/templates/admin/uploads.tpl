@@ -7,11 +7,11 @@
     <ul>
         <{array::files::
             <li class="upload" data-filename="@filename">
-                <input value="@filename" data-method="post"> 
+                <input value="@filename" data-method="patch" data-url="/uploads/@filename"> 
                 <div class="upload-icons">
                     <a href="/uploads/@filename" class="fa fa-link"></a>
                     <a href="#" class="fa fa-search-plus"></a>
-                    <a href="#" class="fa fa-times upload-delete" data-method="post"></a>
+                    <a href="#" class="fa fa-times upload-delete" data-method="delete" data-url="/uploads/@filename"></a>
                 </div>
             </li>}>
     </ul>

@@ -14,6 +14,8 @@ use \listen\Events;
 use \inix\Config as inix;
 use \phyrex\Template;
 use \Phroses\Theme\Theme;
+use \Phroses\Upload;
+use \Phroses\Exceptions\UploadException;
 
 // request variables
 use const \reqc\{ VARS, MIME_TYPES, PATH, EXTENSION, METHOD, HOST, BASEURL };
@@ -331,12 +333,86 @@ self::addRoute(new class extends Route {
 		return [ 
 			2 => function() use (&$site) { 
 				return (
-					stringStartsWith(PATH, "/uploads") && 
-					(new Upload($site, substr(PATH, 8)))->exists() && 
-					trim(PATH, "/") != "uploads"
+					stringStartsWith(PATH, "/uploads") && trim(PATH, "/") != "uploads" && (
+						(new Upload($site, substr(PATH, 8)))->exists() || strtolower(METHOD) == "post"
+					)
 				); 
 			}
 		];
+	}
+});
+
+/**
+ * DELETE UPLOAD
+ * This route deletes uploads
+ */
+self::addRoute(new class extends Route {
+	public $method = "delete";
+	public $response = Phroses::RESPONSES["UPLOAD"];
+	private $out;
+
+	public function follow(&$page, &$site, &$out) {
+		$out = new JSONServer;
+		mapError("access_denied", !$_SESSION, null, 401);
+
+		try {
+			$upload = new Upload($site, substr(PATH, 8));
+			if(!$upload->delete()) throw new UploadException("failed_delete");
+
+		} catch(UploadException $e) {
+			$out->send(["type" => "error", "error" => $e->getMessage() ], 400);
+		}
+
+		$out->send(["type" => "success"], 200);
+	}
+});
+
+/**
+ * PATCH UPLOAD
+ * Allows renaming of an upload
+ */
+self::addRoute(new class extends Route {
+	public $method = "patch";
+	public $response = Phroses::RESPONSES["UPLOAD"];
+	private $out;
+
+	public function follow(&$page, &$site, &$out) {
+		$out = new JSONServer;
+		mapError("access_denied", !$_SESSION, null, 401);
+		mapError("missing_value", !isset($_REQUEST["to"]), [ "value" => "to" ], 400);
+
+		try {
+			$upload = new Upload($site, substr(PATH, 8));
+			if(!$upload->rename($_REQUEST["to"])) throw new UploadException("failed_rename");
+		} catch(UploadException $e) {
+			$out->send(["type" => "error", "error" => $e->getMessage() ], 400);
+		}
+
+		$out->send(["type" => "success"], 200);
+	}
+});
+
+/**
+ * POST UPLOAD
+ * Creates a new upload
+ */
+self::addRoute(new class extends Route {
+	public $method = "post";
+	public $response = Phroses::RESPONSES["UPLOAD"];
+	private $out;
+
+	public function follow(&$page, &$site, &$out) {
+		$out = new JSONServer;
+		mapError("access_denied", !$_SESSION, null, 401);
+		mapError("missing_value", !isset($_FILES["file"]), [ "value" => "file" ], 400);
+		
+		try {
+			Upload::create($site, substr(PATH, 8), $_FILES["file"]);
+		} catch(UploadException $e) {
+			$out->send(["type" => "error", "error" => $e->getMessage() ], 400);
+		}
+
+		$out->send(["type" => "success"], 200);
 	}
 });
 
