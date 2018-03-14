@@ -16,7 +16,7 @@ use \inix\Config as inix;
 use \phyrex\Template as Template;
 use \Phroses\Phroses;
 use \Phroses\Database\Database;
-use \Phroses\Database\Builders\SelectBuilder;
+use \Phroses\Database\Queries\SelectQuery;
 use const \Phroses\{ SITE, INCLUDES };
 use const \reqc\{ VARS };
 use function \Phroses\{ getTagContents };
@@ -339,7 +339,7 @@ Theme::$filters["content"] = function($key, $fieldtype) {
 Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertype = "ASC") {
 	if(!in_array(strtoupper($ordertype), ["ASC", "DESC"])) return;
 
-	$tlist = (new SelectBuilder)
+	$tlist = (new SelectQuery)
 		->setTable("pages")
 		->addColumns(["*"])
 		->addWhere("siteID", "=", ":id")

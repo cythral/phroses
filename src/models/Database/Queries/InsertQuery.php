@@ -1,11 +1,11 @@
 <?php
 
-namespace Phroses\Database\Builders;
+namespace Phroses\Database\Queries;
 
 use \phyrex\Template;
-use \Phroses\Database\Builder;
+use \Phroses\Database\Query;
 
-class InsertBuilder extends Builder {
+class InsertQuery extends Query {
     /** @inheritDoc */
     protected $prefix = "INSERT INTO";
 
@@ -16,10 +16,10 @@ class InsertBuilder extends Builder {
     protected $queryTemplate = "<{var::prefix}> `<{var::table}>` (<{var::columns}>) VALUES (<{var::values}>)";
 
     /**
-     * Adds columns to the builder
+     * Adds columns to the Query
      * 
      * @param array $columns an array of columns to add
-     * @return InsertBuilder returns itself for chaining
+     * @return self returns itself for chaining
      */
     public function addColumns(array $columns): self {
         $this->columns = array_merge($this->columns, $columns);

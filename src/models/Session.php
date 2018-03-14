@@ -4,7 +4,7 @@ namespace Phroses;
 
 use \SessionHandlerInterface;
 use \Phroses\Database\Database;
-use \Phroses\Database\Builders\{ SelectBuilder, ReplaceBuilder, DeleteBuilder };
+use \Phroses\Database\Queries\{ SelectQuery, ReplaceQuery, DeleteQuery };
 
 class Session implements SessionHandlerInterface {
     static private $run = false;
@@ -38,7 +38,7 @@ class Session implements SessionHandlerInterface {
     }
 
     public function read($id): string {
-        return ((new SelectBuilder)
+        return ((new SelectQuery)
             ->setTable("sessions")
             ->addColumns([ "data" ])
             ->addWhere("id", "=", ":id")
@@ -52,7 +52,7 @@ class Session implements SessionHandlerInterface {
     }
 
     public function gc($max) {
-        (new DeleteBuilder)
+        (new DeleteQuery)
             ->setTable("sessions")
             ->addWhere("TIMESTAMPDIFF(second, `date`, NOW())", ">", ":max")
             ->execute([ ":max" => $max ]);
@@ -60,7 +60,7 @@ class Session implements SessionHandlerInterface {
     }
 
     public function destroy($id) {
-        return ((new DeleteBuilder)
+        return ((new DeleteQuery)
             ->setTable("sessions")
             ->addWhere("id", "=", ":id")
             ->execute([ ":id" => $id ])

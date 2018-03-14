@@ -7,7 +7,7 @@ namespace Phroses;
 use \PDO;
 use \inix\Config as inix;
 use \Phroses\Database\Database;
-use \Phroses\Database\Builders\SelectBuilder;
+use \Phroses\Database\Queries\SelectQuery;
 use \Phroses\Exceptions\ReadOnlyException;
 
 class Site extends DataClass {
@@ -58,7 +58,7 @@ class Site extends DataClass {
      * @return array an array of pages indexed by uri
      */
     protected function getPages(): array {
-        $pages = (new SelectBuilder)
+        $pages = (new SelectQuery)
             ->setTable("pages")
             ->addColumns(["*"])
             ->addWhere("siteID", "=", ":id")
@@ -78,7 +78,7 @@ class Site extends DataClass {
      * @return Page|null the retrieved page object or null if not found.
      */
     public function getPage(string $uri): ?Page {
-        $query = (new SelectBuilder)
+        $query = (new SelectQuery)
             ->setTable("pages")
             ->addColumns(["*"])
             ->addWhere("id", "=", ":id")
@@ -105,7 +105,7 @@ class Site extends DataClass {
      * @return int the total number of views the site has gotten
      */
     protected function getViews(): int {
-        return (new SelectBuilder)
+        return (new SelectQuery)
             ->setTable("pages")
             ->addColumns([ "SUM(`views`)" ])
             ->addWhere("siteID", "=", ":id")
@@ -117,7 +117,7 @@ class Site extends DataClass {
      * Getter for site page count (this is faster than count($site->pages))
      */
     protected function getPageCount(): int {
-        return (new SelectBuilder)
+        return (new SelectQuery)
             ->setTable("pages")
             ->addColumns([ "COUNT(`id`)"])
             ->addWhere("siteID", "=", ":id")
@@ -194,7 +194,7 @@ class Site extends DataClass {
                 return $val[0]; 
             }, 
             
-            ((new SelectBuilder)
+            ((new SelectQuery)
                 ->setTable(static::$tableName)
                 ->addColumns(["id", "url"])
                 ->execute()

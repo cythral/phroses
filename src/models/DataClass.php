@@ -10,9 +10,9 @@ namespace Phroses;
 use \PDO;
 use \Phroses\Exceptions\ReadOnlyException;
 use \Phroses\Database\Database;
-use \Phroses\Database\Builders\InsertBuilder;
-use \Phroses\Database\Builders\SelectBuilder;
-use \Phroses\Database\Builders\DeleteBuilder;
+use \Phroses\Database\Queries\InsertQuery;
+use \Phroses\Database\Queries\SelectQuery;
+use \Phroses\Database\Queries\DeleteQuery;
 
 abstract class DataClass {
     protected $db;
@@ -49,7 +49,7 @@ abstract class DataClass {
 
         return 
             ($this->properties[$key] = (
-                (new SelectBuilder)
+                (new SelectQuery)
                     ->setTable(static::$tableName)
                     ->addColumns([ $key ])
                     ->addWhere("id", "=", ":id")
@@ -96,7 +96,7 @@ abstract class DataClass {
         $table = static::$tableName;
 
         return ($this->id) ? 
-            ((new SelectBuilder)
+            ((new SelectQuery)
                 ->setTable(static::$tableName)
                 ->addColumns([ "count(`id`)" ])
                 ->addWhere("id", "=", ":id")
@@ -128,7 +128,7 @@ abstract class DataClass {
         if(!$this->id) return false;
         $table = static::$tableName;
         
-        return ((new DeleteBuilder)
+        return ((new DeleteQuery)
             ->setTable(static::$tableName)
             ->addWhere("id", "=", ":id")
             ->execute([ ":id" => $this->id ])
@@ -148,7 +148,7 @@ abstract class DataClass {
         $db = $db ?? Database::getInstance();
         $table = static::$tableName;
 
-        $info = (new SelectBuilder)
+        $info = (new SelectQuery)
             ->setTable(static::$tableName)
             ->addColumns(["*"])
             ->addWhere($column, "=", ":{$column}")

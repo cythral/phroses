@@ -5,7 +5,7 @@ namespace Phroses\Database;
 use \PDO;
 use \PDOStatement;
 use \Phroses\Patterns\Singleton;
-use \Phroses\Database\Builders\{ InsertBuilder, SelectBuilder, ReplaceBuilder, DeleteBuilder };
+use \Phroses\Database\Queries\{ InsertQuery, SelectQuery, ReplaceQuery, DeleteQuery };
 use \phyrex\Template;
 use const \Phroses\{ SRC, SCHEMAVER };
 
@@ -113,15 +113,15 @@ class Database extends Singleton {
 
 
     /**
-     * Shorthand for using an InsertBuilder to insert 
+     * Shorthand for using an InsertQuery to insert 
      * a row into the database
      * 
      * @param string $table the table to insert the row into
      * @param string $values an array of columns => values to insert
      * @return bool true on success and false on failure
      */
-    public function insert(string $table, array $values, ?InsertBuilder $builder = null): bool {
-        $query = ($builder ?? new InsertBuilder)
+    public function insert(string $table, array $values, ?InsertQuery $Query = null): bool {
+        $query = ($Query ?? new InsertQuery)
             ->setTable($table)
             ->addColumns(array_keys($values));
 
@@ -137,7 +137,7 @@ class Database extends Singleton {
      * @return bool true on success and false on failure
      */
     public function replace(string $table, array $values): bool {
-        return $this->insert($table, $values, (new ReplaceBuilder));
+        return $this->insert($table, $values, (new ReplaceQuery));
     }
 
     /**
@@ -174,7 +174,7 @@ class Database extends Singleton {
      * @return int the schema version in use
      */
     public function getSchemaVersion(): int {
-        return $this->schemaVersion ?? $this->schemaVersion = (new SelectBuilder)
+        return $this->schemaVersion ?? $this->schemaVersion = (new SelectQuery)
             ->setTable("options")
             ->addColumns(["value"])
             ->addWhere("key", "=", "'schemaver'")

@@ -1,18 +1,18 @@
 <?php
 /**
- * A simple sql select statement builder
+ * A simple sql select statement Query
  * 
  * @todo add joins
  * @todo add OR for where
  */
-namespace Phroses\Database\Builders;
+namespace Phroses\Database\Queries;
 
 use \InvalidArgumentException;
-use \Phroses\Database\Builder;
+use \Phroses\Database\Query;
 
-class SelectBuilder extends Builder {
+class SelectQuery extends Query {
 
-    use \Phroses\Database\Builders\Traits\Where;
+    use \Phroses\Database\Queries\Traits\Where;
 
     /** @inheritDoc */
     protected $prefix = "SELECT";
@@ -33,7 +33,7 @@ class SelectBuilder extends Builder {
      * Add columns to select in the query
      * 
      * @param array $columns the columns to select
-     * @return SelectBuilder return itself for chaining
+     * @return self return itself for chaining
      */
     public function addColumns(array $columns): self {
         $this->columns = array_merge($this->columns, $columns);

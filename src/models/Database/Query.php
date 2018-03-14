@@ -6,7 +6,7 @@ use \Closure;
 use \phyrex\Template;
 use function \Phroses\{ callPrefixedMethods };
 
-abstract class Builder {
+abstract class Query {
 
     use \Phroses\Traits\PrefixedMethods;
 
@@ -48,9 +48,9 @@ abstract class Builder {
      * Sets the table to operate on
      * 
      * @param string $table the table to use
-     * @return Builder returns itself for chaining
+     * @return Query returns itself for chaining
      */
-    public function setTable(string $table): Builder {
+    public function setTable(string $table): Query {
         $this->table = $table;
         return $this;
     }

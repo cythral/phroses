@@ -1,6 +1,6 @@
 <?php
 
-namespace Phroses\Database\Builders\Traits;
+namespace Phroses\Database\Queries\Traits;
 
 trait Where {
     protected $where = [];

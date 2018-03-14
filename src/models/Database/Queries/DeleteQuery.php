@@ -1,11 +1,11 @@
 <?php
 
-namespace Phroses\Database\Builders;
+namespace Phroses\Database\Queries;
 
-use \Phroses\Database\Builder;
+use \Phroses\Database\Query;
 
-class DeleteBuilder extends Builder {
-    use \Phroses\Database\Builders\Traits\Where;
+class DeleteQuery extends Query {
+    use \Phroses\Database\Queries\Traits\Where;
 
     /** @inheritDoc */
     protected $prefix = "DELETE FROM";
