@@ -14,7 +14,9 @@ class UploadTest extends TestCase {
      * setUp fixture, creates upload directories and files for testing
      */
     public function setUp() {
-        if(file_exists(ROOT."/uploads")) shell_exec("rm -rf ".ROOT."/uploads");
+        shell_exec("rm -rf ".ROOT."/uploads");
+        clearstatcache();
+
         mkdir(ROOT."/uploads");
         mkdir(ROOT."/uploads/localhost");
         touch(ROOT."/uploads/localhost/test.png");

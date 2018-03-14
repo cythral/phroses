@@ -1,14 +1,18 @@
 <?php
 
 use \Phroses\Phroses;
+use \Phroses\Switches\MethodSwitch;
 use \phyrex\Template;
 use \Phroses\DB;
+use \reqc\JSON\Server as JsonServer;
 use \inix\Config as inix;
 use function \Phroses\{ handleMethod, mapError };
 use const \Phroses\{ SITE, INCLUDES };
 
-handleMethod("post", function($out) use (&$site) {
-    
+(new MethodSwitch(null, [ $site ]))
+
+->case("post", function($out, $site) {
+
     mapError("bad_value", empty($_POST["username"]), [ "field" => "username" ]);
 
     if($_POST["old"] != "" || $_POST["new"] != "" || $_POST["repeat"] != "") {
@@ -21,9 +25,16 @@ handleMethod("post", function($out) use (&$site) {
 
     $site->adminUsername = $_POST["username"];
     $out->send(["type" => "success"], 200);
-}, ["username", "old", "new", "repeat"]);
+
+}, JsonServer::class)
+
+->case("get", function($out, $site) {
+
+    $creds = new Template(INCLUDES["TPL"]."/admin/creds.tpl");
+    $creds->username = $site->adminUsername;
+    echo $creds;
+
+});
 
 
-$creds = new Template(INCLUDES["TPL"]."/admin/creds.tpl");
-$creds->username = $site->adminUsername;
-echo $creds;
+

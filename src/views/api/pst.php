@@ -4,10 +4,14 @@ use Phroses\Phroses;
 use phyrex\Template;
 use Phroses\{ DB };
 use Phroses\Theme\Theme;
+use \Phroses\Switches\MethodSwitch;
+use \reqc\JSON\Server as JsonServer;
 use function Phroses\{ handleMethod };
 use const Phroses\{ INCLUDES, SITE };
 
-handleMethod("post", function($out) use (&$site) {
+(new MethodSwitch)
+
+->case("post", function($out, $site, $page) {
     ob_end_clean();
 
     $page = $site->getPage($_REQUEST["uri"]);
@@ -16,7 +20,6 @@ handleMethod("post", function($out) use (&$site) {
     $pst = new Template(INCLUDES["TPL"]."/pst.tpl");
     $pst->uri = $_REQUEST["uri"];
     
-
     if(!$page) {
         $pst->pst_type = "new";
         $pst->fields = "";
@@ -34,7 +37,11 @@ handleMethod("post", function($out) use (&$site) {
 
     foreach($theme->getTypes() as $type) $pst->push("types", ["type" => $type, "checked" => ($page && $page->type == $type) ? "selected" : "" ]);
     $out->send(["type" => "success", "content" => (string) $pst ], 200);
+    
+}, [ $site, $page ], JsonServer::class)
+
+->case("get", function() {
+    ob_end_clean();
+    Phroses::followRoute("GET", Phroses::RESPONSES["PAGE"][404]);
 });
 
-ob_end_clean();
-Phroses::followRoute("GET", Phroses::RESPONSES["PAGE"][404]);
