@@ -16,16 +16,22 @@ $loader = include ((INPHAR) ? SRC : ROOT) . "/vendor/autoload.php";
 $loader->addPsr4("Phroses\\", SRC."/models"); // can't do this in composer.json because the location changes if in a phar
 include SRC."/functions.php";
 
+// php core
 use \PDO;
-use \reqc;
-use \reqc\Output;
-use \listen\Events;
-use \phyrex\Template;
+
+// phroses core
 use \Phroses\Theme\Theme;
 use \Phroses\Database\Database;
 use \Phroses\Routes\Controller as RouteController;
 use \Phroses\Commands\Controller as CommandController;
+use \Phroses\Exceptions\ExitException;
+
+// vendor
 use \inix\Config as inix;
+use \reqc;
+use \reqc\Output;
+use \listen\Events;
+use \phyrex\Template;
 
 // request variables
 use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL, TYPE, TYPES, METHOD };
@@ -219,14 +225,21 @@ abstract class Phroses {
 	 */
 	static public function setExceptionHandler() {
 		set_exception_handler(function(\Throwable $e) {
-			if($e instanceof \Phroses\Exceptions\ExitException) exit($e->code ?? 0);
-			else {
-				if(TYPE == TYPES["HTTP"]) {
-					$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
-					$out->message = $e->getMessage();
-					echo $out;
+			if(method_exists($e, "defaultHandler")) {
+				$e->handler();
+			} else {
+				(new Switcher(TYPE, [ $e ]))
 
-				} else println($e->getMessage());
+				->case(TYPES["HTTP"], function($e) {
+					$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
+					$out->message = inix::get("mode") == "production" ? "And could not continue." : ($e->getMessage() . "<br>" . $e->getTraceAsString());
+					echo $out;
+				})
+				
+				->case(TYPES["CLI"], function($e) {
+					println($e->getMessage());
+				});
+				
 			}
 		});
 	}

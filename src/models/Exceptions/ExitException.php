@@ -10,4 +10,8 @@ class ExitException extends Exception {
     public function __construct(int $code = 0) {
         $this->code = $code;
     }
+
+    public function defaultHandler() {
+        exit($this->code);
+    }
 }
