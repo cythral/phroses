@@ -20,6 +20,7 @@ include SRC."/functions.php";
 use \PDO;
 
 // phroses core
+use \Phroses\Plugins\Plugin;
 use \Phroses\Theme\Theme;
 use \Phroses\Database\Database;
 use \Phroses\Routes\Controller as RouteController;
@@ -103,7 +104,7 @@ abstract class Phroses {
 		self::$out = new Output;
 
 		Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
-		Events::trigger("pluginsloaded", [ self::loadPlugins() ]);
+		Events::trigger("pluginsloaded", [ Plugin::loadAll() ]);
 		self::$configFileLoaded = Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
 		Events::attach("modeset", [ (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
 
@@ -139,21 +140,6 @@ abstract class Phroses {
 			Events::attach("commandexec", [ array_shift($_SERVER["argv"]), $_SERVER["argv"] ?? [] ], [$commandController, "execute"]);
 			throw new ExitException(0);
 		});
-	}
-	
-	/**
-	 * Loads, and sets up plugins from the plugins directory.
-	 * 
-	 * @return array a list of plugin names that were loaded
-	 */
-	static public function loadPlugins(): array {
-		foreach(glob(INCLUDES["PLUGINS"]."/*", GLOB_ONLYDIR) as $dir) {
-			static $list = [];
-			if(file_exists("{$dir}/bootstrap.php")) include "{$dir}/bootstrap.php";
-			$list[] = basename($dir);
-		}
-
-		return $list;
 	}
 	
 	/**
@@ -226,7 +212,7 @@ abstract class Phroses {
 	static public function setExceptionHandler() {
 		set_exception_handler(function(\Throwable $e) {
 			if(method_exists($e, "defaultHandler")) {
-				$e->handler();
+				$e->defaultHandler();
 			} else {
 				(new Switcher(TYPE, [ $e ]))
 
