@@ -11,6 +11,25 @@ class Controller {
     private $rules = [];
     private $ruleArgs = [];
     private $cascade;
+
+    const RESPONSES = [
+		"DEFAULT" => 0,
+
+		"PAGE" => [
+			200 => 1,
+			301 => 2,
+			404 => 3
+		],
+
+		"SYS" => [
+			200 => 4
+		],
+
+		"ASSET" => 5,
+		"API" => 6,
+		"UPLOAD" => 7,
+		"MAINTENANCE" => 8
+	];
        
     const METHODS = [
         "GET",
@@ -20,7 +39,7 @@ class Controller {
         "DELETE"
     ];
     
-    public function __construct($defaultRoute = Phroses::RESPONSES["PAGE"][200]) {
+    public function __construct($defaultRoute = self::RESPONSES["PAGE"][200]) {
         $this->cascade = new Cascade($defaultRoute);
     }
     
@@ -34,6 +53,7 @@ class Controller {
     
     public function addRoute(Route $route) {
         $methods = ($route->method) ? [ strtoupper($route->method) ] : self::METHODS;
+        $route->controller = $this;
         
         foreach($methods as $method) {
 			if(!isset($this->routes[$method])) $this->routes[$method] = [];
@@ -64,11 +84,11 @@ class Controller {
     /**
      * Selects a route based on rules
      */
-    public function select(string $method = METHOD) {
-        $response = $this->getResponse();
+    public function select(string $method = METHOD, ?int $response = null) {
+        $response = $response ?? $this->getResponse();
 
-        if($response == Phroses::RESPONSES["SYS"][200]) $method = "GET";
-        if(!isset($this->routes[$method][$response])) $response = Phroses::RESPONSES["DEFAULT"];
+        if($response == self::RESPONSES["SYS"][200]) $method = "GET";
+        if(!isset($this->routes[$method][$response])) $response = self::RESPONSES["DEFAULT"];
         
         return $this->routes[$method][$response] ?? null;
     }

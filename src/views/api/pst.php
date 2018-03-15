@@ -6,6 +6,7 @@ use Phroses\{ DB };
 use Phroses\Theme\Theme;
 use \Phroses\Switches\MethodSwitch;
 use \reqc\JSON\Server as JsonServer;
+use \Phroses\Routes\Controller as RouteController;
 use function Phroses\{ handleMethod };
 use const Phroses\{ INCLUDES, SITE };
 
@@ -40,8 +41,13 @@ use const Phroses\{ INCLUDES, SITE };
     
 }, [], JsonServer::class)
 
-->case("get", function() {
+->case("get", (function($out, $page, $site) {
     ob_end_clean();
-    Phroses::followRoute("GET", Phroses::RESPONSES["PAGE"][404]);
-});
+    
+    // reroute to 404
+    $this->controller
+        ->select(\reqc\METHOD, RouteController::RESPONSES["PAGE"]["404"])
+        ->follow($page, $site, $out);
+
+})->bindTo($this), [ $page, $site ]);
 

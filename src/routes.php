@@ -16,6 +16,7 @@ use \phyrex\Template;
 use \Phroses\Theme\Theme;
 use \Phroses\Upload;
 use \Phroses\Routes\Route;
+use \Phroses\Routes\Controller as RouteController;
 use \Phroses\Exceptions\UploadException;
 
 // request variables
@@ -29,7 +30,7 @@ $routes = [];
  */
 $routes[] = new class extends Route {
 	public $method = "get";
-	public $response = Phroses::RESPONSES["PAGE"][200];
+	public $response = RouteController::RESPONSES["PAGE"][200];
 
 	public function follow(&$page, &$site, &$out) {
 		if(safeArrayValEquals($_GET, "mode", "json")) {
@@ -54,7 +55,7 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "get";
-	public $response = Phroses::RESPONSES["PAGE"][301];
+	public $response = RouteController::RESPONSES["PAGE"][301];
 
 	public function follow(&$page, &$site, &$out) {
 
@@ -82,7 +83,7 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "get";
-	public $response = Phroses::RESPONSES["SYS"][200];
+	public $response = RouteController::RESPONSES["SYS"][200];
 
 	public function follow(&$page, &$site, &$out) {
 		$path = substr(PATH, strlen($site->adminURI));
@@ -157,7 +158,7 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "get";
-	public $response = Phroses::RESPONSES["PAGE"][404];
+	public $response = RouteController::RESPONSES["PAGE"][404];
 	
 	public function follow(&$page, &$site, &$out) {		
 		$out->setCode(404);
@@ -176,7 +177,7 @@ $routes[] = new class extends Route {
 		return [ 
 			0 => function() use (&$page) { return !$page->id; },
 			5 => function() use (&$page, &$cascade) { 
-				return $cascade->getResult() == Phroses::RESPONSES["PAGE"][200] && !$page->public && !$_SESSION; 
+				return $cascade->getResult() == RouteController::RESPONSES["PAGE"][200] && !$page->public && !$_SESSION; 
 			}
 		];
 	}
@@ -187,7 +188,7 @@ $routes[] = new class extends Route {
  * Serves theme asset files
  */
 $routes[] = new class extends Route {
-	public $response = Phroses::RESPONSES["ASSET"];
+	public $response = RouteController::RESPONSES["ASSET"];
 	
 	public function follow(&$page, &$site, &$out) { 
 		$page->theme->readAsset(PATH); 
@@ -197,7 +198,7 @@ $routes[] = new class extends Route {
 		return [ 
 			7 => function() use (&$page, &$cascade) { 
 				return (
-					in_array($cascade->getResult(), [ Phroses::RESPONSES["MAINTENANCE"], Phroses::RESPONSES["PAGE"][404] ]) && 
+					in_array($cascade->getResult(), [ RouteController::RESPONSES["MAINTENANCE"], RouteController::RESPONSES["PAGE"][404] ]) && 
 					$page->theme->hasAsset(PATH)
 				); 
 			} 
@@ -210,7 +211,7 @@ $routes[] = new class extends Route {
  * Runs the theme API, if it has one
  */
 $routes[] = new class extends Route {
-	public $response = Phroses::RESPONSES["API"];
+	public $response = RouteController::RESPONSES["API"];
 
 	public function follow(&$page, &$site, &$out) { 
 		$page->theme->runApi(); 
@@ -231,14 +232,14 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "post";
-	public $response = Phroses::RESPONSES["DEFAULT"];
+	public $response = RouteController::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer();
 
 		// Validation
 		$out->error("access_denied", !$_SESSION, 401);
-		$out->error("resource_exists", Phroses::$response != Phroses::RESPONSES["PAGE"][404]);
+		$out->error("resource_exists", Phroses::$response != RouteController::RESPONSES["PAGE"][404]);
 
 		foreach(["title","type"] as $type) {
 			$out->error("missing_value", !array_key_exists($type, $_REQUEST), 400, [ "field" => $type ]);
@@ -263,14 +264,14 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "patch";
-	public $response = Phroses::RESPONSES["DEFAULT"];
+	public $response = RouteController::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer();
 
 		// Validation
 		$out->error("access_denied", !$_SESSION, 401);
-		$out->error("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
+		$out->error("resource_missing", !in_array(Phroses::$response, [ RouteController::RESPONSES["PAGE"][200], RouteController::RESPONSES["PAGE"][301] ]));
 		$out->error("no_change", allKeysDontExist(["type", "uri", "title", "content", "public", "css"], $_REQUEST));
 		$out->error("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), 400, [ "field" => "type" ]);
 		$out->error("resource_exists", isset($_REQUEST["uri"]) && $site->hasPage($_REQUEST["uri"]));
@@ -307,12 +308,12 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "delete";
-	public $response = Phroses::RESPONSES["DEFAULT"];
+	public $response = RouteController::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer();
 		$out->error("access_denied", !$_SESSION, 401);
-		$out->error("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
+		$out->error("resource_missing", !in_array(Phroses::$response, [ RouteController::RESPONSES["PAGE"][200], RouteController::RESPONSES["PAGE"][301] ]));
 		$out->error("delete_failed", !$page->delete());
 		$out->success();
 	}
@@ -324,7 +325,7 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "get";
-	public $response = Phroses::RESPONSES["UPLOAD"];
+	public $response = RouteController::RESPONSES["UPLOAD"];
 	
 	public function follow(&$page, &$site, &$out) {
 		(new Upload($site, substr(PATH, 8)))->display();
@@ -349,7 +350,7 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "delete";
-	public $response = Phroses::RESPONSES["UPLOAD"];
+	public $response = RouteController::RESPONSES["UPLOAD"];
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer;
@@ -373,7 +374,7 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "patch";
-	public $response = Phroses::RESPONSES["UPLOAD"];
+	public $response = RouteController::RESPONSES["UPLOAD"];
 	private $out;
 
 	public function follow(&$page, &$site, &$out) {
@@ -398,7 +399,7 @@ $routes[] = new class extends Route {
  */
 $routes[] = new class extends Route {
 	public $method = "post";
-	public $response = Phroses::RESPONSES["UPLOAD"];
+	public $response = RouteController::RESPONSES["UPLOAD"];
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer;
@@ -420,7 +421,7 @@ $routes[] = new class extends Route {
  * This route displays maintenance mode if a site is in one.
  */
 $routes[] = new class extends Route {
-	public $response = Phroses::RESPONSES["MAINTENANCE"];
+	public $response = RouteController::RESPONSES["MAINTENANCE"];
 
 	public function follow(&$page, &$site, &$out) {
 		$out->setCode(503);
@@ -430,7 +431,7 @@ $routes[] = new class extends Route {
 	public function rules($cascade, $page, $site) {
 		return [
 			6 => function() use (&$site, &$cascade) { 
-				return $site->maintenance && !$_SESSION && $cascade->getResult() != Phroses::RESPONSES["SYS"][200]; 
+				return $site->maintenance && !$_SESSION && $cascade->getResult() != RouteController::RESPONSES["SYS"][200]; 
 			} 
 		];
 	}

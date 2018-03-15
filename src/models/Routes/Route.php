@@ -10,6 +10,7 @@ use \Phroses\Output;
 abstract class Route {
     public $method = null;
     public $response;
+    public $controller;
 
     abstract public function follow(Page &$page, Site &$site, Output &$out);
 

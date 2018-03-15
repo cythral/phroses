@@ -106,8 +106,10 @@ abstract class Phroses {
 		$dbconfig = ((defined("Phroses\TESTING") && inix::get("test-database")) ? inix::get("test-database") : inix::get("database"));
 		Events::attach("dbsetup", [ $dbconfig["host"], $dbconfig["name"], $dbconfig["user"], $dbconfig["password"] ], "\Phroses\Phroses::setupDatabase");
 
-		// page or asset
-		if(TYPE != TYPES["CLI"] && self::$configFileLoaded) {
+		(new Switcher(TYPE))
+
+		->case(TYPES["HTTP"], function() {
+			if(!self::$configFileLoaded) return;
 
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
@@ -122,13 +124,13 @@ abstract class Phroses {
 			$routeController
 				->select()
 				->follow(self::$page, self::$site, self::$out);
-				
-		// command line
-		} else {
+		})
+
+		->case(TYPES["CLI"], function() {
 			Events::trigger("commandsmapped", [ include SRC."/commands.php" ]);
 			Events::attach("commandexec", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::executeCommand");
 			exit(0);
-		}
+		});
 	}
 	
 	/**
