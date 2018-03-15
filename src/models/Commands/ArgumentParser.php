@@ -26,7 +26,7 @@ class ArgumentParser {
             if($this->isFlag($arg)) {
                 $flag = Flag::parse($arg);
                 $parsed["flags"][$flag->name] = $flag;
-            } else $parsed["args"] = $arg;
+            } else $parsed["args"][] = $arg;
         }
 
         return $parsed;

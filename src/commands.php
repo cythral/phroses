@@ -29,12 +29,12 @@ $commands[] = new class extends Command {
 			// turn off/on maintenance for specific sites
 			if(isset($this->flags["site"])) {
 
-				if(!($site = Site::generate($this->flags["site"]))) {
+				if(!($site = Site::generate($this->flags["site"]->value))) {
 					$this->error("Could not find that site");
 				}
 
 				$site->maintenance = [ "on" => 1, "off" => 0 ][$mode];
-				println("Turned maintenance mode for ".$this->flags["site"]." {$mode}");
+				println("Turned maintenance mode for ".$this->flags["site"]->value." {$mode}");
 				throw new ExitException(0);
 
 			}
@@ -47,7 +47,7 @@ $commands[] = new class extends Command {
 		}
 
 		// display
-		$sites = DB::query("SELECT `url`, `maintenance` FROM `sites`", [], PDO::FETCH_ASSOC);
+		$sites = $this->db->fetch("SELECT `url`, `maintenance` FROM `sites`", [], PDO::FETCH_ASSOC);
 		
 		$table = new ConsoleTable;
 		$table->setHeaders([ "URL", "on/off"]);
