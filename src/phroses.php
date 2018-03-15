@@ -64,37 +64,10 @@ abstract class Phroses {
 		]
 	];
 
-	static public $response = self::RESPONSES["PAGE"][200];
+	static public $response = RouteController::RESPONSES["PAGE"][200];
 
 	const MM_ON = true;
 	const MM_OFF = false;
-
-	const RESPONSES = [
-		"DEFAULT" => 0,
-
-		"PAGE" => [
-			200 => 1,
-			301 => 2,
-			404 => 3
-		],
-
-		"SYS" => [
-			200 => 4
-		],
-
-		"ASSET" => 5,
-		"API" => 6,
-		"UPLOAD" => 7,
-		"MAINTENANCE" => 8
-	];
-
-	const METHODS = [
-		"GET",
-		"POST",
-		"PATCH",
-		"PUT",
-		"DELETE"
-	];
 	
 	/**
 	 * This is the first method that gets run.  Triggers listen events
