@@ -137,7 +137,7 @@ abstract class Phroses {
 			$commandController = new CommandController;
 			Events::attach("commandsmapped", [ include SRC."/commands.php" ], [$commandController, "addCommands"]);
 			Events::attach("commandexec", [ array_shift($_SERVER["argv"]), $_SERVER["argv"] ?? [] ], [$commandController, "execute"]);
-			exit(0);
+			throw new ExitException(0);
 		});
 	}
 	

@@ -2,6 +2,8 @@
 
 namespace Phroses\Commands;
 
+use \Phroses\Exceptions\ExitException;
+
 class Controller {
     private $commands = [];
 
@@ -22,7 +24,11 @@ class Controller {
     public function execute(string $name, array $args) {
         $args = (new ArgumentParser($args))->parse();
 
-        $command = $this->select($name);
+        if(!$command = $this->select($name)) {
+            println("Command $name not found");
+            throw new ExitException(1);
+        }
+
         $command->flags = $args["flags"];
         $command->execute(...$args["args"]);
     }
