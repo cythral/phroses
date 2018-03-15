@@ -11,11 +11,13 @@ use \listen\Events;
 use \ZBateson\MailMimeParser\MailMimeParser;
 use \LucidFrame\Console\ConsoleTable;
 use \Phroses\Exceptions\ExitException;
+use \Phroses\Commands\Command;
 
+$commands = [];
 /**
  * Turns application-wide maintenance mode off and on
  */
-self::addCmd(new class extends Command {
+$commands[] = new class extends Command {
 	public $name = "maintenance";
 	
 	public function execute(?string $mode = null) {
@@ -58,12 +60,12 @@ self::addCmd(new class extends Command {
 		$table->display();
 		println(PHP_EOL."Global maintenance mode is ".((file_exists(ROOT."/.maintenance")) ? "on" : "off").PHP_EOL);
 	}
-});
+};
 
 /**
  * Updates phroses' database schema
  */
-self::addCmd(new class extends Command {
+$commands[] = new class extends Command {
 	public $name = "update";
 
 	public function execute() {
@@ -73,13 +75,13 @@ self::addCmd(new class extends Command {
 			$this->error("An error occurred when trying to update the database schema");
 		}
 	}
-});
+};
 
 /**
  * Processes an email that was piped to phroses.  There is
  * no default functionality for this, so a listen event is triggered instead.
  */
-self::addCmd(new class extends Command {
+$commands[] = new class extends Command {
 	public $name = "email";
 
 	public function execute() {
@@ -93,24 +95,24 @@ self::addCmd(new class extends Command {
 			$email->getTextContent() ?? $email->getHtmlContent()
 		]);
 	}
-});
+};
 
 /**
  * This command is used during testing
  */
-self::addCmd(new class extends Command {
+$commands[] = new class extends Command {
 	public $name = "test";
 
 	public function execute() {
 		// will do more here later
 		echo "TEST OK";
 	}
-});
+};
 
 /**
  * Resets the database
  */
-self::addCmd(new class extends Command {
+$commands[] = new class extends Command {
 	public $name = "reset";
 
 	public function execute() {
@@ -125,12 +127,12 @@ self::addCmd(new class extends Command {
 			println("The database has been successfully reset.");
 		}
 	}
-});
+};
 
 /**
  * Restores the database from a backup.  A sql file should be piped to the script
  */
-self::addCmd(new class extends Command {
+$commands[] = new class extends Command {
 	public $name = "restore";
 
 	public function execute() {
@@ -142,12 +144,12 @@ self::addCmd(new class extends Command {
 
 		println("Successfully restored the database from your backup.");
 	}
-});
+};
 
 /**
  * Displays the current version of Phroses
  */
-self::addCmd(new class extends Command {
+$commands[] = new class extends Command {
 	public $name = "version";
 
 	public function execute() {
@@ -158,6 +160,6 @@ self::addCmd(new class extends Command {
 		println($out);
 	}
 
-});
+};
 
-return self::$commands; // return a list of commands for the listen event
+return $commands; // return a list of commands for the listen event

@@ -3,10 +3,12 @@
  * A command class to be extended and used in /src/commands.php
  * Provides an interface for working inside a cli environment
  */
-namespace Phroses;
+namespace Phroses\Commands;
 
+use \Phroses\Phroses;
 use \Phroses\Database\Database;
 use \Phroses\Exceptions\ExitException;
+use function \Phroses\println;
 
 abstract class Command {
 

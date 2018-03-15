@@ -24,6 +24,7 @@ use \phyrex\Template;
 use \Phroses\Theme\Theme;
 use \Phroses\Database\Database;
 use \Phroses\Routes\Controller as RouteController;
+use \Phroses\Commands\Controller as CommandController;
 use \inix\Config as inix;
 
 // request variables
@@ -37,8 +38,6 @@ use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL, TYPE, TYPES, METHOD };
 abstract class Phroses {
 	
 	static private $out;
-	static private $commands = [];
-	static private $routeController;
 	static private $cascade;
 	static private $db;
 
@@ -127,8 +126,11 @@ abstract class Phroses {
 		})
 
 		->case(TYPES["CLI"], function() {
-			Events::trigger("commandsmapped", [ include SRC."/commands.php" ]);
-			Events::attach("commandexec", [ $_SERVER["argv"] ?? [] ], "\Phroses\Phroses::executeCommand");
+			array_shift($_SERVER["argv"]); // remove filename/command name
+
+			$commandController = new CommandController;
+			Events::attach("commandsmapped", [ include SRC."/commands.php" ], [$commandController, "addCommands"]);
+			Events::attach("commandexec", [ array_shift($_SERVER["argv"]), $_SERVER["argv"] ?? [] ], [$commandController, "execute"]);
 			exit(0);
 		});
 	}
@@ -279,39 +281,6 @@ abstract class Phroses {
 		if(substr(PATH, -1) == "/" && PATH != "/") {
 			self::$out->redirect(substr(PATH, 0, -1));
 		}
-	}
-
-	/**
-	 * Executes a cli command.  See ./commands.php for the different commands
-	 * 
-	 * @param array $cliArgs an array of arguments passed from the command line
-	 */
-	static public function executeCommand(array $cliArgs) {
-		array_shift($cliArgs); // remove filename
-		
-		if(count($cliArgs) == 0) {
-			println("no command given");
-			throw new ExitException(1);
-		}
-
-		$cmd = array_shift($cliArgs);
-		[ "args" => $args, "flags" => $flags] = parseCliArgs($cliArgs);
-
-		if(isset(self::$commands[$cmd])) {
-			self::$commands[$cmd]->flags = $flags;
-			self::$commands[$cmd]->execute(...$args);
-		}
-	}
-	
-	/**
-	 * Adds a cli command.  Cli commands should be added using this method
-	 * in ./commands.php
-	 *
-	 * @param string $cmd the name of the command
-	 * @param callable $handler the command handler
-	 */
-	static public function addCmd(Command $command) {
-		self::$commands[$command->name] = $command;
 	}
 	
 	/**

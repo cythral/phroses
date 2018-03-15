@@ -2,7 +2,7 @@
 
 namespace Phroses\Testing;
 
-use \Phroses\Command;
+use \Phroses\Commands\Command;
 use \Phroses\Exceptions\ExitException;
 
 /**
