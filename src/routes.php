@@ -9,7 +9,7 @@ namespace Phroses;
 
 use \reqc;
 use \reqc\Output;
-use \reqc\JSON\Server as JSONServer;
+use \Phroses\JsonServer;
 use \listen\Events;
 use \inix\Config as inix;
 use \phyrex\Template;
@@ -30,13 +30,12 @@ self::addRoute(new class extends Route {
 
 	public function follow(&$page, &$site, &$out) {
 		if(safeArrayValEquals($_GET, "mode", "json")) {
-			$out = new JSONServer();
+			$out = new JsonServer();
 			$out->send($page->getData(), 200);
-			
 		}
 
 		if(safeArrayValEquals($_GET, "mode", "css")) {
-			$out->setContentType(reqc\MIME_TYPES["CSS"]);
+			$out->setContentType(MIME_TYPES["CSS"]);
 			$page->views--;
 			die($page->css);
 		}
@@ -127,6 +126,7 @@ self::addRoute(new class extends Route {
 		return [
 			1 => function() use (&$site) {
 				$ipok = false;
+				
 				if(in_array($site->adminIP, ["", "*"])) $ipok = true;
 				else {
 					foreach(explode(",", $site->adminIP) as $ip) {
@@ -231,27 +231,26 @@ self::addRoute(new class extends Route {
 	public $response = Phroses::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
-		$out = new JSONServer();
+		$out = new JsonServer();
 
 		// Validation
-		mapError("access_denied", !$_SESSION, null, 401);
-		mapError("resource_exists", Phroses::$response != Phroses::RESPONSES["PAGE"][404]);
+		$out->error("access_denied", !$_SESSION, 401);
+		$out->error("resource_exists", Phroses::$response != Phroses::RESPONSES["PAGE"][404]);
 
 		foreach(["title","type"] as $type) {
-			mapError("missing_value", !array_key_exists($type, $_REQUEST), [ "field" => $type ]);
+			$out->error("missing_value", !array_key_exists($type, $_REQUEST), 400, [ "field" => $type ]);
 		}
 
-		mapError("bad_value", !$page->theme->hasType($_REQUEST["type"]), [ "field" => "type" ]);
+		$out->error("bad_value", !$page->theme->hasType($_REQUEST["type"]), 400, [ "field" => "type" ]);
 
 		$page = Page::create(PATH, $_REQUEST["title"], $_REQUEST["type"], $_REQUEST["content"] ?? "{}", $site->id, $site->theme);
-		mapError("create_fail", !$page);
+		$out->error("create_fail", !$page);
 
-		$out->send([ 
-			"type" => "success",
+		$out->success(200, [
 			"id" => $page->id, 
 			"content" => $page->theme->getBody(),
 			"typefields" => $page->theme->getEditorFields()
-		], 200);
+		]);
 	}
 });
 
@@ -264,20 +263,20 @@ self::addRoute(new class extends Route {
 	public $response = Phroses::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
-		$out = new JSONServer();
+		$out = new JsonServer();
 
 		// Validation
-		mapError("access_denied", !$_SESSION, null, 401);
-		mapError("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
-		mapError("no_change", allKeysDontExist(["type", "uri", "title", "content", "public", "css"], $_REQUEST));
-		mapError("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), [ "field" => "type" ]);
-		mapError("resource_exists", isset($_REQUEST["uri"]) && $site->hasPage($_REQUEST["uri"]));
+		$out->error("access_denied", !$_SESSION, 401);
+		$out->error("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
+		$out->error("no_change", allKeysDontExist(["type", "uri", "title", "content", "public", "css"], $_REQUEST));
+		$out->error("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), 400, [ "field" => "type" ]);
+		$out->error("resource_exists", isset($_REQUEST["uri"]) && $site->hasPage($_REQUEST["uri"]));
 		
 		// if requesting a page type to change to redirect with no destination specified, just send the typefields
 		if(safeArrayValEquals($_REQUEST, "type", "redirect") && (!isset($_REQUEST["content"]) || 
 			(isset($_REQUEST["content"]) && !isset(json_decode($_REQUEST["content"])->destination)))) {
 
-			$out->send(["type" => "success", "typefields" => $page->theme->getEditorFields("redirect") ], 200);
+			$out->success(200, [ "typefields" => $page->theme->getEditorFields("redirect") ]);
 		}
 
 		if(isset($_REQUEST["title"])) $page->title = $_REQUEST["title"];
@@ -291,11 +290,11 @@ self::addRoute(new class extends Route {
 			if($_REQUEST["type"] != "redirect") $page->content = "{}";
 		}
 
-		$output = [ "type" => "success" ];
+		$output = [];
 		if(!isset($_REQUEST["nocontent"])) $output["content"] = $page->theme->getBody();
 		if(isset($_REQUEST["type"])) $output["typefields"] = $page->theme->getEditorFields($_REQUEST["type"]);
 
-		$out->send($output, 200);
+		$out->success(200, $output);
 	}
 });
 
@@ -308,12 +307,11 @@ self::addRoute(new class extends Route {
 	public $response = Phroses::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
-		$out = new JSONServer();
-		
-		mapError("access_denied", !$_SESSION, null, 401);
-		mapError("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
-		mapError("delete_failed", !$page->delete());
-		$out->send(["type" => "success"], 200);
+		$out = new JsonServer();
+		$out->error("access_denied", !$_SESSION, 401);
+		$out->error("resource_missing", !in_array(Phroses::$response, [ Phroses::RESPONSES["PAGE"][200], Phroses::RESPONSES["PAGE"][301] ]));
+		$out->error("delete_failed", !$page->delete());
+		$out->success();
 	}
 });
 
@@ -349,21 +347,20 @@ self::addRoute(new class extends Route {
 self::addRoute(new class extends Route {
 	public $method = "delete";
 	public $response = Phroses::RESPONSES["UPLOAD"];
-	private $out;
 
 	public function follow(&$page, &$site, &$out) {
-		$out = new JSONServer;
-		mapError("access_denied", !$_SESSION, null, 401);
+		$out = new JsonServer;
+		mapError("access_denied", !$_SESSION, 401);
 
 		try {
 			$upload = new Upload($site, substr(PATH, 8));
 			if(!$upload->delete()) throw new UploadException("failed_delete");
 
 		} catch(UploadException $e) {
-			$out->send(["type" => "error", "error" => $e->getMessage() ], 400);
+			$out->error($e->getMessage());
 		}
 
-		$out->send(["type" => "success"], 200);
+		$out->success();
 	}
 });
 
@@ -377,18 +374,18 @@ self::addRoute(new class extends Route {
 	private $out;
 
 	public function follow(&$page, &$site, &$out) {
-		$out = new JSONServer;
-		mapError("access_denied", !$_SESSION, null, 401);
-		mapError("missing_value", !isset($_REQUEST["to"]), [ "value" => "to" ], 400);
+		$out = new JsonServer;
+		$out->error("access_denied", !$_SESSION, 401);
+		$out->error("missing_value", !isset($_REQUEST["to"]), 400, [ "value" => "to" ]);
 
 		try {
 			$upload = new Upload($site, substr(PATH, 8));
 			if(!$upload->rename($_REQUEST["to"])) throw new UploadException("failed_rename");
 		} catch(UploadException $e) {
-			$out->send(["type" => "error", "error" => $e->getMessage() ], 400);
+			$out->error($e->getMessage());
 		}
 
-		$out->send(["type" => "success"], 200);
+		$out->success();
 	}
 });
 
@@ -399,20 +396,19 @@ self::addRoute(new class extends Route {
 self::addRoute(new class extends Route {
 	public $method = "post";
 	public $response = Phroses::RESPONSES["UPLOAD"];
-	private $out;
 
 	public function follow(&$page, &$site, &$out) {
-		$out = new JSONServer;
-		mapError("access_denied", !$_SESSION, null, 401);
-		mapError("missing_value", !isset($_FILES["file"]), [ "value" => "file" ], 400);
+		$out = new JsonServer;
+		$out->error("access_denied", !$_SESSION, 401);
+		$out->error("missing_value", !isset($_FILES["file"]), 400, [ "value" => "file" ]);
 		
 		try {
 			Upload::create($site, substr(PATH, 8), $_FILES["file"]);
 		} catch(UploadException $e) {
-			$out->send(["type" => "error", "error" => $e->getMessage() ], 400);
+			$out->error($e->getMessage());
 		}
 
-		$out->send(["type" => "success"], 200);
+		$out->success();
 	}
 });
 
