@@ -23,6 +23,7 @@ use \listen\Events;
 use \phyrex\Template;
 use \Phroses\Theme\Theme;
 use \Phroses\Database\Database;
+use \Phroses\Routes\Controller as RouteController;
 use \inix\Config as inix;
 
 // request variables
@@ -36,9 +37,8 @@ use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL, TYPE, TYPES, METHOD };
 abstract class Phroses {
 	
 	static private $out;
-	static private $routes = [];
 	static private $commands = [];
-	static private $cascadeRules = [];
+	static private $routeController;
 	static private $cascade;
 	static private $db;
 
@@ -108,14 +108,21 @@ abstract class Phroses {
 
 		// page or asset
 		if(TYPE != TYPES["CLI"] && self::$configFileLoaded) {
-			self::$cascade = new Cascade(self::RESPONSES["PAGE"][200]);
-			Events::trigger("routesmapped", [ include SRC."/routes.php" ]);
+
 			Events::trigger("sessionstarted", [ Session::start() ]);
 			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
-			Events::attach("routedetermined", [], "\Phroses\Phroses::determineRoute");
 			if((bool) (inix::get("notrailingslashes") ?? true)) self::removeTrailingSlash();
-			Events::attach("routesfollow", [ METHOD, self::$response ], "\Phroses\Phroses::followRoute");
 
+			// setup routes
+			$routeController = new RouteController;
+			$routeController->addRuleArgs(self::$page, self::$site);
+			Events::attach("routesmapped", [ include SRC."/routes.php" ], [$routeController, "addRoutes"]);
+			self::$response = $routeController->getResponse();
+			
+			$routeController
+				->select()
+				->follow(self::$page, self::$site, self::$out);
+				
 		// command line
 		} else {
 			Events::trigger("commandsmapped", [ include SRC."/commands.php" ]);
@@ -262,19 +269,6 @@ abstract class Phroses {
 			"css" => $info->css
 		], self::$site->theme);
 	}
-
-	/**
-	 * Determines the route to take based on cascade rules added in ./routes.php
-	 */
-	static public function determineRoute(): void {
-		sort(self::$cascadeRules); // make sure rules get executed in order
-		
-		foreach(self::$cascadeRules as list($response, $expr)) {
-			self::$cascade->addRule($expr(), $response);
-		}
-
-		self::$response = self::$cascade->getResult();
-	}
 	
 	/**
 	 * Removes the trailing slash from a uri (/admin/ => /admin)
@@ -284,37 +278,7 @@ abstract class Phroses {
 			self::$out->redirect(substr(PATH, 0, -1));
 		}
 	}
-	
-	/**
-	 * Adds an HTTP route.  Routes should be added using this method in ./routes.php
-	 * 
-	 * @param Route a route object
-	 */
-	static public function addRoute(Route $route) {
-		$methods = ($route->method) ? [ strtoupper($route->method) ] : [ "GET", "POST", "PUT", "PATCH", "DELETE" ]; // if method was null, create a route for all methods
 
-		foreach($methods as $method) {
-			if(!isset(self::$routes[$method])) self::$routes[$method] = [];
-			self::$routes[$method][$route->response] = $route;
-		}
-
-		$cascadeRules = array_map(function($expr) use ($route) { return [ $route->response, $expr ]; }, $route->rules(self::$page, self::$site, self::$cascade));
-		self::$cascadeRules = array_merge(self::$cascadeRules, $cascadeRules);
-	}
-	
-	/**
-	 * "Follows" / executes an http route.  See ./routes.php for the different routes
-	 *
-	 * @param string $method the method to use for following the route (get, post, put, etc.)
-	 * @param int $response the response to use (see self::RESPONSES for possible responses)
-	 * @return mixed anything the route returned
-	 */
-	static public function followRoute(string $method, int $response) {
-		if($response == self::RESPONSES["SYS"][200]) $method = "GET";
-		if(!isset(self::$routes[$method][$response])) $response = self::RESPONSES["DEFAULT"];
-		return self::$routes[$method][$response]->follow(self::$page, self::$site, self::$out);
-	}
-	
 	/**
 	 * Executes a cli command.  See ./commands.php for the different commands
 	 * 

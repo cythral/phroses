@@ -15,16 +15,19 @@ use \inix\Config as inix;
 use \phyrex\Template;
 use \Phroses\Theme\Theme;
 use \Phroses\Upload;
+use \Phroses\Routes\Route;
 use \Phroses\Exceptions\UploadException;
 
 // request variables
 use const \reqc\{ VARS, MIME_TYPES, PATH, EXTENSION, METHOD, HOST, BASEURL };
 
+$routes = [];
+
 /**
  * GET PAGE/200
  * This route gets page information and either displays it as html or json
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "get";
 	public $response = Phroses::RESPONSES["PAGE"][200];
 
@@ -43,13 +46,13 @@ self::addRoute(new class extends Route {
 		if($page->css != null) $page->theme->push("stylesheets", [ "src" => "?mode=css"] );
 		$page->display();
 	}
-});
+};
 
 /**
  * GET PAGE/301
  * This route redirects to a different page.  If the destination is not specified, an error is displayed instead
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "get";
 	public $response = Phroses::RESPONSES["PAGE"][301];
 
@@ -64,20 +67,20 @@ self::addRoute(new class extends Route {
 
 	}
 
-	public function rules(&$page, &$site, &$cascade) {
+	public function rules($cascade, $page, $site) {
 		return [ 
 			4 => function() use (&$page) { 
 				return $page->type == "redirect"; 
 			} 
 		];
 	}
-});
+};
 
 /**
  * GET SYS/200
  * Displays an internal phroses "view" (can be a dashboard page or asset file)
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "get";
 	public $response = Phroses::RESPONSES["SYS"][200];
 
@@ -122,7 +125,7 @@ self::addRoute(new class extends Route {
 
 	}
 	
-	public function rules(&$page, &$site, &$cascade) {
+	public function rules($cascade, $page, $site) {
 		return [
 			1 => function() use (&$site) {
 				$ipok = false;
@@ -146,13 +149,13 @@ self::addRoute(new class extends Route {
 			}
 		];
 	}
-});
+};
 
 /**
  * GET PAGE/404
  * Displays a a 404 not found error when a page or asset is not found.
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "get";
 	public $response = Phroses::RESPONSES["PAGE"][404];
 	
@@ -169,7 +172,7 @@ self::addRoute(new class extends Route {
 		$page->display();
 	}
 	
-	public function rules(&$page, &$site, &$cascade) {
+	public function rules($cascade, $page, $site) {
 		return [ 
 			0 => function() use (&$page) { return !$page->id; },
 			5 => function() use (&$page, &$cascade) { 
@@ -177,20 +180,20 @@ self::addRoute(new class extends Route {
 			}
 		];
 	}
-});
+};
 
 /**
  * (All) ASSET
  * Serves theme asset files
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $response = Phroses::RESPONSES["ASSET"];
 	
 	public function follow(&$page, &$site, &$out) { 
 		$page->theme->readAsset(PATH); 
 	}
 	
-	public function rules(&$page, &$site, &$cascade) {
+	public function rules($cascade, $page, $site) {
 		return [ 
 			7 => function() use (&$page, &$cascade) { 
 				return (
@@ -200,33 +203,33 @@ self::addRoute(new class extends Route {
 			} 
 		];
 	}
-});
+};
 
 /**
  * (All) API
  * Runs the theme API, if it has one
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $response = Phroses::RESPONSES["API"];
 
 	public function follow(&$page, &$site, &$out) { 
 		$page->theme->runApi(); 
 	}
-	public function rules(&$page, &$site, &$cascade) {
+	public function rules($cascade, $page, $site) {
 		return [ 
 			3 => function() use (&$page) { 
 				return (stringStartsWith(PATH, "/api") && $page->theme->hasApi()); 
 			} 
 		];
 	}
-});
+};
 
 
 /**
  * POST (Default handler)
  * This handles all post requests.  If a page does not exist, this route creates one based on request parameters.
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "post";
 	public $response = Phroses::RESPONSES["DEFAULT"];
 
@@ -252,13 +255,13 @@ self::addRoute(new class extends Route {
 			"typefields" => $page->theme->getEditorFields()
 		]);
 	}
-});
+};
 
 /**
  * PATCH (Default handler)
  * This handles all put requests.  If a page exists, this route edits it based on request parameters.
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "patch";
 	public $response = Phroses::RESPONSES["DEFAULT"];
 
@@ -296,13 +299,13 @@ self::addRoute(new class extends Route {
 
 		$out->success(200, $output);
 	}
-});
+};
 
 /**
  * DELETE (Default Handler)
  * This handles all delete requests. If a page exists, this route deletes it.
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "delete";
 	public $response = Phroses::RESPONSES["DEFAULT"];
 
@@ -313,13 +316,13 @@ self::addRoute(new class extends Route {
 		$out->error("delete_failed", !$page->delete());
 		$out->success();
 	}
-});
+};
 
 /**
  * GET UPLOAD
  * This route serves upload files.
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "get";
 	public $response = Phroses::RESPONSES["UPLOAD"];
 	
@@ -327,7 +330,7 @@ self::addRoute(new class extends Route {
 		(new Upload($site, substr(PATH, 8)))->display();
 	}
 
-	public function rules(&$page, &$site, &$cascade) {
+	public function rules($cascade, $page, $site) {
 		return [ 
 			2 => function() use (&$site) { 
 				return (
@@ -338,13 +341,13 @@ self::addRoute(new class extends Route {
 			}
 		];
 	}
-});
+};
 
 /**
  * DELETE UPLOAD
  * This route deletes uploads
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "delete";
 	public $response = Phroses::RESPONSES["UPLOAD"];
 
@@ -362,13 +365,13 @@ self::addRoute(new class extends Route {
 
 		$out->success();
 	}
-});
+};
 
 /**
  * PATCH UPLOAD
  * Allows renaming of an upload
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "patch";
 	public $response = Phroses::RESPONSES["UPLOAD"];
 	private $out;
@@ -387,13 +390,13 @@ self::addRoute(new class extends Route {
 
 		$out->success();
 	}
-});
+};
 
 /**
  * POST UPLOAD
  * Creates a new upload
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $method = "post";
 	public $response = Phroses::RESPONSES["UPLOAD"];
 
@@ -410,13 +413,13 @@ self::addRoute(new class extends Route {
 
 		$out->success();
 	}
-});
+};
 
 /**
  * (All) MAINTENANCE
  * This route displays maintenance mode if a site is in one.
  */
-self::addRoute(new class extends Route {
+$routes[] = new class extends Route {
 	public $response = Phroses::RESPONSES["MAINTENANCE"];
 
 	public function follow(&$page, &$site, &$out) {
@@ -424,14 +427,14 @@ self::addRoute(new class extends Route {
 		die(new Template(INCLUDES["TPL"]."/maintenance.tpl"));
 	}
 
-	public function rules(&$page, &$site, &$cascade) {
+	public function rules($cascade, $page, $site) {
 		return [
 			6 => function() use (&$site, &$cascade) { 
 				return $site->maintenance && !$_SESSION && $cascade->getResult() != Phroses::RESPONSES["SYS"][200]; 
 			} 
 		];
 	}
-});
+};
 
 
-return self::$routes;  // return a list of routes for the listen event
+return $routes;  // return a list of routes for the listen event

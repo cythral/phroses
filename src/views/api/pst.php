@@ -9,11 +9,11 @@ use \reqc\JSON\Server as JsonServer;
 use function Phroses\{ handleMethod };
 use const Phroses\{ INCLUDES, SITE };
 
-(new MethodSwitch)
+(new MethodSwitch(null, [ $site ]))
 
-->case("post", function($out, $site, $page) {
+->case("post", function($out, &$site) {
     ob_end_clean();
-
+    
     $page = $site->getPage($_REQUEST["uri"]);
     $theme = new Theme($site->theme, "page");
 
@@ -38,7 +38,7 @@ use const Phroses\{ INCLUDES, SITE };
     foreach($theme->getTypes() as $type) $pst->push("types", ["type" => $type, "checked" => ($page && $page->type == $type) ? "selected" : "" ]);
     $out->send(["type" => "success", "content" => (string) $pst ], 200);
     
-}, [ $site, $page ], JsonServer::class)
+}, [], JsonServer::class)
 
 ->case("get", function() {
     ob_end_clean();

@@ -82,7 +82,7 @@ class Site extends DataClass {
         $query = (new SelectQuery)
             ->setTable("pages")
             ->addColumns(["*"])
-            ->addWhere("id", "=", ":id")
+            ->addWhere("siteID", "=", ":id")
             ->addWhere("uri", "=", ":uri")
             ->execute([ ":id" => $this->id, ":uri" => $uri ])
             ->fetchAll(PDO::FETCH_ASSOC);
