@@ -68,10 +68,10 @@ abstract class Phroses {
 		Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 		Events::trigger("pluginsloaded", [ Plugin::loadAll() ]);
 		self::$configFileLoaded = Events::attach("reqscheck", [ ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
-		Events::attach("modeset", [ inix::get("mode"), (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::modeset");
 
-		// setup database
-		$dbconfig = ((defined("Phroses\TESTING") && inix::get("test-database")) ? inix::get("test-database") : inix::get("database"));
+		$mode = Events::attach("modeset", [ inix::get("mode"), (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::modeSet");
+		$dbconfig = inix::get($mode->dbDirective);
+		
 		Events::attach("dbsetup", [ $dbconfig["host"], $dbconfig["name"], $dbconfig["user"], $dbconfig["password"] ], "\Phroses\Phroses::setupDatabase");
 
 		(new Switcher(TYPE))
@@ -108,7 +108,7 @@ abstract class Phroses {
 	 * @return void
 	 */
 	static public function cli(): void {
-		array_shift($_SERVER["argv"]); // remove filename/command name
+		array_shift($_SERVER["argv"]); // remove file/command name
 
 		$commandController = new CommandController;
 		Events::attach("commandsmapped", [ include SRC."/commands.php" ], [$commandController, "addCommands"]);
@@ -122,13 +122,14 @@ abstract class Phroses {
 	 *
 	 * @param string $modeName the name of the mode to set it to
 	 * @param bool $noindex removes x-robots-tag if true and in development mode
-	 * @return bool if modesetting was successful
+	 * @return Mode the mode that was set
 	 */
-	static public function modeset(string $modeName, bool $noindex): bool {
-		$modeClass = Mode::MODES[$modeName];
+	static public function modeSet(string $modeName, bool $noindex): Mode {
+		$modeClass = Mode::MODES[strtoupper($modeName)];
 		$mode = new $modeClass;
 		$mode->setup($noindex);
-		return true;
+
+		return $mode;
 	}
 
 
