@@ -86,33 +86,41 @@ abstract class Phroses {
 		Events::attach("dbsetup", [ $dbconfig["host"], $dbconfig["name"], $dbconfig["user"], $dbconfig["password"] ], "\Phroses\Phroses::setupDatabase");
 
 		(new Switcher(TYPE))
+			->case(TYPES["HTTP"], "\Phroses\Phroses::http")
+			->case(TYPES["CLI"], "\Phroses\Phroses::cli");
+	}
 
-		->case(TYPES["HTTP"], function() {
-			if(!self::$configFileLoaded) return;
+	/**
+	 * Handles HTTP Responses
+	 */
+	static public function http() {
+		if(!self::$configFileLoaded) return;
 
-			Events::trigger("sessionstarted", [ Session::start() ]);
-			Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
-			if((bool) (inix::get("notrailingslashes") ?? true)) self::removeTrailingSlash();
+		Events::trigger("sessionstarted", [ Session::start() ]);
+		Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
+		if((bool) (inix::get("notrailingslashes") ?? true)) self::removeTrailingSlash();
 
-			// setup routes
-			$routeController = new RouteController;
-			$routeController->addRuleArgs(self::$page, self::$site);
-			Events::attach("routesmapped", [ include SRC."/routes.php" ], [$routeController, "addRoutes"]);
-			self::$response = $routeController->getResponse();
-			
-			$routeController
-				->select()
-				->follow(self::$page, self::$site, self::$out);
-		})
+		// setup routes
+		$routeController = new RouteController;
+		$routeController->addRuleArgs(self::$page, self::$site);
+		Events::attach("routesmapped", [ include SRC."/routes.php" ], [$routeController, "addRoutes"]);
+		self::$response = $routeController->getResponse();
+		
+		$routeController
+			->select()
+			->follow(self::$page, self::$site, self::$out);
+	}
 
-		->case(TYPES["CLI"], function() {
-			array_shift($_SERVER["argv"]); // remove filename/command name
+	/**
+	 * Handles CLI Responses
+	 */
+	static public function cli() {
+		array_shift($_SERVER["argv"]); // remove filename/command name
 
-			$commandController = new CommandController;
-			Events::attach("commandsmapped", [ include SRC."/commands.php" ], [$commandController, "addCommands"]);
-			Events::attach("commandexec", [ array_shift($_SERVER["argv"]), $_SERVER["argv"] ?? [] ], [$commandController, "execute"]);
-			throw new ExitException(0);
-		});
+		$commandController = new CommandController;
+		Events::attach("commandsmapped", [ include SRC."/commands.php" ], [$commandController, "addCommands"]);
+		Events::attach("commandexec", [ array_shift($_SERVER["argv"]), $_SERVER["argv"] ?? [] ], [$commandController, "execute"]);
+		throw new ExitException(0);
 	}
 	
 	/**

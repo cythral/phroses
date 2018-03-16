@@ -3,6 +3,7 @@
 namespace Phroses\Commands;
 
 use \Phroses\Exceptions\ExitException;
+use function \Phroses\println;
 
 class Controller {
     private $commands = [];
@@ -25,7 +26,7 @@ class Controller {
         $args = (new ArgumentParser($args))->parse();
 
         if(!$command = $this->select($name)) {
-            println("Command $name not found");
+            println("Command '$name' not found");
             throw new ExitException(1);
         }
 
