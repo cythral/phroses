@@ -155,16 +155,13 @@ abstract class Phroses {
 		// if no configuration file found, run installer
 		if(!inix::load($configFile)) {
 			if(TYPE == TYPES["HTTP"]) {
-				include SRC."/system/install.php";
+				throw new ExitException(1, getIncludeOutput(SRC."/system/install.php"));
 			}
-			
 			return false;
 		}
 
 		if(safeArrayValEquals($_REQUEST, "error", "rewrite")) {
-			self::$out->setCode(500);
-			echo new Template(INCLUDES["TPL"]."/errors/rewrite.tpl");
-			throw new ExitException(1);
+			throw new ExitException(1, new Template(INCLUDES["TPL"]."/errors/rewrite.tpl"));
 		}
 
 		return true;
