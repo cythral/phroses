@@ -18,6 +18,7 @@ include SRC."/functions.php";
 
 // php core
 use \PDO;
+use \Throwable;
 
 // phroses core
 use \Phroses\Modes\Mode;
@@ -44,8 +45,8 @@ use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL, TYPE, TYPES, METHOD };
 abstract class Phroses {
 	
 	static private $out;
-	static private $cascade;
 	static private $db;
+	static private $mode;
 
 	static public $configFileLoaded = false;
 	static public $page;
@@ -63,20 +64,42 @@ abstract class Phroses {
 	 * @return void
 	 */
 	static public function main(): void {
-		self::$out = new Output;
-
-		Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
+		set_exception_handler("\Phroses\Phroses::exceptionHandler");
 		Events::trigger("pluginsloaded", [ Plugin::loadAll() ]);
-		self::$configFileLoaded = Events::attach("reqscheck", [ ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
 
-		$mode = Events::attach("modeset", [ inix::get("mode"), (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::modeSet");
-		$dbconfig = inix::get($mode->dbDirective);
-		
+		self::$out = new Output;
+		self::$configFileLoaded = Events::attach("reqscheck", [ ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
+		self::$mode = Events::attach("modeset", [ inix::get("mode"), (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::modeSet");
+
+		$dbconfig = inix::get(self::$mode->dbDirective);
 		Events::attach("dbsetup", [ $dbconfig["host"], $dbconfig["name"], $dbconfig["user"], $dbconfig["password"] ], "\Phroses\Phroses::setupDatabase");
 
 		(new Switcher(TYPE))
 			->case(TYPES["HTTP"], "\Phroses\Phroses::http")
 			->case(TYPES["CLI"], "\Phroses\Phroses::cli");
+	}
+
+	/**
+	 * The default exception handler
+	 * 
+	 * @return void
+	 */
+	static public function exceptionHandler(Throwable $e): void {
+		if(method_exists($e, "defaultHandler")) {
+			$e->defaultHandler();
+		} else {
+			(new Switcher(TYPE, [ $e ]))
+
+			->case(TYPES["HTTP"], function($e) {
+				$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
+				$out->message = inix::get("mode") == "production" ? "And could not continue." : ($e->getMessage() . "<br>" . $e->getTraceAsString());
+				echo $out;
+			})
+			
+			->case(TYPES["CLI"], function($e) {
+				println($e->getMessage());
+			});
+		}
 	}
 
 	/**
@@ -165,29 +188,7 @@ abstract class Phroses {
 		return true;
 	}
 
-	/**
-	 * Sets the default exception handler
-	 */
-	static public function setExceptionHandler() {
-		set_exception_handler(function(\Throwable $e) {
-			if(method_exists($e, "defaultHandler")) {
-				$e->defaultHandler();
-			} else {
-				(new Switcher(TYPE, [ $e ]))
-
-				->case(TYPES["HTTP"], function($e) {
-					$out = new Template(INCLUDES["TPL"]."/errors/exception.tpl");
-					$out->message = inix::get("mode") == "production" ? "And could not continue." : ($e->getMessage() . "<br>" . $e->getTraceAsString());
-					echo $out;
-				})
-				
-				->case(TYPES["CLI"], function($e) {
-					println($e->getMessage());
-				});
-				
-			}
-		});
-	}
+	
 	
 	/**
 	 * Loads information about the site and page requested
@@ -197,7 +198,7 @@ abstract class Phroses {
 	static public function loadSiteInfo(bool $showNewSite) {
 		$query = self::$db->fetch("CALL `viewPage`(?,?)", [ BASEURL, PATH ]);
 		$info = $query[0] ?? null;
-		
+
 		// if site doesn't exist, create a new one
 		if(!$info) {
 			throw new ExitException(127, ($showNewSite) ? getIncludeOutput("system/newsite.php") : new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
