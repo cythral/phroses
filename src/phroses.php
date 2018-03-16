@@ -132,8 +132,6 @@ abstract class Phroses {
 		return $mode;
 	}
 
-
-
 	/**
 	 * Sets up the database
 	 * 
@@ -155,7 +153,7 @@ abstract class Phroses {
 		// if no configuration file found, run installer
 		if(!inix::load($configFile)) {
 			if(TYPE == TYPES["HTTP"]) {
-				throw new ExitException(1, getIncludeOutput(SRC."/system/install.php"));
+				throw new ExitException(127, getIncludeOutput(SRC."/system/install.php"));
 			}
 			return false;
 		}
@@ -200,7 +198,7 @@ abstract class Phroses {
 		$query = self::$db->fetch("CALL `viewPage`(?,?)", [ BASEURL, PATH ]);
 		$info = $query[0] ?? null;
 		
-		// if site doesn't exist, create a new one (script ends here)
+		// if site doesn't exist, create a new one
 		if(!$info) {
 			throw new ExitException(127, ($showNewSite) ? getIncludeOutput("system/newsite.php") : new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
 		}

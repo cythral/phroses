@@ -4,23 +4,27 @@ use \Phroses\Installer;
 use \Phroses\Exceptions\InstallerException;
 use \reqc\Output;
 use \phyrex\Template;
+use \Phroses\JsonServer;
+use \Phroses\Switches\MethodSwitch;
 use function \Phroses\handleMethod;
 
 use const \Phroses\{ DEPS, ROOT, SRC, SCHEMAVER, INCLUDES, INPHAR };
 use const \reqc\{ MIME_TYPES };
 
-$out = new Output();
-$out->setCode(404);
-
 if(!is_writable(ROOT)) {
-    $out->setContentType(MIME_TYPES["TXT"]);
+    (new Output)->setContentType(MIME_TYPES["TXT"]);
     echo "No write access to ".ROOT.". Please fix directory permissions";
     exit(1);
 }
 
-handleMethod("post", function($out) {
-    try {
+(new MethodSwitch)
 
+->case("post", function($out) {
+    foreach(["host", "database", "username", "password"] as $req) {
+        $out->error("missing_value", !isset($_POST[$req]));
+    }
+    
+    try {
         $installer = new Installer;
         $installer->setupDatabase($_POST["host"], $_POST["database"], $_POST["username"], $_POST["password"], DEPS["MYSQL"]);
         $installer->installSchema(SRC."/schema/install.sql", SCHEMAVER);
@@ -29,19 +33,21 @@ handleMethod("post", function($out) {
             "pepper" => bin2hex(random_bytes(10))
         ]);
 
-        $out->send(["type" => "success"], 200);
+        $out->success();
 
     } catch(InstallerException $e) {
-        $output = [ "type" => "error", "error" => $e->getMessage() ];
-        if($e->getMessage() == "version") $output["minver"] = DEPS["MYSQL"];
+        $extra = [];
+        if($e->getMessage() == "version") $extra["minver"] = DEPS["MYSQL"];
 
-        $out->send($output, 400);
+        $out->error($e->getMessage(), true, 400, $extra);
     }
+}, [], JsonServer::class)
 
-}, ["host", "database", "username", "password"]);
+->case("get", function() {
+    $install = new Template(INCLUDES["TPL"]."/installer.tpl");
+    $install->styles = file_get_contents(SRC."/views/assets/css/phroses.css");
+    $install->script = file_get_contents(SRC."/views/assets/js/phroses.min.js");
+    echo $install;
+});
 
 
-$install = new Template(INCLUDES["TPL"]."/installer.tpl");
-$install->styles = file_get_contents(SRC."/views/assets/css/phroses.css");
-$install->script = file_get_contents(SRC."/views/assets/js/phroses.min.js");
-echo $install;
