@@ -20,6 +20,7 @@ include SRC."/functions.php";
 use \PDO;
 
 // phroses core
+use \Phroses\Modes\Mode;
 use \Phroses\Plugins\Plugin;
 use \Phroses\Theme\Theme;
 use \Phroses\Database\Database;
@@ -38,9 +39,7 @@ use \phyrex\Template;
 use const \reqc\{ VARS, MIME_TYPES, PATH, BASEURL, TYPE, TYPES, METHOD };
 
 /**
- * This class is a collection of static methods and properties for
- * the sake of breaking up functional elements into smaller, more manageable units of code.
- * It is not meant to be instantiated, and should only be run once.  
+ * front controller style
  */
 abstract class Phroses {
 	
@@ -52,18 +51,6 @@ abstract class Phroses {
 	static public $page;
 	static public $site;
 
-	static private $modes = [
-		"development" => [
-			"display_errors" => 1,
-			"error_reporting" => E_ALL
-		],
-
-		"production" => [
-			"display_errors" => 0,
-			"error_reporting" => 0
-		]
-	];
-
 	static public $response = RouteController::RESPONSES["PAGE"][200];
 
 	const MM_ON = true;
@@ -72,14 +59,16 @@ abstract class Phroses {
 	/**
 	 * This is the first method that gets run.  Triggers listen events
 	 * which call other methods in the class.
+	 * 
+	 * @return void
 	 */
-	static public function start() {
+	static public function main(): void {
 		self::$out = new Output;
 
 		Events::attach("exceptionhandlerset", [], "\Phroses\Phroses::setExceptionHandler");
 		Events::trigger("pluginsloaded", [ Plugin::loadAll() ]);
-		self::$configFileLoaded = Events::attach("reqscheck", [ INCLUDES["THEMES"]."/bloom", ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
-		Events::attach("modeset", [ (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::setupMode");
+		self::$configFileLoaded = Events::attach("reqscheck", [ ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
+		Events::attach("modeset", [ inix::get("mode"), (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::modeset");
 
 		// setup database
 		$dbconfig = ((defined("Phroses\TESTING") && inix::get("test-database")) ? inix::get("test-database") : inix::get("database"));
@@ -92,8 +81,10 @@ abstract class Phroses {
 
 	/**
 	 * Handles HTTP Responses
+	 * 
+	 * @return void
 	 */
-	static public function http() {
+	static public function http(): void {
 		if(!self::$configFileLoaded) return;
 
 		Events::trigger("sessionstarted", [ Session::start() ]);
@@ -113,8 +104,10 @@ abstract class Phroses {
 
 	/**
 	 * Handles CLI Responses
+	 * 
+	 * @return void
 	 */
-	static public function cli() {
+	static public function cli(): void {
 		array_shift($_SERVER["argv"]); // remove filename/command name
 
 		$commandController = new CommandController;
@@ -127,22 +120,18 @@ abstract class Phroses {
 	 * Sets up production / development mode
 	 * Alters ini settings and removes x-robots-tag header if setup to do so
 	 *
+	 * @param string $modeName the name of the mode to set it to
 	 * @param bool $noindex removes x-robots-tag if true and in development mode
 	 * @return bool if modesetting was successful
 	 */
-	static public function setupMode(bool $noindex): bool {
-		if(!array_key_exists(inix::get("mode"), self::$modes)) return false;
-		
-		foreach(self::$modes[inix::get("mode")] as $key => $val) { 
-			ini_set($key, $val); 
-		}
-
-		if($noindex && inix::get("mode") == "development") {
-			self::$out->setHeader("X-Robots-Tag", "none");
-		}
-		
+	static public function modeset(string $modeName, bool $noindex): bool {
+		$modeClass = Mode::MODES[$modeName];
+		$mode = new $modeClass;
+		$mode->setup($noindex);
 		return true;
 	}
+
+
 
 	/**
 	 * Sets up the database
@@ -161,15 +150,7 @@ abstract class Phroses {
 	 * @param string $configFile the location of the config file
 	 * @return bool true if environment/filesystem requirements have been met
 	 */
-	static public function checkReqs(string $defaultTheme, string $configFile) {
-		if(!file_exists($defaultTheme)) {
-			self::$out->setCode(500);
-			$themeError = new Template(INCLUDES["TPL"]."/errors/notheme.tpl");
-			$themeError->themename = basename($defaultTheme);
-			echo $themeError;
-			return false;
-		}
-
+	static public function checkReqs(string $configFile) {
 		// if no configuration file found, run installer
 		if(!inix::load($configFile)) {
 			if(TYPE == TYPES["HTTP"]) {
@@ -181,7 +162,8 @@ abstract class Phroses {
 
 		if(safeArrayValEquals($_REQUEST, "error", "rewrite")) {
 			self::$out->setCode(500);
-			die((string) new Template(INCLUDES["TPL"]."/errors/rewrite.tpl"));
+			echo new Template(INCLUDES["TPL"]."/errors/rewrite.tpl");
+			throw new ExitException(1);
 		}
 
 		return true;
@@ -274,5 +256,5 @@ abstract class Phroses {
 	}
 }
 
-// lets begin
-Phroses::start();
+
+Phroses::main();
