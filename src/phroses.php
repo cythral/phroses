@@ -202,11 +202,7 @@ abstract class Phroses {
 		
 		// if site doesn't exist, create a new one (script ends here)
 		if(!$info) {
-			if($showNewSite) include "system/newsite.php";
-			else {
-				self::$out->setCode(404);
-				die(new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
-			}
+			throw new ExitException(127, ($showNewSite) ? getIncludeOutput("system/newsite.php") : new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
 		}
 
 		self::$site = new Site([
