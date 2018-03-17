@@ -68,6 +68,7 @@ INSERT INTO `options` (`key`, `value`) VALUES (
   '<{var::schemaver}>'
 );
 
+DELIMITER /
 CREATE DEFINER = 'root'@'%' PROCEDURE `viewPage`(IN `url` VARCHAR(255) CHARSET utf8, IN `path` VARCHAR(255) CHARSET utf8)
 BEGIN 
 
@@ -80,4 +81,6 @@ SELECT
 
 UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pid;
 
-END;
+END/
+
+DELIMITER ;

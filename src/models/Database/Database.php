@@ -165,7 +165,12 @@ class Database extends Singleton {
         $tpl = new Template($schemaFile);
         $tpl->schemaver = SCHEMAVER;
 
-        return $this->con->query((string) $tpl) !== false;
+        // remove custom delimiters
+        $tpl = preg_replace_callback("/DELIMITER ([^\n ]+)\n(.*)DELIMITER ([^\n ]+)/is", function($matches) {
+            return str_replace($matches[1], ";", $matches[2]);
+        }, $tpl);
+
+        return $this->con->query($tpl) !== false;
     }
 
     /**
