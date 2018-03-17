@@ -196,7 +196,7 @@ abstract class Phroses {
 	 * @param bool $showNewSite whether or not to show the form to create a new site
 	 */
 	static public function loadSiteInfo(bool $showNewSite) {
-		$query = self::$db->fetch("CALL `viewPage`(?,?)", [ BASEURL, PATH ]);
+		$query = self::$db->fetch("CALL `viewPage`(?,?)", [ BASEURL, PATH ], PDO::FETCH_ASSOC);
 		$info = $query[0] ?? null;
 
 		// if site doesn't exist, create a new one
@@ -204,29 +204,19 @@ abstract class Phroses {
 			throw new ExitException(127, ($showNewSite) ? getIncludeOutput("system/newsite.php") : new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
 		}
 
-		self::$site = new Site([
-			"id" => $info->id,
-			"url" => BASEURL,
-			"name" => $info->name,
-			"theme" => $info->theme,
-			"adminURI" => $info->adminURI ?? "/admin",
-			"adminUsername" => $info->adminUsername,
-			"adminPassword" => $info->adminPassword,
-			"adminIP" => $info->adminIP,
-			"maintenance" => (bool)$info->maintenance
-		]);
-		
-		self::$page = new Page([
-			"id" => $info->pageID,
-			"type" => $info->type ?? "page",
-			"views" => $info->views,
-			"dateCreated" => $info->dateCreated,
-			"dateModified" => $info->dateModified,
-			"title" => $info->title,
-			"content" => json_decode($info->content, true) ?? [],
-			"public" => $info->public,
-			"css" => $info->css
-		], self::$site->theme);
+		$siteInfo = array_slice($info, 0, 9);
+		$pageInfo = array_slice($info, 9);
+
+		// correct ids
+		$pageInfo["id"] = $siteInfo["id"];
+		$siteInfo["id"] = $pageInfo["siteID"];
+
+		// add defaults
+		$pageInfo["content"] = json_decode($pageInfo["content"] ?? "{}", true);
+		$pageInfo["type"] = empty($pageInfo["type"]) ? "page" : $pageInfo["type"];
+
+		self::$site = new Site($siteInfo);
+		self::$page = new Page($pageInfo, self::$site->theme);
 	}
 	
 	/**

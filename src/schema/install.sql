@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `options`;
 DROP TABLE IF EXISTS `pages`;
 DROP TABLE IF EXISTS `sites`;
 DROP TABLE IF EXISTS `sessions`;
-
+DROP PROCEDURE IF EXISTS `viewPage`;
 
 /******************************************
 OPTIONS TABLE
@@ -68,19 +68,16 @@ INSERT INTO `options` (`key`, `value`) VALUES (
   '<{var::schemaver}>'
 );
 
-DELIMITER $$
-CREATE DEFINER=`root`@`%` PROCEDURE `viewPage`(IN `url` VARCHAR(255) CHARSET utf8, IN `path` VARCHAR(255) CHARSET utf8)
-    SQL SECURITY INVOKER
+CREATE DEFINER = 'root'@'%' PROCEDURE `viewPage`(IN `url` VARCHAR(255) CHARSET utf8, IN `path` VARCHAR(255) CHARSET utf8)
 BEGIN 
 
 SELECT 
-	`page`.*, 
-	`sites`.*, 
-    (@pid:=`page`.`id`) AS `pageID`, 
-    (`page`.`views` + 1) AS `views`
-   	FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=path  WHERE `sites`.`url`=url;
+  `sites`.*,
+  `page`.*, 
+  (`page`.`views` + 1) AS `views`,
+  `sites`.`id` AS `siteID`
+  FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=path  WHERE `sites`.`url`=url;
 
 UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pid;
 
-END$$
-DELIMITER ;
+END;
