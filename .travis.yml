@@ -1,45 +1,40 @@
 language: php
 
 php:
-  - '7.2'
+- '7.2'
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y -qq postfix
-  
-before_script: 
-  # setup config
-  - phpenv config-add config/php.ini
-  - mv config/phroses.conf phroses.conf
+- openssl aes-256-cbc -K $encrypted_8f3c12225dfc_key -iv $encrypted_8f3c12225dfc_iv -in config/deploy.key.enc -out config/deploy.key -d
+- sudo apt-get update -qq
+- sudo apt-get install -y -qq postfix
 
-  # install dependencies
-  - export PATH=$PWD/vendor/bin:$(npm bin):$PATH
-  - npm install -g bower
-  - composer install
+before_script:
+# add config
+- phpenv config-add config/php.ini
+- mv config/phroses.conf phroses.conf
 
-  # setup mysql
-  - sudo mysql -e 'CREATE DATABASE phroses;'
-  - sudo mysql phroses < src/schema/install.sql
-  - sudo mysql phroses -e "show tables"
-  
-  # setup postfix
-  - sudo service postfix stop
-  - smtp-sink -d "%d.%H.%M.%S" localhost:2500 1000 &
-  - echo -e '#!/usr/bin/env bash\nexit 0' | sudo tee /usr/sbin/sendmail
-  - echo 'sendmail_path = "/usr/sbin/sendmail -t -i "' | sudo tee "/home/travis/.phpenv/versions/`php -i | grep "PHP Version" | head -n 1 | grep -o -P '\d+\.\d+\.\d+.*'`/etc/conf.d/sendmail.ini"
-  
+# install dependencies
+- export PATH=$PWD/vendor/bin:$(npm bin):$PATH
+- npm install -g bower
+- composer install
+
+# setup mysql
+- sudo mysql -e 'CREATE DATABASE phroses;'
+- sudo mysql phroses < src/schema/install.sql
+- sudo mysql phroses -e "show tables"
+
+# setup postfix
+- sudo service postfix stop
+- smtp-sink -d "%d.%H.%M.%S" localhost:2500 1000 &
+- echo -e '#!/usr/bin/env bash\nexit 0' | sudo tee /usr/sbin/sendmail
+- echo 'sendmail_path = "/usr/sbin/sendmail -t -i "' | sudo tee "/home/travis/.phpenv/versions/`php
+  -i | grep "PHP Version" | head -n 1 | grep -o -P '\d+\.\d+\.\d+.*'`/etc/conf.d/sendmail.ini"
 
 script:
-  - composer run test
-  
-deploy:
-  provider: releases
-  api_key: 
-    secure: "mGvTjHnzhgB3T2W5DIO2FH66coklbC7HtV2lo/O6FMzrtrkbZ/M+nP7dySzBcISBPxasqgUqdqpLYV0l+QgjKGf5PyJIYmX/dES47usxYG6oZNa6rquM8MMIYkBEqeEIjWzyssg69Txxel5q9nghOsUGW8OnAyEKpN735rGBi7L8DV51dPtNnRoJZb7pvM08qka2N9RffmNroD4OgXQmPVkfBtJDgISMc/qi8Mvb+nLOA6lu3cEalTaHyyFPIp9CvmPDRKnYZJPQNYfKqxnbA2+a26ZEYPT9py+ca8nseU8cPm8RVkCnU0QcfMHVk7tlwHCS4RPm7hot9+FXeuPYu2hWszuzCmViLWN2Ur+t6j7IoxlMD8+POw0EuE2I+oGh7Dffgnh/g19EGAo/jftv6TM9dTMn11Xo6zqO4YCLZnWoAfg7sD7MCiiQFj0hg2dcyBnP1hbWQ/lg+EU3AXvGfiUglzSJz5D2zjkVpypfy+lGCcvWsWR+dSzri8lhosPN9cA9b9gAkTdLFCLp8VdUnZGVKl5/0U2nADjm93OLf9AZGn+Pgy9nYSUbfQpUGcjqit9lFOpc0IkhKlfvf/US6GrjP0XusvBb4WTAzKEG58wCeH6UVlcRvQcNksjsvW9Tl9JF1BV4Y62YMneDDYdzuw/hThQA6K6SFf6tFhpZ8Dg="
-  file: "phroses.tar.gz"
-  skip_cleanup: true
-  on:
-    tags: true
+- composer run test
+
+after_success:
+- ./scripts/deploy.sh
 
 addons:
   mariadb: '10.2'
