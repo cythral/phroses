@@ -31,7 +31,6 @@ before_script:
 
 script:
   - composer run test
-  - php phroses.phar test
   
 deploy:
   provider: releases
@@ -41,6 +40,6 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    
+
 addons:
   mariadb: '10.2'
