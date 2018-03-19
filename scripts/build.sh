@@ -32,7 +32,7 @@ mv build/phroses.phar build/usr/bin/phroses
 chmod 775 build/usr/bin/phroses
 
 # build .deb
-printf "Version: $1\n" >> build/DEBIAN/control
+printf "Version: $(echo $1 | sed 's/v//g')\n" >> build/DEBIAN/control
 dpkg --build build
 
 # copy phroses.phar to root for testing
