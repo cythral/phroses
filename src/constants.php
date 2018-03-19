@@ -17,13 +17,16 @@ define("Phroses\DEPS", [
 	"EXTS" => [ "pdo_mysql", "json", "dom", "session", "date", "curl" ]
 ]);
 
+define("Phroses\DATA_ROOT", INPHAR ? "/var/phroses" : ROOT);
+define("Phroses\CONF_ROOT", INPHAR ? "/etc/phroses" : ROOT);
+
 define("Phroses\INCLUDES", [ // location of various files that are included
-	"THEMES" => ROOT."/themes",
+	"THEMES" => DATA_ROOT."/themes",
 	"MODELS" => SRC."/models/classes",
 	"VIEWS" => SRC."/views",
 	"TPL" => SRC."/templates",
-	"PLUGINS" => ROOT."/plugins",
-	"UPLOADS" => ROOT."/uploads",
+	"PLUGINS" => DATA_ROOT."/plugins",
+	"UPLOADS" => DATA_ROOT."/uploads",
 	"TESTS" => ROOT."/tests"
 ]);
 

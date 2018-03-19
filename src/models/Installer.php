@@ -2,7 +2,7 @@
 
 namespace Phroses;
 
-use \PDO;
+use \Phroses\Database\Database;
 use \phyrex\Template;
 use \Phroses\Exceptions\InstallerException;
 
@@ -22,8 +22,8 @@ class Installer {
     public function setupDatabase(string $host, string $database, string $username, string $password, string $min, string $driver = "mysql") {
         try {
 
-            $this->db = new PDO($this->getDSN($driver, $host, $database), $username, $password);
-            $this->dbVersion = $this->db->query("select version()")->fetchColumn();
+            $this->db = Database::getInstance($host, $database, $username, $password);
+            $this->dbVersion = $this->db->getHandle()->query("select version()")->fetchColumn();
             $this->dbHost = $host;
             $this->dbName = $database;
             $this->dbUser = $username;
@@ -41,7 +41,7 @@ class Installer {
 
         $schema = new Template($schemaFile);
         $schema->version = $version;
-        if(!$this->db->query((string) $schema)) throw new InstallerException("schemainstallfail");
+        if(!$this->db->installSchema()) throw new InstallerException("schemainstallfail");
     }
 
 

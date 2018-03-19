@@ -69,14 +69,15 @@ INSERT INTO `options` (`key`, `value`) VALUES (
 );
 
 DELIMITER /
-CREATE DEFINER = 'root'@'%' PROCEDURE `viewPage`(IN `url` VARCHAR(255) CHARSET utf8, IN `path` VARCHAR(255) CHARSET utf8)
+CREATE DEFINER = 'root'@'%' PROCEDURE `viewPage` (IN `url` VARCHAR(255) CHARSET utf8, IN `path` VARCHAR(255) CHARSET utf8) NOT DETERMINISTIC READS SQL DATA SQL SECURITY INVOKER
 BEGIN 
 
 SELECT 
   `sites`.*,
   `page`.*, 
   (`page`.`views` + 1) AS `views`,
-  `sites`.`id` AS `siteID`
+  `sites`.`id` AS `siteID`,
+  (@pid:=`page`.`id`) AS `id`
   FROM `sites` LEFT JOIN `pages` AS `page` ON `page`.`siteID`=`sites`.`id` AND `page`.`uri`=path  WHERE `sites`.`url`=url;
 
 UPDATE `pages` SET `views` = `views` + 1 WHERE `id`=@pid;

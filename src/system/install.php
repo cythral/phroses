@@ -8,12 +8,12 @@ use \Phroses\JsonServer;
 use \Phroses\Switches\MethodSwitch;
 use function \Phroses\handleMethod;
 
-use const \Phroses\{ DEPS, ROOT, SRC, SCHEMAVER, INCLUDES, INPHAR };
+use const \Phroses\{ DEPS, ROOT, SRC, SCHEMAVER, INCLUDES, INPHAR, CONF_ROOT };
 use const \reqc\{ MIME_TYPES };
 
-if(!is_writable(ROOT)) {
+if(!is_writable(CONF_ROOT)) {
     (new Output)->setContentType(MIME_TYPES["TXT"]);
-    echo "No write access to ".ROOT.". Please fix directory permissions";
+    echo "No write access to ".CONF_ROOT.". Please fix directory permissions";
     exit(1);
 }
 
@@ -28,7 +28,7 @@ if(!is_writable(ROOT)) {
         $installer = new Installer;
         $installer->setupDatabase($_POST["host"], $_POST["database"], $_POST["username"], $_POST["password"], DEPS["MYSQL"]);
         $installer->installSchema(SRC."/schema/install.sql", SCHEMAVER);
-        $installer->setupConfFile(SRC."/phroses.conf", ROOT."/phroses.conf", [
+        $installer->setupConfFile(SRC."/phroses.conf", CONF_ROOT."/phroses.conf", [
             "mode" => (INPHAR) ? "production" : "development",
             "pepper" => bin2hex(random_bytes(10))
         ]);

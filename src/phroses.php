@@ -54,6 +54,7 @@ abstract class Phroses {
 
 	static public $response = RouteController::RESPONSES["PAGE"][200];
 
+	const SITE_COLS = 9;
 	const MM_ON = true;
 	const MM_OFF = false;
 	
@@ -68,7 +69,7 @@ abstract class Phroses {
 		Events::trigger("pluginsloaded", [ Plugin::loadAll() ]);
 
 		self::$out = new Output;
-		self::$configFileLoaded = Events::attach("reqscheck", [ ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
+		self::$configFileLoaded = Events::attach("reqscheck", [ CONF_ROOT."/phroses.conf" ], "\Phroses\Phroses::checkReqs");
 		self::$mode = Events::attach("modeset", [ inix::get("mode"), (bool) (inix::get("devnoindex") ?? true) ], "\Phroses\Phroses::modeSet");
 
 		$dbconfig = inix::get(self::$mode->dbDirective);
@@ -201,13 +202,14 @@ abstract class Phroses {
 
 		// if site doesn't exist, create a new one
 		if(!$info) {
-			throw new ExitException(127, ($showNewSite) ? getIncludeOutput("system/newsite.php") : new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
+			throw new ExitException(127, ($showNewSite) ? getIncludeOutput(SRC."/system/newsite.php") : new Template(INCLUDES["TPL"]."/errors/nosite.tpl"));
 		}
 
-		$siteInfo = array_slice($info, 0, 9);
-		$pageInfo = array_slice($info, 9);
+		// first half of results are site columns, second half is page columns
+		$siteInfo = array_slice($info, 0, self::SITE_COLS); 
+		$pageInfo = array_slice($info, self::SITE_COLS);
 
-		// correct ids
+		// id column was overwritten with pages.id
 		$pageInfo["id"] = $siteInfo["id"];
 		$siteInfo["id"] = $pageInfo["siteID"];
 

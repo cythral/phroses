@@ -1,0 +1,7 @@
+Package: phroses
+Architecture: all
+Maintainer: @cythral
+Priority: optional
+Description: multi-site cms
+Depends: apache2
+License: GPL-3

@@ -14,6 +14,7 @@ use \Phroses\Exceptions\ExitException;
 use \Phroses\Commands\Command;
 
 $commands = [];
+
 /**
  * Turns application-wide maintenance mode off and on
  */
@@ -160,6 +161,15 @@ $commands[] = new class extends Command {
 		println($out);
 	}
 
+};
+
+
+$commands[] = new class extends Command {
+	public $name = "vars";
+
+	public function execute() {
+		println(implode(",", $_ENV));
+	}
 };
 
 return $commands; // return a list of commands for the listen event

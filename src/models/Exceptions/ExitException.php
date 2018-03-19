@@ -13,7 +13,7 @@ class ExitException extends Exception {
 
     public $code;
 
-    public function __construct(int $code = 0, string $message = "") {
+    public function __construct(int $code = 0, ?string $message = "") {
         $this->code = $code;
         $this->message = $message;
     }
