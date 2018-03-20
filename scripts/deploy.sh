@@ -11,9 +11,8 @@ ssh travis@deb.cythral.com <<PHRS
     export PATH=\$PATH:\$PWD/vendor/bin:\$(npm bin)
     git pull origin $TRAVIS_BRANCH; 
     composer run build -- $TRAVIS_BRANCH
-    
     aptly repo add stretch phroses-$TRAVIS_BRANCH.deb
-    aptly -batch=true publish update stretch
+    aptly publish update stretch
     git clean -xdf
 PHRS
 
