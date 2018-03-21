@@ -5,29 +5,18 @@ chmod 600 config/deploy.key
 ssh-add config/deploy.key
 
 if [ ! -z "$TRAVIS_TAG" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-
-ssh travis@deb.cythral.com <<PHRS
-    cd phroses 
-    composer install
-    export PATH=\$PATH:\$PWD/vendor/bin:\$(npm bin)
-    git pull origin $TRAVIS_BRANCH; 
-    composer run build -- $TRAVIS_BRANCH
-    aptly repo add stable phroses-$TRAVIS_BRANCH.deb
-    aptly publish update stretch
-    git clean -xdf
-PHRS
-
+    version=$TRAVIS_BRANCH
+    repo="stable"
 else
-    
-ssh travis@deb.cythral.com <<PHRS
-    cd phroses
-    composer install
-    export PATH=\$PATH:\$PWD/vendor/bin:\$(npm bin)
-    git pull origin $TRAVIS_BRANCH
-    composer run build -- "${TRAVIS_BRANCH}a${TRAVIS_BUILD_NUMBER}"
-    aptly repo add unstable phroses-${TRAVIS_BRANCH}a${TRAVIS_BUILD_NUMBER}.deb
-    aptly publish update stretch
-    git clean -xdf
-PHRS
-
+    version="${TRAVIS_BRANCH}a${TRAVIS_BUILD_NUMBER}"
+    repo="unstable"
 fi
+
+composer run build -- $version
+scp phroses-${version}.deb travis@deb.cythral.com:phroses-${version}.deb
+
+ssh travis@deb.cythral.com <<PHRS
+    aptly repo add ${repo} phroses-${version}.deb
+    aptly publish update stretch
+    rm phroses-${version}.deb
+PHRS
