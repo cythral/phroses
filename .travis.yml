@@ -38,3 +38,5 @@ after_success:
 
 addons:
   mariadb: '10.2'
+  ssh_known_hosts:
+  - deb.cythral.com
