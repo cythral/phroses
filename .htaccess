@@ -6,6 +6,8 @@
     RewriteEngine on
     RewriteBase /
     DirectorySlash off # needed for uris like /uploads to work when notrailingslashes = true
+    
+    SetEnv PHROSES_DEV true
 
     # Maintenance Mode -- 
     RewriteCond %{DOCUMENT_ROOT}/.maintenance -f  

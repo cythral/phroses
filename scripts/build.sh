@@ -19,12 +19,15 @@ cp -r themes build/var/phroses/themes
 cp -r plugins build/var/phroses/plugins
 rm -rf build/var/phroses/themes/bloom2
 
-# build phar
 cp -r src build/src
 cp composer.json build/src/composer.json
 cp composer.lock build/src/composer.lock
+
 cd build/src
+sed -i.bak -e "s/{{version}}/$1/g" constants.php
 composer install --no-dev --no-scripts
+
+# build phar
 cd ../../
 php scripts/phar.php
 rm -rf build/src

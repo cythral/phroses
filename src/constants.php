@@ -6,7 +6,7 @@
 namespace Phroses;
 
 define("Phroses", true);
-define("Phroses\VERSION", "v0.8.0-dev");
+define("Phroses\VERSION", "{{version}}");
 define("Phroses\SRC", __DIR__); // location of the src folder
 define("Phroses\SCHEMAVER", 4); // database schema version
 define("Phroses\INPHAR", strpos(__DIR__, "phar://") !== false); // if in the packaged phar or not
@@ -17,8 +17,8 @@ define("Phroses\DEPS", [
 	"EXTS" => [ "pdo_mysql", "json", "dom", "session", "date", "curl" ]
 ]);
 
-define("Phroses\DATA_ROOT", INPHAR ? "/var/phroses" : ROOT);
-define("Phroses\CONF_ROOT", INPHAR ? "/etc/phroses" : ROOT);
+define("Phroses\DATA_ROOT", INPHAR && !getenv("PHROSES_DEV") ? "/var/phroses" : ROOT);
+define("Phroses\CONF_ROOT", INPHAR && !getenv("PHROSES_DEV") ? "/etc/phroses" : ROOT);
 
 define("Phroses\INCLUDES", [ // location of various files that are included
 	"THEMES" => DATA_ROOT."/themes",
