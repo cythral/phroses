@@ -3,5 +3,5 @@ Architecture: all
 Maintainer: @cythral
 Priority: optional
 Description: multi-site cms
-Depends: apache2
+Depends: apache2, php7.2, mariadb-server
 License: GPL-3
