@@ -13,7 +13,7 @@ ssh travis@deb.cythral.com <<PHRS
     git pull origin $TRAVIS_BRANCH; 
     composer run build -- $TRAVIS_BRANCH
     aptly repo add stable phroses-$TRAVIS_BRANCH.deb
-    aptly publish update stretch stable
+    aptly publish update stretch
     git clean -xdf
 PHRS
 
@@ -26,7 +26,7 @@ ssh travis@deb.cythral.com <<PHRS
     git pull origin $TRAVIS_BRANCH
     composer run build -- "$TRAVIS_BRANCHa$TRAVIS_BUILD_NUMBER"
     aptly repo add unstable phroses-$TRAVIS_BRANCHa$TRAVIS_BUILD_NUMBER
-    aptly publish update stretch unstable
+    aptly publish update stretch
     git clean -xdf
 PHRS
 
