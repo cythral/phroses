@@ -1,9 +1,10 @@
 #!/bin/bash
-if [ ! -z "$TRAVIS_TAG" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
 
 eval "$(ssh-agent -s)"
 chmod 600 config/deploy.key
 ssh-add config/deploy.key
+
+if [ ! -z "$TRAVIS_TAG" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
 
 ssh travis@deb.cythral.com <<PHRS
     cd phroses 
