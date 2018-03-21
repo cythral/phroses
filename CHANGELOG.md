@@ -11,7 +11,11 @@
  - Refactored routing.  Introduced a Route and Cascade class to handle routing and cascading route rules
  - Refactored installation, installation functions have been moved to a class
  - The Theme class uses a 'Loader' to load errors, assets and types.  DummyLoader and FolderLoader are the current ones, PharLoader to be added in a future version.
-- New Site class replaces the SITE[] constant
+ - New Site class replaces the SITE[] constant
+ - \Phroses\Database\Database replaces \Phroses\DB
+ - New /admin/info page displays version information
+### Misc
+ - Phroses is now a Debian package.  Packages for other systems to be added in future versions
 
 <br />
 
