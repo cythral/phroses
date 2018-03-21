@@ -11,13 +11,22 @@ ssh travis@deb.cythral.com <<PHRS
     export PATH=\$PATH:\$PWD/vendor/bin:\$(npm bin)
     git pull origin $TRAVIS_BRANCH; 
     composer run build -- $TRAVIS_BRANCH
-    aptly repo add stretch phroses-$TRAVIS_BRANCH.deb
+    aptly repo add stable phroses-$TRAVIS_BRANCH.deb
     aptly publish update stretch
     git clean -xdf
 PHRS
 
 else
     
-echo "Skipping deployment since this is not a tagged commit"
+ssh travis@deb.cythral.com <<PHRS
+    cd phroses
+    composer install
+    export PATH=\$PATH:\$PWD/vendor/bin:\$(npm bin)
+    git pull origin $TRAVIS_BRANCH
+    composer run build -- "$TRAVIS_BRANCHa$TRAVIS_BUILD_NUMBER"
+    aptly repo add unstable phroses-$TRAVIS_BRANCHa$TRAVIS_BUILD_NUMBER
+    aptly publish update stretch
+    git clean -xdf
+PHRS
 
 fi
