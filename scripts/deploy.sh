@@ -24,8 +24,8 @@ ssh travis@deb.cythral.com <<PHRS
     composer install
     export PATH=\$PATH:\$PWD/vendor/bin:\$(npm bin)
     git pull origin $TRAVIS_BRANCH
-    composer run build -- "$TRAVIS_BRANCHa$TRAVIS_BUILD_NUMBER"
-    aptly repo add unstable phroses-$TRAVIS_BRANCHa$TRAVIS_BUILD_NUMBER
+    composer run build -- "${TRAVIS_BRANCH}a${TRAVIS_BUILD_NUMBER}"
+    aptly repo add unstable phroses-${TRAVIS_BRANCH}a${TRAVIS_BUILD_NUMBER}.deb
     aptly publish update stretch
     git clean -xdf
 PHRS
