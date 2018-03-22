@@ -21098,6 +21098,13 @@ if(!$("#phr-admin-page").val()) {
     });
     
     Phroses.utils.formify({
+        selector: ".admin-ip input",
+        action: "change",
+        collect: function() { return { "adminip" : $(this).val() } },
+        success: Phroses.utils.displaySaved
+    });
+
+    Phroses.utils.formify({
         selector: ".siteurl-changer input",
         action: "change",
         collect: function() { return { "url" : $(this).val() } },

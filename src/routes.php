@@ -129,15 +129,6 @@ $routes[] = new class extends Route {
 	public function rules($cascade, $page, $site) {
 		return [
 			1 => function() use (&$site) {
-				$ipok = false;
-				
-				if(in_array($site->adminIP, ["", "*"])) $ipok = true;
-				else {
-					foreach(explode(",", $site->adminIP) as $ip) {
-						if($ip == $_SERVER["REMOTE_ADDR"]) $ipok = true;
-					}
-				}
-
 				return (
 					PATH != "/" &&
 					stringStartsWith(PATH, $site->adminURI) && (
@@ -145,7 +136,7 @@ $routes[] = new class extends Route {
 						file_exists(($adminpath = INCLUDES["VIEWS"].substr(PATH, strlen($site->adminURI))).".php") || // views/page.php
 						file_exists($adminpath) || // views/page.css
 						file_exists("$adminpath/index.php") // views/page/index.php
-					) && $ipok
+					) && $site->ipHasAccess($_SERVER["REMOTE_ADDR"])
 				); 
 			}
 		];

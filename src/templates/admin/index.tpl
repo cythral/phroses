@@ -43,6 +43,11 @@
             <input class="c form_field form_input" type="text" value="<{var::adminuri}>" data-method="POST" data-url="" data-initial-value="<{var::adminuri}>">
         </div>
 
+        <div class="form_icfix aln-l c admin-ip panel-input">
+            <div>Admin IPs:</div>
+            <input class="c form_field form_input" type="text" value="<{var::adminip}>" data-method="POST" data-url="" placeholder="Comma separated IP Addresses or blank for no restrictions.">
+        </div>
+
         <div class="form_icfix aln-l c maintenance-select panel-input">
             <div>Maintenance:</div>
             <select class="c form_field form_select" data-method="POST" data-url="">

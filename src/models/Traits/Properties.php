@@ -16,7 +16,7 @@ trait Properties {
             return $this->{"get{$key}"}();
         }
         
-        return $this->properties[$key] ?? ((method_exists($this, "_get")) ? $this->_get($key) : null);
+        return $this->properties[strtolower($key)] ?? ((method_exists($this, "_get")) ? $this->_get($key) : null);
     }
 
     /**
@@ -31,8 +31,8 @@ trait Properties {
             $val = $this->{"set{$key}"}($val);
             if(!$val) return;
         }
-
+        
         if(method_exists($this, "_set")) $this->_set($key, $val);
-        $this->properties[$key] = $val;
+        $this->properties[strtolower($key)] = $val;
     }
 }

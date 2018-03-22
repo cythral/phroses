@@ -5,6 +5,7 @@
 namespace Phroses;
 
 use \PDO;
+use \ArrayObject;
 use \inix\Config as inix;
 use \Phroses\Patterns\DataClass;
 use \Phroses\Database\Database;
@@ -15,6 +16,7 @@ class Site extends DataClass {
     /** @var string the name of the table this class corresponds to in the database */
     static protected $tableName = "sites";
 
+    /** @inheritDoc */
     static protected $readOnlyProperties = [
         "views",
         "pagecount",
@@ -124,6 +126,53 @@ class Site extends DataClass {
             ->addWhere("siteID", "=", ":id")
             ->execute([ ":id" => $this->id ])
             ->fetchColumn();
+    }
+
+    /**
+     * Getter for adminIP.  This returns an array object which proxies changes to the 
+     * adminIP setter ( so you can do $site->adminIP->append(...) )
+     * 
+     * @return ArrayObject
+     */
+    protected function getAdminIP(): ArrayObject {
+        $value = !isset($this->properties["adminip"]) || in_array($this->properties["adminip"], ["", "*"]) ? [] : explode(",", $this->properties["adminip"]);
+        
+        return new class($value, $this) extends ArrayObject {
+            private $controller;
+
+            public function __construct($array, $controller) {
+                $this->controller = $controller;
+                parent::__construct($array);
+            }
+
+            public function append($value) {
+                parent::append($value);
+                $this->controller->adminIP = (array) $this;
+            }
+        };
+    }
+
+    /**
+     * Setter for adminIP
+     * 
+     * @param array $val an array of ip addresses to allow access to the dashboard
+     * @return string
+     */
+    protected function setAdminIP(array $val): string {
+        $return = implode(",", $val);
+        return empty($return) ? "*" : $return; // have to return a nonempty string otherwise the setter will not forward it to the database
+    }
+
+
+    /**
+     * Checks to see if an IP address has access to the admin dashboard
+     * 
+     * @param string $ip the ip to check against
+     * @return bool true if the ip has access and false if not
+     */
+    public function ipHasAccess(string $ip): bool {
+        $ips = (array)$this->adminIP;
+        return empty($ips) || in_array($ip, $ips);
     }
     
     /**

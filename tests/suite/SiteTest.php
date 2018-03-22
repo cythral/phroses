@@ -273,9 +273,77 @@ class SiteTest extends TestCase {
      * Setting the pageCount property should throw an exception
      * 
      * @depends testGenerateValidId
+     * @covers \Phroses\Site::setPageCount
      */
     public function testSetPageCount() {
         $this->expectException(ReadOnlyException::class);
         Site::generate(1)->pageCount = 5;
+    }
+
+    /**
+     * The getter for adminIP should return an array of ip addresses
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getAdminIp
+     */
+    public function testGetAdminIp() {
+        $this->assertArrayEquals(["192.168.0.1", "10.8.0.1"], (array)Site::generate(1)->adminIP);
+    }
+
+    /**
+     * Makes sure the setter for adminIP works as expected
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::setAdminIp
+     */
+    public function testSetAdminIp() {
+        $site = Site::generate(1);
+        $site->adminIP = ["192.168.0.1"];
+        $this->assertArrayEquals(["192.168.0.1"], (array)$site->adminIP);
+    }
+
+    /**
+     * When appending to the adminIP arrayobject, it should call the setter so changes persist
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::getAdminIp
+     */
+    public function testAddAdminIp() {
+        $site = Site::generate(1);
+        $site->adminIP->append("192.168.0.2");
+        $this->assertArrayEquals(["192.168.0.1", "10.8.0.1", "192.168.0.2"], (array)$site->adminIP);
+    }
+
+    /**
+     * ipHasAccess should return true when the specified ip address is in the adminIP arrayobject
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::ipHasAccess
+     */
+    public function testIpHasAccessTrue() {
+        $this->assertTrue(Site::generate(1)->ipHasAccess("192.168.0.1"));
+    }
+
+    /**
+     * ipHasAccess should return false when the specified ip address is not in the arrayobject and it is not empty
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::ipHasAccess
+     */
+    public function testIpHasAccessFalse() {
+        $this->assertFalse(Site::generate(1)->ipHasAccess("192.168.0.2"));
+    }
+
+    /**
+     * If the adminIP arrayobject is empty, all ips should have access
+     * 
+     * @depends testGenerateValidId
+     * @depends testSetAdminIp
+     * @covers \Phroses\Site::ipHasAccess
+     */
+    public function testIpHasAccessEmpty() {
+        $site = Site::generate(1);
+        $site->adminIP = [];
+        $this->assertTrue($site->ipHasAccess("8.8.8.8"));
     }
 }
