@@ -46,7 +46,7 @@ use const \reqc\{ HOST, METHOD };
     $index->viewcount = ($site->views > 999) ? "999+" : $site->views;
     $index->fullviewcount = $site->views;
     $index->adminuri = $site->adminURI;
-    $index->adminip = implode(",", $site->adminIP);
+    $index->adminip = implode(",", (array) $site->adminIP);
     $index->host = HOST;
     
     foreach(Theme::list() as $thm) {
