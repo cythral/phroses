@@ -19,5 +19,5 @@ ssh travis@deb.cythral.com <<PHRS
     aptly repo add ${repo} phroses-${version}.deb
     aptly publish update stretch
     rm phroses-${version}.deb
-    ../publish.sh Phroses ${version} ${repo}
+    ./publish.sh Phroses ${version} ${repo}
 PHRS
