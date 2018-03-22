@@ -20980,55 +20980,6 @@ if(!$("#phr-admin-page").val()) {
             }, 2000); 
         }
     });
-
-    /**
-     * Upgrade screen
-     * uses EventSource to track progress, so formify doesnt work here.
-     */
-    $("#phr-upgrade-screen").submit(function(e) {
-        e.preventDefault();
-        $(this).fadeIn();
-        
-        var ev = new EventSource(controller.adminuri+"/update/start");
-        ev.addEventListener("progress", function(e) {
-            console.log(e.data);
-            $(".phr-progress-bar").css({width: JSON.parse(e.data).progress+"%" });
-            
-            // completion
-            if(JSON.parse(e.data).progress === 100) {
-                ev.close();
-                
-                $("#phr-upgrade-screen .phr-progress").addClass("done");
-                $("#phr-upgrade-screen h1").fadeOut(function() {
-                    $(this).html("Phroses updated to "+JSON.parse(e.data).version);
-                    $(this).fadeIn();
-                });
-                
-                setTimeout(function() {
-                    location.reload();
-                }, 5000);
-            }
-        });
-
-        ev.addEventListener("error", function(e) {
-            ev.close();
-            console.log(e.data);
-            var data = JSON.parse(e.data);
-
-            var extra = "";
-            if(data.error == "write") extra = "<br>debug: operation " + data.action + " on file " + data.file;
-
-            $(".phr-progress-error").html(Phroses.errors[data.error] + extra);
-            $(".phr-progress").addClass("error");
-        });
-    });
-
-    $(".phr-update-icon").click(function() {
-        $(this).addClass("done");
-        setTimeout(function() {
-            $("#phr-upgrade-screen").submit();
-        }, 1000);
-    });
         
     $("#phr-new-page").submit(function(e) {
         document.location = $("#phr-new-page input").val() + "#new";
