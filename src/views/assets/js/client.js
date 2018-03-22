@@ -10802,6 +10802,7 @@ editor.prototype.setupSaving = function() {
             });
 
             data.push({name : "id", value : $("#pid").val() });
+            data.push({name:"title", value: $("#pst-es-title").val() });
             data.push({name : "content", value : JSON.stringify(content) });
             data.push({ name: "css", value: editors["css-editor"].getValue() });
             if($("#pst-es-type").val() === "redirect") data.push({name : "type", value : "redirect" });

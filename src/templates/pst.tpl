@@ -54,8 +54,12 @@
 </form>
 
 <form id="pst-edit" class="container screen pst-content" data-method="PATCH" data-url="" data-view="mode-content">
-  <select id="pst-es-type" data-method="patch" data-url=""><{array::types::<option value="@type" @checked>@type</option>}></select>
-
+  <input id="pst-es-title" data-method="patch" data-url="" value="<{var::title}>">
+  <div class="type-wrapper">
+    <div></div>
+    <select id="pst-es-type" data-method="patch" data-url=""><{array::types::<option value="@type" @checked>@type</option>}></select>
+  </div>
+  <div class="clear"></div>
   <div class="mode-switcher">
     <div class="mode mode-content" data-view="mode-content">Content</div>
     <div class="mode mode-style" data-view="mode-style">style</div>

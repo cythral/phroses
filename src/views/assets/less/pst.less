@@ -188,22 +188,22 @@
 }
 
 #pst-es-title {
-    height: 70px;
-    line-height: 70px;
-    margin-top: 5px;
+    height: 50px;
+    line-height: 50px;
+    padding: 5px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     background: none;
     border: none;
-    font-size: 2em;
+    font-size: 1.5em;
     font-weight: bold;
     color: #673AB7;
-    padding-left: 20px;
     transition: border .3s;
     border: 5px solid transparent;
-    border-radius: 25px;
-    &:hover, &:focus { border: 5px solid #673AB7; }
+    width: 45%; 
+    border-bottom: 3px solid @primary;
+    float: left;
 }
 
 #pst-es-actions {
@@ -225,6 +225,22 @@
 
 #pst-ds p { margin-bottom: 30px; }
 
+.type-wrapper {
+    float: left;
+    width: 55%;
+    right: -20px;
+    position: relative;
+} 
+
+.type-wrapper div {
+    border-bottom: 25px solid @primary;
+    border-right: 25px solid @primary;
+    border-left: 25px solid transparent;
+    border-top: 25px solid transparent;
+    position: absolute;
+    left: -50px;
+}
+
 #pst-es-type {
     background: transparent;
     height: 50px;
@@ -238,12 +254,11 @@
     -moz-appearance: none;
     appearance: none;
     text-align: center;
-    margin-top: 10px;
     cursor: pointer;
-    text-align-last: center;
     text-transform: uppercase;
     width: 100%;
     border: none;
+
 
     &:after {
         content:"\f0d7";
@@ -348,5 +363,10 @@ body.editView {
 
     #pst-save {
         animation: bounceIn .3s forwards;
+    }
+
+    #pst-move, #pst-delete, #pst-vis {
+        pointer-events: none;
+        opacity: .5;
     }
 }
