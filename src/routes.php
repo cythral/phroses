@@ -229,7 +229,7 @@ $routes[] = new class extends Route {
 		$out = new JsonServer();
 
 		// Validation
-		$out->error("access_denied", !$_SESSION, 401);
+		$out->restrict();
 		$out->error("resource_exists", Phroses::$response != RouteController::RESPONSES["PAGE"][404]);
 
 		foreach(["title","type"] as $type) {
@@ -261,9 +261,9 @@ $routes[] = new class extends Route {
 		$out = new JsonServer();
 
 		// Validation
-		$out->error("access_denied", !$_SESSION, 401);
-		$out->error("resource_missing", !in_array(Phroses::$response, [ RouteController::RESPONSES["PAGE"][200], RouteController::RESPONSES["PAGE"][301] ]));
-		$out->error("no_change", allKeysDontExist(["type", "uri", "title", "content", "public", "css"], $_REQUEST));
+		$out->restrict();
+		$out->requireExistingPage();
+		$out->requireChanges(["type", "uri", "title", "content", "public", "css"]);
 		$out->error("bad_value", !$page->theme->hasType($_REQUEST["type"] ?? $page->type), 400, [ "field" => "type" ]);
 		$out->error("resource_exists", isset($_REQUEST["uri"]) && $site->hasPage($_REQUEST["uri"]));
 		
@@ -273,16 +273,18 @@ $routes[] = new class extends Route {
 
 			$out->success(200, [ "typefields" => $page->theme->getEditorFields("redirect") ]);
 		}
+		
+		$sanitizer = new Sanitizer($_REQUEST);
+		$sanitizer->applyCallback("htmlspecialchars_decode", ["content"]);
+		$_REQUEST = $sanitizer();
 
-		if(isset($_REQUEST["title"])) $page->title = $_REQUEST["title"];
-		if(isset($_REQUEST["uri"])) $page->uri = urldecode($_REQUEST["uri"]);
-		if(isset($_REQUEST["public"])) $page->public = $_REQUEST["public"];
-		if(isset($_REQUEST["css"])) $page->css = urldecode($_REQUEST["css"]);
-		if(isset($_REQUEST["content"])) $page->content = htmlspecialchars_decode($_REQUEST["content"]);
+		foreach($_REQUEST as $key => $value) {
+			if(!isset($page->{$key})) continue;
+			$page->{$key} = $value;
+		}
 
-		if(isset($_REQUEST["type"])) {
-			$page->type = urldecode($_REQUEST["type"]);
-			if($_REQUEST["type"] != "redirect") $page->content = "{}";
+		if(isset($_REQUEST["type"]) && $_REQUEST["type"] != "redirect") {
+			$page->content = "{}";
 		}
 
 		$output = [];
@@ -303,8 +305,8 @@ $routes[] = new class extends Route {
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer();
-		$out->error("access_denied", !$_SESSION, 401);
-		$out->error("resource_missing", !in_array(Phroses::$response, [ RouteController::RESPONSES["PAGE"][200], RouteController::RESPONSES["PAGE"][301] ]));
+		$out->restrict();
+		$out->requireExistingPage();
 		$out->error("delete_failed", !$page->delete());
 		$out->success();
 	}
@@ -345,7 +347,7 @@ $routes[] = new class extends Route {
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer;
-		mapError("access_denied", !$_SESSION, 401);
+		$out->restrict();
 
 		try {
 			$upload = new Upload($site, substr(PATH, 8));
@@ -370,7 +372,7 @@ $routes[] = new class extends Route {
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer;
-		$out->error("access_denied", !$_SESSION, 401);
+		$out->restrict();
 		$out->error("missing_value", !isset($_REQUEST["to"]), 400, [ "value" => "to" ]);
 
 		try {
@@ -394,7 +396,7 @@ $routes[] = new class extends Route {
 
 	public function follow(&$page, &$site, &$out) {
 		$out = new JsonServer;
-		$out->error("access_denied", !$_SESSION, 401);
+		$out->restrict();
 		$out->error("missing_value", !isset($_FILES["file"]), 400, [ "value" => "file" ]);
 		
 		try {

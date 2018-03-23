@@ -35,4 +35,10 @@ trait Properties {
         if(method_exists($this, "_set")) $this->_set($key, $val);
         $this->properties[strtolower($key)] = $val;
     }
+
+    public function __isset(string $key): bool {
+        return (method_exists($this, "get{$key}") && (new \ReflectionMethod($this, "get{$key}"))->isProtected()) ||
+            isset($this->properties[strtolower($key)]) ||
+            (method_exists($this, "_get") && $this->_get($key) != null);
+    }
 }

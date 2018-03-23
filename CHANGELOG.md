@@ -2,14 +2,14 @@
 
 ## v0.8.0
 ### New Features
- - **Page CSS**: the ability to add custom css to specific pages has been added, and the editor has been completely redone to accommodate this. Page styles are reloaded on keyup, so that you can view your changes in realtime.
+ - **Page CSS**: the ability to add custom css to specific pages has been added, and the editor has been completely redone to accommodate this. Page styles are reloaded on keyup, so that you can view your changes in real-time.
  - **IP Restriction**: you can now restrict administrator access to specific ip addresses on /admin
 ### New Commands
  - **version**: displays the current version of phroses that is in use
  - **reset**: easily reset the database back to default
  - **restore**: restores the database from input sql (pipe a backup created from mysqldump)
 ### Bug Fixes & Minor Changes
- - Refactored routing.  Introduced a Route and Cascade class to handle routing and cascading route rules.
+ - Refactored routing.  Introduced a Route and Cascade class to handle routing and cascading route rules. Route controlling now handled by a separate class rather than the front controller.
  - Refactored installation, installation functions have been moved to a class.
  - The Theme class uses a 'Loader' to load errors, assets and types.  DummyLoader and FolderLoader are the current ones, PharLoader to be added in a future version.
  - New Site class replaces the SITE[] constant.
@@ -17,7 +17,9 @@
  - New /admin/info page displays versioning information.
  - Phroses is now a Debian package.  Packages for other systems to be added in future versions.
  - Since you can update/upgrade through apt now, the web interface for upgrading has been removed.
-
+ - New Plugin class for loading and interfacing with plugins.
+ - Command parsing & handling moved to \Phroses\Commands namespace
+ - Mode handling moved to \Phroses\Modes namespace
 <br />
 
 ---
