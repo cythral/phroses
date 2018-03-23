@@ -20,6 +20,7 @@
  - New Plugin class for loading and interfacing with plugins.
  - Command parsing & handling moved to \Phroses\Commands namespace
  - Mode handling moved to \Phroses\Modes namespace
+ - New Sanitizer class to apply sanitization callbacks to array elements
 <br />
 
 ---
