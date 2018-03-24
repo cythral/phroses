@@ -14,14 +14,14 @@
 
 <input type="hidden" id="pid" value="<{var::id}>">
 
-<form id="pst-ds" class="container screen" data-method="DELETE" data-url="">
+<form id="pst-ds" class="container screen" data-method="DELETE" data-url="" tabindex="0">
   <h1>Are you sure?</h1>
   <p>You're about to permanently delete this page.  It cannot be recovered.</p>
   <a id="pst-ds-y" href="#" class="pst_btn txt screen-enter" data-target="pst-ds" data-action="submit" data-scroll="on">Yes</a>
   <a id="pst-ds-n" href="#" class="pst_btn txt screen-escape" data-target="pst-ds" data-action="fadeOut" data-scroll="on">No</a>
 </form>
 
-<form id="pst-ms" class="container screen" data-method="PATCH", data-url="">
+<form id="pst-ms" class="container screen" data-method="PATCH", data-url="" tabindex="0">
 	<h1>Move Page</h1>
 	<p>You may change the URI of the page with this form.</p>
 		<div class="container">

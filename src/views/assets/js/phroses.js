@@ -20861,7 +20861,7 @@ if(!$("#phr-admin-page").val()) {
 
             failure: function(data) {
                 data = data.responseJSON;
-                Phroses.genericError(Phroses.errors["pst-ms"][data.error] || Phroses.errors[data.error] || "An unknown error occurred.");
+                Phroses.utils.genericError(Phroses.errors["pst-ms"][data.error] || Phroses.errors[data.error] || "An unknown error occurred.");
             }
         });
         
