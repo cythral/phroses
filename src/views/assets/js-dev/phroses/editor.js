@@ -85,6 +85,8 @@ editor.prototype.setupSaving = function() {
             if(pdata.type !== "redirect") utils.displaySaved();
         }
     });
+
+    $("#pst-es-title").change(function() { $("#pst-es").submit() });
 };
 
 editor.prototype.setupStylesTab = function() {

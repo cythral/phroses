@@ -20828,15 +20828,13 @@ if(!$("#phr-admin-page").val()) {
         $("body").append(data.content);
         
         Phroses.setupButtons();
+        Phroses.setupScreens();
 
         // setup editor
         var editor = new Phroses.editor;
-
-        $("#pst-es-title").change(function() { $("#pst-es").submit() });
-        
     
         /**
-         * Deletion Screen
+         * Deletion Screen 
          */
         Phroses.utils.formify({
             selector: "#pst-ds",
@@ -20886,7 +20884,7 @@ if(!$("#phr-admin-page").val()) {
                 $("#phr-container").html(data.content);
                 $("#mode-content").html(data.typefields);
                 
-                $("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
+                $("#pst-es-title").val(title);
                 $("#pst-es-type").val($("#pst-ns select").val());
                 editor.aceify();
                 document.title = title;
@@ -21157,6 +21155,8 @@ editor.prototype.setupSaving = function() {
             if(pdata.type !== "redirect") utils.displaySaved();
         }
     });
+
+    $("#pst-es-title").change(function() { $("#pst-es").submit() });
 };
 
 editor.prototype.setupStylesTab = function() {
@@ -21239,6 +21239,10 @@ module.exports = {
         "resource_exists" : "The URI you are trying to move this page to already exists."
     },
 
+    "pst-ns": {
+        "missing_value" : "Missing {{value}} value"
+    },
+
     "uploads" : {
         "resource_exists" : "That filename already exists.",
         "failed_upl" : "There was an error uploading that file, it may be too large.",
@@ -21249,7 +21253,7 @@ module.exports = {
     "admin" : {
         "resource_exists" : "That page already exists",
         "bad_uri" : "Please use a valid uri that is not '/'"
-    }
+    } 
 };
 
 },{}],7:[function(require,module,exports){
@@ -21266,22 +21270,38 @@ Phroses.utils = require("./utils");
 Phroses.setupButtons = function() {
     $(".pst_btn, .phr-btn").click(function(e) {
         e.preventDefault();
+        
         if($(this).data("target")) {
             if($(this).data("scroll") === "off") {
                 $("body").addClass("noscroll");
             } else if($(this).data("scroll") === "on") {
                 $("body").removeClass("noscroll");
             }
-            $("#"+$(this).data("target"))[$(this).data("action")]();
+
+            $("#"+$(this).data("target"))[$(this).data("action")]();            
         }
+
     });
     
     $(".pst_btn").on("dragstart", function() { return false; });	
 };
 
+Phroses.setupScreens = function() {
+    $(".screen").keydown(function(e) {
+        if($(this).is(":visible")) {
+            if(e.which === 13) {
+                $(this).find(".screen-enter")[0].click();
+            }
+            if(e.which === 27) {
+                $(this).find(".screen-escape")[0].click();
+            }
+        }
+    });
+}
+
 
 module.exports = Phroses;
-
+ 
 },{"./editor":5,"./errors":6,"./utils":8,"jquery":1}],8:[function(require,module,exports){
 var $ = require("jquery"), 
     errors = require("./errors"),

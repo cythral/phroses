@@ -9,6 +9,10 @@ module.exports = {
         "resource_exists" : "The URI you are trying to move this page to already exists."
     },
 
+    "pst-ns": {
+        "missing_value" : "Missing {{value}} value"
+    },
+
     "uploads" : {
         "resource_exists" : "That filename already exists.",
         "failed_upl" : "There was an error uploading that file, it may be too large.",
@@ -19,5 +23,5 @@ module.exports = {
     "admin" : {
         "resource_exists" : "That page already exists",
         "bad_uri" : "Please use a valid uri that is not '/'"
-    }
+    } 
 };

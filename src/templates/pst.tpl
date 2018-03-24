@@ -17,8 +17,8 @@
 <form id="pst-ds" class="container screen" data-method="DELETE" data-url="">
   <h1>Are you sure?</h1>
   <p>You're about to permanently delete this page.  It cannot be recovered.</p>
-  <a id="pst-ds-y" href="#" class="pst_btn txt" data-target="pst-ds" data-action="submit" data-scroll="on">Yes</a>
-  <a id="pst-ds-n" href="#" class="pst_btn txt" data-target="pst-ds" data-action="fadeOut" data-scroll="on">No</a>
+  <a id="pst-ds-y" href="#" class="pst_btn txt screen-enter" data-target="pst-ds" data-action="submit" data-scroll="on">Yes</a>
+  <a id="pst-ds-n" href="#" class="pst_btn txt screen-escape" data-target="pst-ds" data-action="fadeOut" data-scroll="on">No</a>
 </form>
 
 <form id="pst-ms" class="container screen" data-method="PATCH", data-url="">
@@ -30,27 +30,27 @@
 				<input id="puri" name="uri" class="form_input form_field" placeholder="Page URI" value="<{var::uri}>" autocomplete="off">     
 			</div>
 		</div>
-    <a id="pst-ms-s" href="#" class="pst_btn txt" data-target="pst-ms" data-action="submit" data-scroll="on">Submit</a>
-    <a id="pst-ms-c" href="#" class="pst_btn txt" data-target="pst-ms" data-action="fadeOut" data-scroll="on">Cancel</a>
+    <a id="pst-ms-s" href="#" class="pst_btn txt screen-enter" data-target="pst-ms" data-action="submit" data-scroll="on">Submit</a>
+    <a id="pst-ms-c" href="#" class="pst_btn txt screen-escape" data-target="pst-ms" data-action="fadeOut" data-scroll="on">Cancel</a>
 </form>
 
-<form id="pst-ns" class="container screen" data-method="POST" data-url="">
+<form id="pst-ns" class="container screen" data-method="POST" data-url="" tabindex="0">
 	<h1>Create a New Page</h1>
 	<div class="container">
 		<div class="form_icfix c aln-l">
 			<div>Title:</div>
-			<input name="title" class="form_input form_field" placeholder="Page Title" autocomplete="off">
+			<input name="title" class="form_input form_field" placeholder="Page Title" autocomplete="off" required>
 		</div>
 		<div class="form_icfix c aln-l">
 			<div>Type:</div>
-			<select name="type" class="c form_select form_field">
+			<select name="type" class="c form_select form_field" required>
 				<option value="" disabled selected>Select a Page Type</option>
 				<{array::types::<option value="@type">@type</option>}>
 			</select>
 		</div>
 	</div>
-	<a id="pst-ns-s" href="#" class="pst_btn txt" data-target="pst-ns" data-action="submit" data-scroll="on">Submit</a>
-  <a id="pst-ns-c" href="#" class="pst_btn txt" data-target="pst-ns" data-action="fadeOut" data-scroll="on">Cancel</a>
+	<a id="pst-ns-s" href="#" class="pst_btn txt screen-enter" data-target="pst-ns" data-action="submit" data-scroll="on">Submit</a>
+  <a id="pst-ns-c" href="#" class="pst_btn txt screen-escape" data-target="pst-ns" data-action="fadeOut" data-scroll="on">Cancel</a>
 </form>
 
 <form id="pst-edit" class="container screen pst-content" data-method="PATCH" data-url="" data-view="mode-content">

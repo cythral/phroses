@@ -32,15 +32,13 @@ if(!$("#phr-admin-page").val()) {
         $("body").append(data.content);
         
         Phroses.setupButtons();
+        Phroses.setupScreens();
 
         // setup editor
         var editor = new Phroses.editor;
-
-        $("#pst-es-title").change(function() { $("#pst-es").submit() });
-        
     
         /**
-         * Deletion Screen
+         * Deletion Screen 
          */
         Phroses.utils.formify({
             selector: "#pst-ds",
@@ -90,7 +88,7 @@ if(!$("#phr-admin-page").val()) {
                 $("#phr-container").html(data.content);
                 $("#mode-content").html(data.typefields);
                 
-                $("#pst-es input[name=title]").val($("#pst-ns input[name=title]").val());
+                $("#pst-es-title").val(title);
                 $("#pst-es-type").val($("#pst-ns select").val());
                 editor.aceify();
                 document.title = title;
