@@ -21278,9 +21278,9 @@ Phroses.setupButtons = function() {
                 $("body").removeClass("noscroll");
             }
 
-            $("#"+$(this).data("target"))[$(this).data("action")]();            
+            $("#"+$(this).data("target"))[$(this).data("action")]();
+            $("#"+$(this).data("target")).focus();            
         }
-
     });
     
     $(".pst_btn").on("dragstart", function() { return false; });	
@@ -21297,8 +21297,7 @@ Phroses.setupScreens = function() {
             }
         }
     });
-}
-
+};
 
 module.exports = Phroses;
  
@@ -21334,6 +21333,26 @@ utils.genericError = function(message) {
     
 };
 
+
+utils.requiredFields = function(el) {
+    var elements = el.find("[required]").toArray();
+
+    for(var element in elements) {
+        element = $(elements[element]);
+
+        if(!element.val()) {
+            element.parent(".c.form_icfix").addClass("missing");
+
+            element.one("focus", function() {
+                $(this).parent(".c.form_icfix").removeClass("missing");
+            });
+            return false; 
+        }
+    }
+
+    return true;
+};
+
 utils.formify = function(options) {
     if(options.hash) {
         if(window.location.hash === options.hash) {
@@ -21350,9 +21369,11 @@ utils.formify = function(options) {
     $(document).on(options.action || "submit", options.selector, function(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
+
+        if(!utils.requiredFields($(this))) return;
+
         var data = (options.collect || function() { return $(this).serializeArray(); }).bind(this)();
         
-
         $.ajax({
             url : $(this).data("url"),
             data : data,
@@ -21364,6 +21385,7 @@ utils.formify = function(options) {
 
     console.log("Formified element <"+options.selector+">");
 };
+
 
 utils.getParameters = function() {
     var src = document.currentScript.getAttribute("src"),

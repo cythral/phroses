@@ -671,3 +671,30 @@ select.c {
         color: @primary;
     }
 }
+
+.c.form_icfix.missing {
+    position: relative;
+
+    div {
+        color: red;
+    }
+ 
+    input, select {
+        border-color: red;
+        color: red;
+    }
+
+    &:after {
+        position: absolute;
+        right: 5px;
+        content: "required";
+        top: 10px;
+        line-height: 30px;
+        text-transform: uppercase;
+        font-size: 13px;
+        background: #333;
+        padding: 0 10px 0 10px;
+        height: 30px;
+        color: white;
+    }
+}

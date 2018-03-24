@@ -19,9 +19,9 @@ Phroses.setupButtons = function() {
                 $("body").removeClass("noscroll");
             }
 
-            $("#"+$(this).data("target"))[$(this).data("action")]();            
+            $("#"+$(this).data("target"))[$(this).data("action")]();
+            $("#"+$(this).data("target")).focus();            
         }
-
     });
     
     $(".pst_btn").on("dragstart", function() { return false; });	
@@ -38,8 +38,7 @@ Phroses.setupScreens = function() {
             }
         }
     });
-}
-
+};
 
 module.exports = Phroses;
  
