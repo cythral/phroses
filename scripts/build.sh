@@ -10,8 +10,8 @@ composer run build:css
 mkdir build
 mkdir -p build/var/phroses
 mkdir -p build/usr/bin
-mkdir -p build/etc/apache2/sites-available/
-cp config/apache-vhost.conf build/etc/apache2/sites-available/phroses.conf
+mkdir -p build/etc/apache2/conf-available/
+cp config/apache.conf build/etc/apache2/conf-available/phroses.conf
 cp -r config/DEBIAN build/DEBIAN
 
 # setup data directory

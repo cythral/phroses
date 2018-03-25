@@ -4,11 +4,10 @@ if [[ ! -d /etc/phroses ]]; then
     mkdir /etc/phroses && chown www-data /etc/phroses
 fi
 
-
 read -p "Enable phroses and restart apache? (Y/n): " answer
 
 if [[ "$answer" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     a2enmod rewrite
-    a2ensite phroses
-    service apache2 restart
+    a2enconf phroses
+    systemctl restart apache2
 fi;
