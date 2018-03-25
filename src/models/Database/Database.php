@@ -148,9 +148,11 @@ class Database extends Singleton {
     public function updateSchema(): bool {
         $version = $this->getSchemaVersion();
         if($version >= SCHEMAVER) return true;
-        
-        while($version < SCHEMAVER) {
+        $version++;
+
+        while($version <= SCHEMAVER) {
             if($this->con->query(file_get_contents(self::SCHEMA_ROOT."/update-{$version}.sql")) === false) return false;
+            $version++;
         }
 
         return true;
@@ -181,8 +183,8 @@ class Database extends Singleton {
     public function getSchemaVersion(): int {
         return $this->schemaVersion ?? $this->schemaVersion = (new SelectQuery)
             ->setTable("options")
-            ->addColumns(["value"])
-            ->addWhere("key", "=", "'schemaver'")
+            ->addColumns(["`value`"])
+            ->addWhere("`key`", "=", "'schemaver'")
             ->execute()
             ->fetchColumn();
     }
