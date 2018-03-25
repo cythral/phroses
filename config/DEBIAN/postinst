@@ -1,7 +1,11 @@
 #!/bin/bash
 
-mkdir /etc/phroses && chown www-data /etc/phroses
-read -p "Enable site and restart apache? (Y/n): " answer
+if [[ ! -d /etc/phroses ]]; then
+    mkdir /etc/phroses && chown www-data /etc/phroses
+fi
+
+
+read -p "Enable phroses and restart apache? (Y/n): " answer
 
 if [[ "$answer" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     a2enmod rewrite
