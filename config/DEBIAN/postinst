@@ -9,5 +9,5 @@ read -p "Enable phroses and restart apache? (Y/n): " answer
 if [[ "$answer" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     a2enmod rewrite
     a2enconf phroses
-    systemctl restart apache2
+    service apache2 restart
 fi;
