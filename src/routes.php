@@ -45,6 +45,7 @@ $routes[] = new class extends Route {
 		}
 
 		if($page->css != null) $page->theme->push("stylesheets", [ "src" => "?mode=css"] );
+		
 		$page->display();
 	}
 };
@@ -279,7 +280,7 @@ $routes[] = new class extends Route {
 		$_REQUEST = $sanitizer();
 
 		foreach($_REQUEST as $key => $value) {
-			if(!isset($page->{$key})) continue;
+			if(!isset($page->{$key}) && $key != "css") continue;
 			$page->{$key} = $value;
 		}
 
