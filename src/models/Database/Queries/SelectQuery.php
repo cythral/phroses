@@ -40,9 +40,10 @@ class SelectQuery extends Query {
         return $this;
     }
 
-    public function orderBy(string $column, string $direction) {
+    public function orderBy(string $column, string $direction): self {
         $this->orderByColumn = $column;
         $this->orderByDirection = $direction;
+        return $this;
     }
 
     /**

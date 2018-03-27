@@ -344,7 +344,7 @@ Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertyp
 		->setTable("pages")
 		->addColumns(["*"])
 		->addWhere("siteID", "=", ":id")
-		->addWhere("type", "=", ":type")
+		->addWhere("`type`", "=", ":type")
 		->orderBy($orderby, $ordertype)
 		->execute([ ":id" => Phroses::$site->id, ":type" => $type ])
 		->fetchAll();
