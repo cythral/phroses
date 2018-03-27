@@ -8,7 +8,7 @@ if [ ! -z "$TRAVIS_TAG" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     version=$TRAVIS_BRANCH
     repo="stable"
 else
-    version="${TRAVIS_BRANCH}a${TRAVIS_BUILD_NUMBER}"
+    version="${TRAVIS_BRANCH}+${TRAVIS_BUILD_NUMBER}"
     repo="unstable"
 fi
 
