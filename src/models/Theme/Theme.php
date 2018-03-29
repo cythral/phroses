@@ -9,6 +9,7 @@
 
 namespace Phroses\Theme; 
 
+use \PDO;
 use \DOMDocument;
 use \Exception;
 use \reqc; 
@@ -347,7 +348,7 @@ Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertyp
 		->addWhere("`type`", "=", ":type")
 		->orderBy($orderby, $ordertype)
 		->execute([ ":id" => Phroses::$site->id, ":type" => $type ])
-		->fetchAll();
+		->fetchAll(PDO::FETCH_OBJ);
     
     foreach($tlist as $page) {
         $out = $field;
