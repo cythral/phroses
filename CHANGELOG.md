@@ -1,4 +1,20 @@
 # CHANGE LOG
+## v0.9.0
+### Bug Fixes & Minor Changes
+- Fixes an issue where elements in the dashbar were overflowing on smaller screen sizes (issue #10)
+
+<br />
+
+---
+
+<br />
+
+
+## v0.8.2
+This release fixes an issue with the typelist template filter.
+
+## v0.8.1
+This release fixes an issue where page specific css was not being saved properly.
 
 ## v0.8.0
 ### New Features
