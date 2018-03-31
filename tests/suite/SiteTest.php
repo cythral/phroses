@@ -287,7 +287,7 @@ class SiteTest extends TestCase {
      * @covers \Phroses\Site::getAdminIp
      */
     public function testGetAdminIp() {
-        $this->assertArrayEquals(["192.168.0.1", "10.8.0.1"], (array)Site::generate(1)->adminIP);
+        $this->assertArrayEquals(["192.168.0.1", "10.8.0.1", "10.9.0.0/27"], (array)Site::generate(1)->adminIP);
     }
 
     /**
@@ -311,7 +311,7 @@ class SiteTest extends TestCase {
     public function testAddAdminIp() {
         $site = Site::generate(1);
         $site->adminIP->append("192.168.0.2");
-        $this->assertArrayEquals(["192.168.0.1", "10.8.0.1", "192.168.0.2"], (array)$site->adminIP);
+        $this->assertArrayEquals(["192.168.0.1", "10.8.0.1", "10.9.0.0/27", "192.168.0.2"], (array)$site->adminIP);
     }
 
     /**
@@ -345,5 +345,51 @@ class SiteTest extends TestCase {
         $site = Site::generate(1);
         $site->adminIP = [];
         $this->assertTrue($site->ipHasAccess("8.8.8.8"));
+    }
+
+    /**
+     * ipHasAccess should return true when testing with an ips in a range specified within the adminIP array
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::ipHasAccess
+     */
+    public function testIpHasAccessRange() {
+        $site = Site::generate(1);
+        $this->assertTrue($site->ipHasAccess("10.9.0.1"));
+    }
+
+    /**
+     * ipHasAccess should return false when testing with an ip that is not in a range specified in the adminIP array
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::ipHasAccess
+     */
+    public function testIpHasAccessOutsideRange() {
+        $site = Site::generate(1);
+        $this->assertFalse($site->ipHasAccess("10.9.0.32"));
+    }
+
+    /**
+     * ipHasAccess should work with ipv6 ranges
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::ipHasAccess
+     */
+    public function testIpHasAccessRange6() {
+        $site = Site::generate(1);
+        $site->adminIP = ["fdc9:f765:1356:acd7::/64"];
+        $this->assertTrue($site->ipHasAccess("fdc9:f765:1356:acd7::1"));
+    }
+
+    /**
+     * ipHasAccess should work with ipv6 ranges
+     * 
+     * @depends testGenerateValidId
+     * @covers \Phroses\Site::ipHasAccess
+     */
+    public function testIpHasAccessOutsideRange6() {
+        $site = Site::generate(1);
+        $site->adminIP = ["fdc9:f765:1356:acd7::/64"];
+        $this->assertFalse($site->ipHasAccess("fdc9:f765:1356:ffff::1/64"));
     }
 }

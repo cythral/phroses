@@ -1,5 +1,6 @@
-<IfModule header>
+<IfModule mod_headers.c>
     header unset x-powered-by
+    header set ipaddr "%{REMOTE_ADDR}s"
 </IfModule>
 
 <IfModule mod_rewrite.c>

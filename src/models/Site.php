@@ -172,7 +172,14 @@ class Site extends DataClass {
      */
     public function ipHasAccess(string $ip): bool {
         $ips = (array)$this->adminIP;
-        return empty($ips) || in_array($ip, $ips);
+        if(empty($ips)) return true;
+        $ip = new IP($ip);
+
+        foreach($ips as $acceptIP) {
+            if($ip->inRange($acceptIP)) return true;
+        }
+
+        return false;
     }
     
     /**
