@@ -21100,11 +21100,11 @@ editor.prototype.setupSaving = function() {
 
     storeInitialValues("#pst-metadata");
 
-    $("html").on("keydown", "body.multiView", function(e) {
+    $("html").on("keydown", ".phroses-container", function(e) {
         if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
             e.preventDefault();
             e.stopImmediatePropagation();
-            $("#pst-"+$(this).data("view")).submit();
+            $("#pst-"+$("body").data("view")).submit();
         }
     });
 
