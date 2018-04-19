@@ -370,6 +370,7 @@
 }
 
 body.multiView {
+    width: 70vw;
 
     .activeMultiView {
         right: 0 !important;
@@ -381,30 +382,26 @@ body.multiView {
         border: 1px solid white;
     }
 
-    #phr-container {
-        width: 70vw;
-    }
-
-    #pst {
+    & + div #pst {
         right: 30vw;
     }
 
-    #pst-save {
+    & + div #pst-save {
         animation: bounceIn .3s forwards;
     }
 
     &[data-view="edit"] {
-        #pst-edit { .activeMultiView; }
-        #pst-edit-trg { .activeMultiViewBtn; }
-        #pst > *:not(#pst-edit-trg):not(#pst-save) { .disable }                
-        #pst-save { right: 20px; }
+        & + div #pst-edit { .activeMultiView; }
+        & + div #pst-edit-trg { .activeMultiViewBtn; }
+        & + div #pst > *:not(#pst-edit-trg):not(#pst-save) { .disable }                
+        & + div #pst-save { right: 20px; }
     }
 
 
     &[data-view="metadata"] {
-        #pst-metadata { .activeMultiView }
-        #pst-metadata-trg { .activeMultiViewBtn; }
-        #pst > *:not(#pst-metadata-trg):not(#pst-save) { .disable; }
-        #pst-save { right: 115px; }
+        & + div #pst-metadata { .activeMultiView }
+        & + div #pst-metadata-trg { .activeMultiViewBtn; }
+        & + div #pst > *:not(#pst-metadata-trg):not(#pst-save) { .disable; }
+        & + div #pst-save { right: 115px; }
     }    
 }

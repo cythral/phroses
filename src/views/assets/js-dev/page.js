@@ -23,13 +23,9 @@ $(document).on("click", ".jlink", function() {
 
 if(!$("#phr-admin-page").val()) {
 
-    
-    var content = $("body").html();
-    $("body").html('<div id="phr-container">'+content+"</div>");
-
     $.post(controller.adminuri+"/api/pst", { uri : window.location.pathname }, function(data) {
 
-        $("body").append(data.content);
+        $("html").append(data.content);
         
         Phroses.setupButtons();
         Phroses.setupScreens();

@@ -161,7 +161,7 @@ editor.prototype.aceify = function() {
 
 editor.prototype.updatePage = function(title, content) {
     if(typeof title !== 'undefined') document.title = title;
-    if(typeof content !== 'undefined') $("#phr-container").html(content);
+    if(typeof content !== 'undefined') $("body").html(content);
     this.reloadStyles();
 }
 

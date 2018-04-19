@@ -10451,13 +10451,9 @@ $(document).on("click", ".jlink", function() {
 
 if(!$("#phr-admin-page").val()) {
 
-    
-    var content = $("body").html();
-    $("body").html('<div id="phr-container">'+content+"</div>");
-
     $.post(controller.adminuri+"/api/pst", { uri : window.location.pathname }, function(data) {
 
-        $("body").append(data.content);
+        $("html").append(data.content);
         
         Phroses.setupButtons();
         Phroses.setupScreens();
@@ -10848,7 +10844,7 @@ editor.prototype.aceify = function() {
 
 editor.prototype.updatePage = function(title, content) {
     if(typeof title !== 'undefined') document.title = title;
-    if(typeof content !== 'undefined') $("#phr-container").html(content);
+    if(typeof content !== 'undefined') $("body").html(content);
     this.reloadStyles();
 }
 
