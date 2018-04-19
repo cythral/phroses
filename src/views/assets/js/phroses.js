@@ -20894,21 +20894,6 @@ if(!$("#phr-admin-page").val()) {
                 });
             }
         });
-
-        /**
-         * Public / Private Switcher
-         */
-        Phroses.utils.formify({
-            selector: "#pst-vis input",
-            action: "change",
-            collect: function() {
-                return {
-                    "id" : $("#pid").val(),
-                    "public" : ($(this).is(":checked") === true) ? 1 : 0
-                };
-            },
-            success: function() {}
-        });
     });
     
 
@@ -21081,9 +21066,23 @@ var editor = function() {
     this.setupStylesTab();
 };
 
+function correctCheckboxValue() {
+    if($(this).is(":checked")) $(this).val("1");
+    else $(this).val("0");
+}
+
+function storeInitialValues(selector) {
+    $(selector).find("input,select").each(function() {
+        $(this).data("initial-value", $(this).val());
+    });
+}
+
 editor.prototype.setupTrigger = function() {
-    $("#pst-edit-trg").click(function() { 
-        $("body").toggleClass("editView"); 
+    $(".multiViewTrigger").click(function() {
+        $("body").attr("data-view", $(this).data("view"));
+        $("body").toggleClass("multiView");
+        $("#pst-save").data("target", "pst-"+$(this).data("view"));
+        
         setTimeout(function() {
             editors["css-editor"].resize(true);
         }, 1000);
@@ -21100,11 +21099,16 @@ editor.prototype.setupTabbing = function() {
 editor.prototype.setupSaving = function() {
     var $this = this;
 
-    $("html").on("keydown", "body.editView", function(e) {
+    correctCheckboxValue.apply($(".checkbox input"));
+    $(".checkbox input").click(correctCheckboxValue);
+
+    storeInitialValues("#pst-metadata");
+
+    $("html").on("keydown", "body.multiView", function(e) {
         if((e.ctrlKey || e.metaKey) && String.fromCharCode(e.which).toLowerCase() == 's') {
             e.preventDefault();
             e.stopImmediatePropagation();
-            $("#pst-edit").submit();
+            $("#pst-"+$(this).data("view")).submit();
         }
     });
 
@@ -21134,16 +21138,36 @@ editor.prototype.setupSaving = function() {
 
     // type switcher
     utils.formify({
-        selector:  "#pst-es-type",
-        action: "change",
+        selector:  "#pst-metadata",
+        action: "submit",
         collect: function() {
-            if($("#pst-edit").attr("data-view") == "mode-content") {
-                $("#mode-content").slideUp();
+            var data = new Array(); 
+            data.push({ name: "id", value: $("#pid").val() });
+            var els = $("#pst-metadata input, #pst-metadata select").toArray();
+
+            for(var el in els) {
+                el = $(els[el]);
+
+                if(el.val() !== el.data("initial-value")) {
+                    data.push({name: el.attr("name"), value: el.val() });
+                }
             }
 
-            return { type : $(this).val(), id : $("#pid").val() };
+            return data;
         },
         success: function(pdata) {
+            
+            $("#pst-metadata").find("input,select").each(function() {
+                if($(this).val() !== $(this).data("initial-value")) {
+                    
+                    if($(this).attr("name") === "uri") {
+                        history.replaceState({}, document.title, $(this).val());
+                    }
+
+                    $(this).data("initial-value", $(this).val());
+                }
+            })
+
             $("#mode-content").html(pdata.typefields);
             $this.aceify();
             if(typeof pdata.content !== 'undefined') $("#phr-container").html(pdata.content);
@@ -21155,8 +21179,6 @@ editor.prototype.setupSaving = function() {
             if(pdata.type !== "redirect") utils.displaySaved();
         }
     });
-
-    $("#pst-es-title").change(function() { $("#pst-es").submit() });
 };
 
 editor.prototype.setupStylesTab = function() {

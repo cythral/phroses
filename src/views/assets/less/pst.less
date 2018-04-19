@@ -67,7 +67,7 @@
     &:hover:before { content: "delete"; }
 }
 
-#pst-move {
+#pst-metadata-trg {
     animation-delay: 1.2s;
     &:hover:before { content: "move"; }
 }
@@ -187,24 +187,6 @@
     height: 100px;	
 }
 
-#pst-es-title {
-    height: 50px;
-    line-height: 50px;
-    padding: 5px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background: none;
-    border: none;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #673AB7;
-    transition: border .3s;
-    border: 5px solid transparent;
-    width: 45%; 
-    border-bottom: 3px solid @primary;
-    float: left;
-}
 
 #pst-es-actions {
     position: absolute;
@@ -241,7 +223,7 @@
     left: -50px;
 }
 
-#pst-es-type {
+/*#pst-es-type {
     background: transparent;
     height: 50px;
     padding: 0 10px 0 10px;
@@ -264,8 +246,17 @@
         content:"\f0d7";
         font-family: fontAwesome;
     }
-}
+}*/
 
+#pst-es-type {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    &:after {
+        content: "V";
+    }
+}
 #pst-edit-trg {
     transition: transform .5s, box-shadow .5s;
 }
@@ -275,12 +266,16 @@
     transition: width 1s;
 }
 
-#pst-edit {
+.multiViewScreen {
     width: 30vw;
     left: auto;
     right: -30vw;
     display: block;
     transition: right 1s;
+}
+
+#pst-edit {
+    .multiViewScreen;
 
     #css-editor {
         height: ~"calc(100% - 110px)";
@@ -291,6 +286,28 @@
         border-bottom: 2px solid @primary;
         background: none;
         margin: 5px 0 5px 0;
+    }
+}
+
+#pst-metadata {
+    .multiViewScreen;
+
+    .form_icfix {
+        margin: 10px 0 10px 0;
+        border-bottom: 2px solid transparent;
+        transition: border .5s;
+
+        input, select {
+            text-align: right;
+        }
+
+        &:hover {
+            border-bottom: 2px solid @primary;
+        }
+
+        .checkbox input:checked:before {
+            content: "yes";
+        }
     }
 }
 
@@ -344,35 +361,50 @@
 #pst-save {
     animation: none;
     position: absolute;
-    right: 20px;
     bottom: 110px;
 }
 
-body.editView {
-    #phr-container {
-        width: 70vw;
+.disable {
+    pointer-events: none;
+    opacity: .5;
+}
+
+body.multiView {
+
+    .activeMultiView {
+        right: 0 !important;
     }
 
-    #pst-edit { 
-        right: 0;
+    .activeMultiViewBtn {
+        transform: rotate(-180deg);
+        box-shadow: 0 0 5px 3px @primary !important;
+        border: 1px solid white;
+    }
+
+    #phr-container {
+        width: 70vw;
     }
 
     #pst {
         right: 30vw;
     }
 
-    #pst-edit-trg {
-        transform: rotate(-180deg);
-        box-shadow: 0 0 5px 3px @primary !important;
-        border: 1px solid white;
-    }
-
     #pst-save {
         animation: bounceIn .3s forwards;
     }
 
-    #pst-move, #pst-delete, #pst-vis {
-        pointer-events: none;
-        opacity: .5;
+    &[data-view="edit"] {
+        #pst-edit { .activeMultiView; }
+        #pst-edit-trg { .activeMultiViewBtn; }
+        #pst > *:not(#pst-edit-trg):not(#pst-save) { .disable }                
+        #pst-save { right: 20px; }
     }
+
+
+    &[data-view="metadata"] {
+        #pst-metadata { .activeMultiView }
+        #pst-metadata-trg { .activeMultiViewBtn; }
+        #pst > *:not(#pst-metadata-trg):not(#pst-save) { .disable; }
+        #pst-save { right: 115px; }
+    }    
 }

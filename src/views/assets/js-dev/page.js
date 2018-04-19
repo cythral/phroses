@@ -98,21 +98,6 @@ if(!$("#phr-admin-page").val()) {
                 });
             }
         });
-
-        /**
-         * Public / Private Switcher
-         */
-        Phroses.utils.formify({
-            selector: "#pst-vis input",
-            action: "change",
-            collect: function() {
-                return {
-                    "id" : $("#pid").val(),
-                    "public" : ($(this).is(":checked") === true) ? 1 : 0
-                };
-            },
-            success: function() {}
-        });
     });
     
 

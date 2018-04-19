@@ -1,11 +1,7 @@
 <div id="pst" class="<{var::pst_type}>">
-    <div id="pst-vis" >
-        <input type="checkbox" <{var::visibility}> id="vs-cb" data-method="PATCH" data-url="">
-        <label for="vs-cb">Public</label>
-    </div>
     <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn" data-scroll="off"><i class="ci ci-delete"></i></a>
-    <a href="#" id="pst-move" class="pst_btn" data-target="pst-ms" data-action="fadeIn" data-scroll="off"><i class="ci ci-urlmove"></i></a>
-    <a href="#" id="pst-edit-trg" class="pst_btn"><i class="ci ci-edit"></i></a>
+    <a href="#" id="pst-metadata-trg" class="pst_btn multiViewTrigger" data-view="metadata"><i class="ci ci-urlmove"></i></a>
+    <a href="#" id="pst-edit-trg" class="pst_btn multiViewTrigger" data-view="edit"><i class="ci ci-edit"></i></a>
     <a href="#" id="pst-save" class="pst_btn" data-target="pst-edit" data-action="submit"><i class="ci ci-save"></i></a>
     <a href="#" id="pst-new" class="pst_btn" data-target="pst-ns" data-action="fadeIn" data-scroll="off"><i class="ci ci-new"></i></a>
 </div>
@@ -54,12 +50,6 @@
 </form>
 
 <form id="pst-edit" class="container screen pst-content" data-method="PATCH" data-url="" data-view="mode-content">
-  <input id="pst-es-title" data-method="patch" data-url="" value="<{var::title}>">
-  <div class="type-wrapper">
-    <div></div>
-    <select id="pst-es-type" data-method="patch" data-url=""><{array::types::<option value="@type" @checked>@type</option>}></select>
-  </div>
-  <div class="clear"></div>
   <div class="mode-switcher">
     <div class="mode mode-content" data-view="mode-content">Content</div>
     <div class="mode mode-style" data-view="mode-style">style</div>
@@ -71,6 +61,31 @@
 
   <div id="mode-style" class="mode-view">
     <div class="editor" id="css-editor" data-mode="css"><{var::css}></div>
+  </div>
+</form>
+
+
+<form id="pst-metadata" class="container screen" data-method="PATCH" data-url="" tabindex="0">
+  <div class="form_icfix c aln-l">
+      <div>Title:</div>
+      <input id="pst-es-title" name="title" class="title form_input form_field" placeholder="Page Title" value="<{var::title}>" autocomplete="off">     
+  </div>
+
+  <div class="form_icfix c aln-l">
+    <div>URI:</div>
+    <input id="puri" name="uri" class="uri form_input form_field" placeholder="Page URI" value="<{var::uri}>" autocomplete="off">     
+  </div>
+  <div class="form_icfix c aln-l">
+    <div>Type:</div>
+    <select id="pst-es-type" name="type" dir="rtl" class="type c form_select form_field" data-method="patch" data-url=""><{array::types::<option value="@type" @checked>@type</option>}></select>
+  </div>
+
+  <div class="form_icfix c aln-l">
+    <div>Public:</div>
+    <div class="checkbox">
+      <input type="checkbox" <{var::visibility}> id="pst-pub" name="public">
+      <div><div></div></div>
+    </div>
   </div>
 </form>
 

@@ -169,7 +169,7 @@ ul.inline {
     height: 50px;
     position: relative;
 
-    div {
+    > div:first-child {
         position: absolute;
         z-index: 1;
         line-height: 50px;
@@ -186,8 +186,62 @@ ul.inline {
         position: absolute;
         padding-left: 15% !important;
         z-index: 0;
+        font-weight: normal !important;
+    }
+
+    .checkbox {
+        position: absolute;
+        right: 10px;
+        height: 30px;
+        width: 50px;
+        border: 2px solid @primary;
+        border-radius: 50px;
+        cursor: pointer;
+        top: 10px;
+
+        input {
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+
+            &:checked {
+                & + div {
+                    background: @primary !important;
+                    
+                    div {
+                        background: white !important;
+                        left: ~"calc(100% - 25px)";
+                    }
+                }
+            }
+        }
+
+        > div {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            z-index: 2;
+            border-radius: 25px;
+            pointer-events: none;
+            transition: background .5s;
+            background: white;
+
+            div {
+                height: 20px;
+                width: 20px;
+                position: absolute;
+                border-radius: 25px;
+                top: 2.5px;
+                transition: background .5s, left .5s;
+                left: calc(0% + 5px);
+                pointer-events: none;
+                background: @primary;
+            }
+        }
     }
 }
+
 
 #phroses_site_password .form_icfix { margin: 20px 0 20px 0; }
 
@@ -333,14 +387,15 @@ ul.inline {
 .form_icfix.c div, input {
     color: #673AB7;
 }
-.form_icfix.c input, select.c {
-    border-bottom: 2px solid #673AB7;
-    border-top: none;
-    border-left: none;
-    border-right: none;
+.form_icfix.c > input, select.c {
+    border: none;
     font-size: 110%;
     font-weight: bold;
     background: none;
+}
+
+.form_icfix.c {
+    border-bottom: 2px solid #673AB7;
 }
 
 select.c {
