@@ -1,4 +1,5 @@
 # CHANGE LOG
+
 ## v0.9.0
 ### Bug Fixes & Minor Changes
 - Fixes an issue where elements in the dashbar were overflowing on smaller screen sizes (issue #10)
@@ -9,6 +10,8 @@
 
 <br />
 
+## v0.8.3
+ This release fixes an issue with the order by clause in select queries.
 
 ## v0.8.2
 This release fixes an issue with the typelist template filter.

@@ -54,6 +54,6 @@ class SelectQuery extends Query {
     }
 
     public function filterOrderBy() {
-        $this->order = (isset($this->orderByColumn, $this->orderByDirection)) ? "ORDER BY `{$this->orderByColumn}` {$this->orderByDirection}" : "";
+        $this->tpl->order = (isset($this->orderByColumn, $this->orderByDirection)) ? "ORDER BY `{$this->orderByColumn}` {$this->orderByDirection}" : "";
     }
 }

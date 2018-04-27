@@ -25,3 +25,4 @@
 /DEBIAN/
 *.deb
 /config/deploy.key
+/themes/recharge
