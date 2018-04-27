@@ -1,5 +1,13 @@
 # CHANGE LOG
-
+## v0.8.3
+ - This release fixes an issue with the order by clause in select queries.
+ 
+## v0.8.2
+ - This release fixes an issue with the typelist template filter.
+ 
+## v0.8.1 
+ - This release fixes an issue where page specific css was not being saved properly.
+ 
 ## v0.8.0
 ### New Features
  - **Page CSS**: the ability to add custom css to specific pages has been added, and the editor has been completely redone to accommodate this. Page styles are reloaded on keyup, so that you can view your changes in real-time.
