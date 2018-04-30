@@ -38,6 +38,7 @@ function readfileCached($file) {
     
     header("cache-control: public, max-age=86400");
     header("etag: $etag");
+    header("content-length: ".filesize($file));
     header_remove("pragma");
     header_remove("expires");
     
