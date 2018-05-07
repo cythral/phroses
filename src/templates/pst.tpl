@@ -1,7 +1,7 @@
 <div class="phroses-container">
   <div id="pst" class="<{var::pst_type}>">
       <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn" data-scroll="off"><i class="ci ci-delete"></i></a>
-      <a href="#" id="pst-metadata-trg" class="pst_btn multiViewTrigger" data-view="metadata"><i class="ci ci-urlmove"></i></a>
+      <a href="#" id="pst-metadata-trg" class="pst_btn multiViewTrigger" data-view="metadata"><i class="ci ci-code"></i></a>
       <a href="#" id="pst-edit-trg" class="pst_btn multiViewTrigger" data-view="edit"><i class="ci ci-edit"></i></a>
       <a href="#" id="pst-save" class="pst_btn" data-target="pst-edit" data-action="submit"><i class="ci ci-save"></i></a>
       <a href="#" id="pst-new" class="pst_btn" data-target="pst-ns" data-action="fadeIn" data-scroll="off"><i class="ci ci-new"></i></a>
