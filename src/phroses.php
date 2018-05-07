@@ -133,6 +133,7 @@ abstract class Phroses {
 	 */
 	static public function cli(): void {
 		array_shift($_SERVER["argv"]); // remove file/command name
+		if(!isset($_SERVER["argv"][0])) throw new ExitException(1, "No Command Specified\n");
 
 		$commandController = new CommandController;
 		Events::attach("commandsmapped", [ include SRC."/commands.php" ], [$commandController, "addCommands"]);
