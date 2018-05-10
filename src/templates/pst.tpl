@@ -1,8 +1,8 @@
 <div class="phroses-container">
   <div id="pst" class="<{var::pst_type}>">
-      <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn" data-scroll="off"><i class="ci ci-delete"></i></a>
-      <a href="#" id="pst-metadata-trg" class="pst_btn multiViewTrigger" data-view="metadata"><i class="ci ci-code"></i></a>
-      <a href="#" id="pst-edit-trg" class="pst_btn multiViewTrigger" data-view="edit"><i class="ci ci-edit"></i></a>
+      <a href="#" id="pst-delete" class="pst_btn" data-target="pst-ds" data-action="fadeIn" data-scroll="off" data-shortcut="d" data-shortcut-action="click"><i class="ci ci-delete"></i></a>
+      <a href="#" id="pst-metadata-trg" class="pst_btn multiViewTrigger" data-view="metadata" data-shortcut="m" data-shortcut-action="click"><i class="ci ci-code"></i></a>
+      <a href="#" id="pst-edit-trg" class="pst_btn multiViewTrigger" data-view="edit" data-shortcut="e" data-shortcut-action="click"><i class="ci ci-edit"></i></a>
       <a href="#" id="pst-save" class="pst_btn" data-target="pst-edit" data-action="submit"><i class="ci ci-save"></i></a>
       <a href="#" id="pst-new" class="pst_btn" data-target="pst-ns" data-action="fadeIn" data-scroll="off"><i class="ci ci-new"></i></a>
   </div>
@@ -16,19 +16,6 @@
     <p>You're about to permanently delete this page.  It cannot be recovered.</p>
     <a id="pst-ds-y" href="#" class="pst_btn txt screen-enter" data-target="pst-ds" data-action="submit" data-scroll="on">Yes</a>
     <a id="pst-ds-n" href="#" class="pst_btn txt screen-escape" data-target="pst-ds" data-action="fadeOut" data-scroll="on">No</a>
-  </form>
-
-  <form id="pst-ms" class="container screen" data-method="PATCH", data-url="" tabindex="0">
-    <h1>Move Page</h1>
-    <p>You may change the URI of the page with this form.</p>
-      <div class="container">
-        <div class="form_icfix c aln-l">
-          <div>URI:</div>
-          <input id="puri" name="uri" class="form_input form_field" placeholder="Page URI" value="<{var::uri}>" autocomplete="off">     
-        </div>
-      </div>
-      <a id="pst-ms-s" href="#" class="pst_btn txt screen-enter" data-target="pst-ms" data-action="submit" data-scroll="on">Submit</a>
-      <a id="pst-ms-c" href="#" class="pst_btn txt screen-escape" data-target="pst-ms" data-action="fadeOut" data-scroll="on">Cancel</a>
   </form>
 
   <form id="pst-ns" class="container screen" data-method="POST" data-url="" tabindex="0">

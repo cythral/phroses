@@ -1,10 +1,12 @@
 var 
     $ = require("jquery"),
     utils = require("./utils"),
+    keys = require("../keys"),
     editors = {}; 
 
 var editor = function() {
     this.aceify();
+    this.setupShortcuts();
     this.setupTrigger();
     this.setupTabbing();
     this.setupSaving();
@@ -19,6 +21,21 @@ function correctCheckboxValue() {
 function storeInitialValues(selector) {
     $(selector).find("input,select").each(function() {
         $(this).data("initial-value", $(this).val());
+    });
+}
+
+editor.prototype.setupShortcuts = function() {
+    $("[data-shortcut]").each(function() {
+       var key = $(this).data("shortcut"),
+           action = $(this).data("shortcut-action"),
+           $this = $(this);
+       
+       $(window).on("keydown", function(e) {
+            if(e.which === Number(keys[key]) && e.altKey) {
+                e.preventDefault();
+                $this[action]();
+            }
+       })
     });
 }
 
