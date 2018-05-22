@@ -237,8 +237,8 @@ abstract class Phroses {
 	 * @param bool $mode whether to turn maintainenance mode off or on (use self::MM_ON or self::MM_OFF)
 	 */
 	static public function setMaintenance(bool $mode = self::MM_ON) {
-		if($mode == self::MM_ON) copy(INCLUDES["TPL"]."/maintenance.tpl", ROOT."/.maintenance");
-		if($mode == self::MM_OFF) unlink(ROOT."/.maintenance");
+		if($mode == self::MM_ON) copy(INCLUDES["TPL"]."/maintenance.tpl", DATA_ROOT."/.maintenance");
+		if($mode == self::MM_OFF) unlink(DATA_ROOT."/.maintenance");
 	}
 }
 

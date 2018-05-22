@@ -59,7 +59,7 @@ $commands[] = new class extends Command {
 
 		echo PHP_EOL;
 		$table->display();
-		println(PHP_EOL."Global maintenance mode is ".((file_exists(ROOT."/.maintenance")) ? "on" : "off").PHP_EOL);
+		println(PHP_EOL."Global maintenance mode is ".((file_exists(DATA_ROOT."/.maintenance")) ? "on" : "off").PHP_EOL);
 	}
 };
 
