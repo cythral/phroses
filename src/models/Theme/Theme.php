@@ -346,6 +346,7 @@ Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertyp
 		->addColumns(["*"])
 		->addWhere("siteID", "=", ":id")
 		->addWhere("`type`", "=", ":type")
+		->addWhere("`public`", "=", 1)
 		->orderBy($orderby, $ordertype)
 		->execute([ ":id" => Phroses::$site->id, ":type" => $type ])
 		->fetchAll(PDO::FETCH_OBJ);
