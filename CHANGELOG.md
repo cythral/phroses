@@ -1,8 +1,15 @@
 # CHANGE LOG
 
 ## v0.9.0
+### New Features
+- **Metadata Screen**: You can now control page title, type, visibility, and URI from the new metadata screen.
+- **IP Subnet Restiction**: you can now restrict admin access to subnets using cidr notation in the admin dashboard.  
+- **Screen Shortcuts**: quickly access screens using shortcuts.  Alt-m for metadata, Alt-e for editing, and Alt-d for deletion
+
+
 ### Bug Fixes & Minor Changes
 - Fixes an issue where elements in the dashbar were overflowing on smaller screen sizes (issue #10)
+- Fixes an issue where global maintenance mode would not go into effect.  Global maintenance mode can now be bypassed if you are logged in.  If you wish to turn off phroses completely, simply disable the conf and restart apache, or stop apache altogether.
 
 <br />
 

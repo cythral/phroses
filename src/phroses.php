@@ -112,10 +112,10 @@ abstract class Phroses {
 		if(!self::$configFileLoaded) return;
 		Events::trigger("sessionstarted", [ Session::start() ]);
 
-		if(self::isMaintenanceModeOn() && !isset($_SESSION)) {
+		if(self::isMaintenanceModeOn() && !$_SESSION) {
 			throw new ExitException(2, file_get_contents(DATA_ROOT."/.maintenance"));
 		}
-		
+
 		Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
 		if((bool) (inix::get("notrailingslashes") ?? true)) self::removeTrailingSlash();
 
