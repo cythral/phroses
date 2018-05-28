@@ -33,6 +33,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["PAGE"][200];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		if(safeArrayValEquals($_GET, "mode", "json")) {
 			$out = new JsonServer();
 			$out->send($page->getData(), 200);
@@ -59,6 +61,7 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["PAGE"][301];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
 
 		if(array_key_exists("destination", $page->content) && !empty($page->content["destination"]) && $page->content["destination"] != PATH) {
 			$out->redirect($page->content["destination"]);
@@ -87,6 +90,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["SYS"][200];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		$path = substr(PATH, strlen($site->adminURI));
 
 		if(!is_dir($file = INCLUDES["VIEWS"].$path) && file_exists($file) && strtolower(EXTENSION) != "php") {
@@ -152,7 +157,9 @@ $routes[] = new class extends Route {
 	public $method = "get";
 	public $response = RouteController::RESPONSES["PAGE"][404];
 	
-	public function follow(&$page, &$site, &$out) {		
+	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		$out->setCode(404);
 		$out->setContentType(MIME_TYPES["HTML"]);
 	
@@ -182,7 +189,9 @@ $routes[] = new class extends Route {
 $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["ASSET"];
 	
-	public function follow(&$page, &$site, &$out) { 
+	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		$page->theme->readAsset(PATH); 
 	}
 	
@@ -206,6 +215,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["API"];
 
 	public function follow(&$page, &$site, &$out) { 
+		parent::follow($page, $site, $out);
+
 		$page->theme->runApi(); 
 	}
 	public function rules($cascade, $page, $site) {
@@ -227,6 +238,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		$out = new JsonServer();
 
 		// Validation
@@ -259,6 +272,7 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
 		$out = new JsonServer();
 
 		// Validation
@@ -305,6 +319,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["DEFAULT"];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		$out = new JsonServer();
 		$out->restrict();
 		$out->requireExistingPage();
@@ -322,6 +338,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["UPLOAD"];
 	
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		(new Upload($site, substr(PATH, 8)))->display();
 	}
 
@@ -347,6 +365,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["UPLOAD"];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		$out = new JsonServer;
 		$out->restrict();
 
@@ -372,6 +392,8 @@ $routes[] = new class extends Route {
 	private $out;
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		$out = new JsonServer;
 		$out->restrict();
 		$out->error("missing_value", !isset($_REQUEST["to"]), 400, [ "value" => "to" ]);
@@ -396,6 +418,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["UPLOAD"];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+
 		$out = new JsonServer;
 		$out->restrict();
 		$out->error("missing_value", !isset($_FILES["file"]), 400, [ "value" => "file" ]);
@@ -418,6 +442,8 @@ $routes[] = new class extends Route {
 	public $response = RouteController::RESPONSES["MAINTENANCE"];
 
 	public function follow(&$page, &$site, &$out) {
+		parent::follow($page, $site, $out);
+		
 		$out->setCode(503);
 		die(new Template(INCLUDES["TPL"]."/maintenance.tpl"));
 	}
