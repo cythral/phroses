@@ -26,13 +26,18 @@ function storeInitialValues(selector) {
 
 editor.prototype.setupShortcuts = function() {
     $("[data-shortcut]").each(function() {
-       var key = $(this).data("shortcut"),
+
+        var key = $(this).data("shortcut"),
            action = $(this).data("shortcut-action"),
            $this = $(this);
        
        $(window).on("keydown", function(e) {
             if(e.which === Number(keys[key]) && e.altKey) {
                 e.preventDefault();
+                if($("body").hasClass("multiView")) {
+                    $("body").removeClass("multiView");
+                }
+                
                 $this[action]();
             }
        })
