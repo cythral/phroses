@@ -8,6 +8,7 @@ class ExitException extends Exception {
     const HTTP_RESPONSE_CODES = [
         0 => 200,
         1 => 500,
+        2 => 503,
         127 => 404 // 127 = command not found
     ];
 

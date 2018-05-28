@@ -110,6 +110,9 @@ abstract class Phroses {
 	 */
 	static public function http(): void {
 		if(!self::$configFileLoaded) return;
+		if(self::isMaintenanceModeOn() && !$_SESSION) {
+			throw new ExitException(2, file_get_contents(DATA_ROOT."/.maintenance"));
+		}
 
 		Events::trigger("sessionstarted", [ Session::start() ]);
 		Events::attach("siteinfoloaded", [ (bool)(inix::get("expose") ?? true) ], "\Phroses\Phroses::loadSiteInfo");
@@ -239,6 +242,10 @@ abstract class Phroses {
 	static public function setMaintenance(bool $mode = self::MM_ON) {
 		if($mode == self::MM_ON) copy(INCLUDES["TPL"]."/maintenance.tpl", DATA_ROOT."/.maintenance");
 		if($mode == self::MM_OFF) unlink(DATA_ROOT."/.maintenance");
+	}
+
+	static public function isMaintenanceModeOn(): bool {
+		return file_exists(DATA_ROOT."/.maintenance");
 	}
 }
 
