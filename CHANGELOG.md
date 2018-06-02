@@ -1,7 +1,8 @@
 # CHANGE LOG
 
 ## v0.9.1
-- This release adds a theme.process event
+- Adds a theme.process event hook
+- Adds a page theme filter
 
 ## v0.9.0
 ### New Features

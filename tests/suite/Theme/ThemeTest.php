@@ -2,6 +2,7 @@
 
 namespace Phroses\Testing\Theme;
 
+use \listen\Events;
 use \Phroses\Testing\TestCase;
 use \Phroses\Theme\Theme;
 use \Phroses\Theme\Loaders\FolderLoader;
@@ -178,6 +179,24 @@ class ThemeTest extends TestCase {
         foreach($assets as $asset => $exists) {
             $this->assertEquals($exists, $theme->hasAsset($asset));
         }
+    }
+    
+    /**
+     * @covers \Phroses\Theme::process
+     */
+    public function testProcessEvent() {
+        $count = 0;
+
+        Events::listen("theme.process", function($theme) use (&$count) {
+            $count++;
+        });
+
+        ob_start();
+        $theme = new Theme("bloom", "page");
+        echo $theme;
+        ob_end_clean();
+
+        $this->assertEquals(1, $count);
     }
 
     public function loaderProvider() {

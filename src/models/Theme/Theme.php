@@ -368,3 +368,7 @@ Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertyp
 Theme::$filters["site"] = function($var) {
     echo Phroses::$site->{$var} ?? "";
 };
+
+Theme::addFilter("page", function($var) {
+	echo Phroses::$page->{$var} ?? "";
+});
