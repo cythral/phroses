@@ -14,6 +14,7 @@ use \DOMDocument;
 use \Exception;
 use \reqc; 
 use \inix\Config as inix;
+use \listen\Events;
 use \phyrex\Template as Template;
 use \Phroses\Phroses;
 use \Phroses\Database\Database;
@@ -279,7 +280,8 @@ final class Theme extends Template {
 	 * @param bool $loadSessionTools whether or not to load the session tools
 	 */
 	protected function process(bool $loadSessionTools = true) {
-        if($loadSessionTools) $this->loadSessionTools();
+		if($loadSessionTools) $this->loadSessionTools();
+		Events::trigger("theme.process", [ $this ]);
         parent::process();
 	}
 	
@@ -366,3 +368,7 @@ Theme::$filters["typelist"] = function($type, $field, $orderby = "id", $ordertyp
 Theme::$filters["site"] = function($var) {
     echo Phroses::$site->{$var} ?? "";
 };
+
+Theme::addFilter("page", function($var) {
+	echo Phroses::$page->{$var} ?? "";
+});

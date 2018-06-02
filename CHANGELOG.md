@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## v0.9.1
+- Adds a theme.process event hook
+- Adds a page theme filter
+
 ## v0.9.0
 ### New Features
 - **Metadata Screen**: You can now control page title, type, visibility, and URI from the new metadata screen.
