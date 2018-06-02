@@ -279,7 +279,8 @@ final class Theme extends Template {
 	 * @param bool $loadSessionTools whether or not to load the session tools
 	 */
 	protected function process(bool $loadSessionTools = true) {
-        if($loadSessionTools) $this->loadSessionTools();
+		if($loadSessionTools) $this->loadSessionTools();
+		Events::trigger("theme.process", [ $this ]);
         parent::process();
 	}
 	
