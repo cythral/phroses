@@ -14,6 +14,7 @@ use \DOMDocument;
 use \Exception;
 use \reqc; 
 use \inix\Config as inix;
+use \listen\Events;
 use \phyrex\Template as Template;
 use \Phroses\Phroses;
 use \Phroses\Database\Database;

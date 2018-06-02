@@ -1,5 +1,8 @@
 # CHANGE LOG
 
+## v0.9.1
+- This release adds a theme.process event
+
 ## v0.9.0
 ### New Features
 - **Metadata Screen**: You can now control page title, type, visibility, and URI from the new metadata screen.
