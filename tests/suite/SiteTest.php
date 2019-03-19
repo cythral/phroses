@@ -15,7 +15,7 @@ class SiteTest extends TestCase {
     /**
      * Setup fixture, inserts dataset into the database
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->db = $this->getDatabase();
         $dataset = file_get_contents(\Phroses\INCLUDES["TESTS"]."/datasets/sites.json");
         $dataset = str_replace("{password}", inix::get("test-password.hash"), $dataset);
@@ -28,7 +28,7 @@ class SiteTest extends TestCase {
     /**
      * Teardown fixture, closes database connection
      */
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->db);
     }
 

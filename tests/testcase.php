@@ -6,7 +6,7 @@ class TestCase extends \PHPUnit\Framework\TestCase {
     protected $db;
 
     public function assertArrayEquals($expected, $actual) {
-        $this->assertEquals($expected, $actual, "\$canonicalize = true", $delta = 0.0, $maxDepth = 10, $canonicalize = true);
+        $this->assertEqualsCanonicalizing($expected, $actual, "", $delta = 0.0, $maxDepth = 10);
     }
 
     public function assertArrayType(array $array, $type) {

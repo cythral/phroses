@@ -6,7 +6,7 @@ use \Phroses\JsonServer;
 use \Phroses\Exceptions\ExitException;
 
 class JsonServerTest extends TestCase {
-    public function setUp() {
+    public function setUp(): void {
         $this->setOutputCallback(function() {});
     }
     
@@ -40,13 +40,17 @@ class JsonServerTest extends TestCase {
         try {
             (new JsonServer)->success(200, ["a" => true]);
         } catch(ExitException $e) {}
-        $this->assertArraySubset(["a" => true], json_decode($this->getActualOutput(), true));
+        
+        $result = json_decode($this->getActualOutput(), true);
+        $this->assertEquals(true, $result["a"] ?? false);
     }
     
     public function testErrorExtra() {
         try {
             (new JsonServer)->error("test", true, 400, ["a" => true]);
         } catch(ExitException $e) {}
-        $this->assertArraySubset(["a" => true], json_decode($this->getActualOutput(), true));
+
+        $result = json_decode($this->getActualOutput(), true);
+        $this->assertEquals(true, $result["a"] ?? false);
     }
 }

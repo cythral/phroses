@@ -13,7 +13,7 @@ class UploadTest extends TestCase {
     /**
      * setUp fixture, creates upload directories and files for testing
      */
-    public function setUp() {
+    public function setUp(): void {
         shell_exec("rm -rf ".ROOT."/uploads");
         clearstatcache();
 
@@ -38,7 +38,7 @@ class UploadTest extends TestCase {
     /**
      * tearDown fixture, remove all upload directories and files used in testing
      */
-    public function tearDown() {
+    public function tearDown(): void {
         shell_exec("rm -rf ".ROOT."/uploads");
         clearstatcache();
         if(file_exists(ROOT."/temp")) unlink(ROOT."/temp");

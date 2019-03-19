@@ -74,7 +74,7 @@ class FolderLoaderTest extends TestCase {
      */
     public function testGetTypes(FolderLoader $loader, array $types) {
         $types = array_keys(array_filter($types, function($value, $key) { return $value; }, ARRAY_FILTER_USE_BOTH));
-        $this->assertEquals($types, $loader->getTypes(), "\$canonicalize = true", $delta = 0.0, $maxDepth = 10, $canonicalize = true);
+        $this->assertEqualsCanonicalizing($types, $loader->getTypes(), "", $delta = 0.0, $maxDepth = 10);
     }
 
     /**
@@ -92,7 +92,7 @@ class FolderLoaderTest extends TestCase {
      */
     public function testGetAssets(FolderLoader $loader, array $assets) {
         $assets = array_keys(array_filter($assets, function($value, $key) { return $value; }, ARRAY_FILTER_USE_BOTH));
-        $this->assertEquals($assets, $loader->getAssets(), "\$canonicalize = true", $delta = 0.0, $maxDepth = 10, $canonicalize = true);
+        $this->assertEqualsCanonicalizing($assets, $loader->getAssets(), "", $delta = 0.0, $maxDepth = 10);
     }
 
     /**
