@@ -15,7 +15,7 @@ fi
 composer run build -- $version
 scp phroses-${version}.deb travis@deb.cythral.com:phroses-${version}.deb
 
-ssh travis@deb.cythral.com <<PHRS
+ssh -4 travis@deb.cythral.com <<PHRS
     aptly repo add ${repo} phroses-${version}.deb
     aptly publish update stretch
     rm phroses-${version}.deb
